@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \":*)",
+      "Bash(node -e \"const fs=require\\(''fs''\\);const p=''C:/Users/Finlec A/.claude/projects/C--Users-Finlec-A-Desktop-Alpha-Treckers/a2c9107d-cf70-44cf-a6f4-0b77245ccc6e/tool-results/toolu_01DhRgECxvo34YJmdWNmXKz3.json'';const d=JSON.parse\\(fs.readFileSync\\(p,''utf8''\\)\\);const t=d[0].text;const lines=t.split\\(''\\\\n''\\);console.log\\(''Total lines:'',lines.length\\);console.log\\(''---PART1---''\\);console.log\\(lines.slice\\(0,200\\).join\\(''\\\\n''\\)\\);\")",
+      "Bash(node -e \"const fs=require\\(''fs''\\);const p=''C:/Users/Finlec A/.claude/projects/C--Users-Finlec-A-Desktop-Alpha-Treckers/a2c9107d-cf70-44cf-a6f4-0b77245ccc6e/tool-results/toolu_01DhRgECxvo34YJmdWNmXKz3.json'';const d=JSON.parse\\(fs.readFileSync\\(p,''utf8''\\)\\);const t=d[0].text;const lines=t.split\\(''\\\\n''\\);console.log\\(lines.slice\\(200,450\\).join\\(''\\\\n''\\)\\);\")",
+      "Bash(node -e \"const fs=require\\(''fs''\\);const p=''C:/Users/Finlec A/.claude/projects/C--Users-Finlec-A-Desktop-Alpha-Treckers/a2c9107d-cf70-44cf-a6f4-0b77245ccc6e/tool-results/toolu_01DhRgECxvo34YJmdWNmXKz3.json'';const d=JSON.parse\\(fs.readFileSync\\(p,''utf8''\\)\\);const t=d[0].text;const lines=t.split\\(''\\\\n''\\);console.log\\(lines.slice\\(450,700\\).join\\(''\\\\n''\\)\\);\")",
+      "Bash(node -e \"const fs=require\\(''fs''\\);const p=''C:/Users/Finlec A/.claude/projects/C--Users-Finlec-A-Desktop-Alpha-Treckers/a2c9107d-cf70-44cf-a6f4-0b77245ccc6e/tool-results/toolu_01DhRgECxvo34YJmdWNmXKz3.json'';const d=JSON.parse\\(fs.readFileSync\\(p,''utf8''\\)\\);const t=d[0].text;const lines=t.split\\(''\\\\n''\\);console.log\\(lines.slice\\(700,1002\\).join\\(''\\\\n''\\)\\);\")",
+      "Bash(npm --version)",
+      "Bash(git --version)",
+      "Bash(find '/c/Users/Finlec A/Desktop/Alpha Treckers' -name *.prisma -o -name schema.prisma -o -name seed.ts)",
+      "Bash(npm install:*)"
+    ]
+  }
+}

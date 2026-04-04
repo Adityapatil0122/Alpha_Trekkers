@@ -1,0 +1,245 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  GUIDE
+}
+
+enum Difficulty {
+  EASY
+  MODERATE
+  DIFFICULT
+  EXTREME
+}
+
+enum TripCategory {
+  WEEKEND
+  WEEKDAY
+  NIGHT_TREK
+  MONSOON
+  WINTER_SPECIAL
+  CAMPING
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum ScheduleStatus {
+  OPEN
+  FULL
+  CANCELLED
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  password      String
+  firstName     String
+  lastName      String
+  phone         String?
+  avatarUrl     String?
+  role          UserRole  @default(USER)
+  emailVerified Boolean   @default(false)
+  refreshToken  String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  bookings Booking[]
+  reviews  Review[]
+
+  @@map("users")
+}
+
+model Trip {
+  id               String       @id @default(uuid())
+  title            String
+  slug             String       @unique
+  description      String
+  shortDescription String
+  difficulty       Difficulty
+  category         TripCategory
+  durationHours    Int
+  distanceKm       Float
+  elevationM       Int
+  maxAltitudeM     Int
+  region           String
+  fortName         String?
+  startLocation    String
+  endLocation      String
+  meetingPoint     String
+  meetingTime      String
+  basePrice        Float
+  discountPrice    Float?
+  maxGroupSize     Int
+  minAge           Int          @default(12)
+  isActive         Boolean      @default(true)
+  isFeatured       Boolean      @default(false)
+  avgRating        Float        @default(0)
+  totalReviews     Int          @default(0)
+  totalBookings    Int          @default(0)
+  latitude         Float?
+  longitude        Float?
+  highlights       String[]
+  inclusions       String[]
+  exclusions       String[]
+  thingsToCarry    String[]
+  itinerary        Json
+  routeMapUrl      String?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  images    TripImage[]
+  schedules TripSchedule[]
+  bookings  Booking[]
+  reviews   Review[]
+
+  @@map("trips")
+}
+
+model TripImage {
+  id        String  @id @default(uuid())
+  tripId    String
+  url       String
+  altText   String?
+  isPrimary Boolean @default(false)
+  sortOrder Int     @default(0)
+
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@map("trip_images")
+}
+
+model TripSchedule {
+  id             String         @id @default(uuid())
+  tripId         String
+  date           DateTime
+  availableSpots Int
+  priceOverride  Float?
+  status         ScheduleStatus @default(OPEN)
+  createdAt      DateTime       @default(now())
+
+  trip     Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  bookings Booking[]
+
+  @@map("trip_schedules")
+}
+
+model Booking {
+  id              String        @id @default(uuid())
+  userId          String
+  tripId          String
+  scheduleId      String
+  numberOfPeople  Int
+  totalAmount     Float
+  discountAmount  Float?
+  status          BookingStatus @default(PENDING)
+  specialRequests String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  user         User                 @relation(fields: [userId], references: [id])
+  trip         Trip                 @relation(fields: [tripId], references: [id])
+  schedule     TripSchedule         @relation(fields: [scheduleId], references: [id])
+  payment      Payment?
+  participants BookingParticipant[]
+
+  @@map("bookings")
+}
+
+model BookingParticipant {
+  id             String  @id @default(uuid())
+  bookingId      String
+  fullName       String
+  age            Int
+  phone          String
+  emergencyName  String?
+  emergencyPhone String?
+  medicalNotes   String?
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@map("booking_participants")
+}
+
+model Payment {
+  id                 String        @id @default(uuid())
+  bookingId          String        @unique
+  razorpayOrderId    String        @unique
+  razorpayPaymentId  String?
+  razorpaySignature  String?
+  amount             Float
+  currency           String        @default("INR")
+  status             PaymentStatus @default(PENDING)
+  paidAt             DateTime?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  booking Booking @relation(fields: [bookingId], references: [id])
+
+  @@map("payments")
+}
+
+model Review {
+  id         String   @id @default(uuid())
+  userId     String
+  tripId     String
+  rating     Int
+  title      String?
+  comment    String
+  isApproved Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tripId])
+  @@map("reviews")
+}
+
+model HeroImage {
+  id        String   @id @default(uuid())
+  url       String
+  title     String?
+  subtitle  String?
+  ctaText   String?
+  ctaLink   String?
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@map("hero_images")
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("contact_messages")
+}
