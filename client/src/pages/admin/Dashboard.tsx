@@ -39,20 +39,20 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="font-heading text-3xl font-bold text-stone-900">Dashboard</h2>
-        <p className="mt-2 text-sm text-stone-500">
+        <h2 className="font-heading text-4xl font-bold text-ink-900">Dashboard</h2>
+        <p className="mt-2 text-sm text-ink-700/68">
           Snapshot of platform activity and admin workload.
         </p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {statCards.map(({ key, label, Icon }) => (
-          <div key={key} className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+          <div key={key} className="travel-panel rounded-[1.8rem] p-5">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-stone-500">{label}</p>
-              <Icon className="h-5 w-5 text-forest-600" />
+              <p className="text-sm font-medium text-ink-700/68">{label}</p>
+              <Icon className="h-5 w-5 text-forest-500" />
             </div>
-            <p className="mt-4 font-heading text-3xl font-bold text-stone-900">
+            <p className="mt-4 font-heading text-3xl font-bold text-ink-900">
               {key === 'totalRevenue'
                 ? `INR ${Math.round(stats[key]).toLocaleString('en-IN')}`
                 : stats[key].toLocaleString('en-IN')}
@@ -61,7 +61,7 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
+      <div className="rounded-[1.8rem] border border-gold-500/20 bg-gold-500/10 p-5 text-sm text-gold-600">
         Unread contact messages: {stats.unreadMessages.toLocaleString('en-IN')}
       </div>
     </div>

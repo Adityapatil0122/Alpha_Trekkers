@@ -9,7 +9,12 @@
       "Bash(npm --version)",
       "Bash(git --version)",
       "Bash(find '/c/Users/Finlec A/Desktop/Alpha Treckers' -name *.prisma -o -name schema.prisma -o -name seed.ts)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "WebFetch(domain:themesflat.co)",
+      "Bash(npx tsc:*)",
+      "Bash(npx vite:*)",
+      "Bash(npx concurrently:*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173)"
     ]
   }
 }

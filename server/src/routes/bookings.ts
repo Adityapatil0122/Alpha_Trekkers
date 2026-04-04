@@ -11,6 +11,12 @@ import crypto from 'crypto';
 
 const router = Router();
 
+function firstString(value: unknown): string | undefined {
+  if (typeof value === 'string') return value;
+  if (Array.isArray(value) && typeof value[0] === 'string') return value[0];
+  return undefined;
+}
+
 // GET /api/bookings - User's bookings
 router.get(
   '/',
@@ -19,7 +25,7 @@ router.get(
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
-      const status = req.query.status as string;
+      const status = firstString(req.query.status);
 
       const where: any = { userId: req.user!.id };
       if (status) {
@@ -74,8 +80,11 @@ router.get(
   auth,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const id = firstString(req.params.id);
+      if (!id) throw new AppError(400, 'Invalid booking ID');
+
       const booking = await prisma.booking.findUnique({
-        where: { id: req.params.id },
+        where: { id },
         include: {
           trip: {
             select: {
@@ -241,7 +250,8 @@ router.post(
   auth,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id } = req.params;
+      const id = firstString(req.params.id);
+      if (!id) throw new AppError(400, 'Invalid booking ID');
 
       const booking = await prisma.booking.findUnique({
         where: { id },
@@ -318,7 +328,8 @@ router.post(
   auth,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id } = req.params;
+      const id = firstString(req.params.id);
+      if (!id) throw new AppError(400, 'Invalid booking ID');
 
       const booking = await prisma.booking.findUnique({ where: { id } });
 
@@ -399,7 +410,8 @@ router.post(
   validate(verifyPaymentSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id } = req.params;
+      const id = firstString(req.params.id);
+      if (!id) throw new AppError(400, 'Invalid booking ID');
       const { razorpayOrderId, razorpayPaymentId, razorpaySignature } = req.body;
 
       const booking = await prisma.booking.findUnique({

@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { MAHARASHTRA_MONSOON_IMAGES } from '@alpha-trekkers/shared';
 
 const prisma = new PrismaClient();
 
@@ -134,10 +135,10 @@ This trek is ideal for intermediate trekkers who want to experience both the phy
         { time: '05:00 PM', title: 'Arrive at Pune', description: 'Reach Swargate Bus Stand. Trek concludes with fond memories and new friendships.' },
       ],
       images: [
-        { url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800', altText: 'Rajgad Fort panoramic view from Balle Killa', isPrimary: true, sortOrder: 0 },
-        { url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800', altText: 'Rajgad Fort trail through mountain forest', isPrimary: false, sortOrder: 1 },
-        { url: 'https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?w=800', altText: 'Sunrise view from Rajgad Fort', isPrimary: false, sortOrder: 2 },
-        { url: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?w=800', altText: 'Rajgad Fort ancient walls and bastions', isPrimary: false, sortOrder: 3 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.rajgad[0], altText: 'Rajgad Fort in the Maharashtra monsoon', isPrimary: true, sortOrder: 0 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.rajgad[1], altText: 'Rainy ridge sections at Rajgad Fort', isPrimary: false, sortOrder: 1 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.rajgad[2], altText: 'Rajgad after the monsoon rains', isPrimary: false, sortOrder: 2 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.rajgad[3], altText: 'Cloud-wrapped monsoon view from Rajgad', isPrimary: false, sortOrder: 3 },
       ],
       schedules: [0, 1, 2, 3].map((i) => ({
         date: weekends[i],
@@ -222,9 +223,9 @@ Torna is a moderately challenging trek suitable for those who have completed at 
         { time: '04:30 PM', title: 'Arrive at Pune', description: 'Reach Swargate. Trek concludes.' },
       ],
       images: [
-        { url: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800', altText: 'Torna Fort summit view with dramatic clouds', isPrimary: true, sortOrder: 0 },
-        { url: 'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=800', altText: 'Torna Fort trekking trail through forest', isPrimary: false, sortOrder: 1 },
-        { url: 'https://images.unsplash.com/photo-1501555088652-021faa106b9b?w=800', altText: 'Trekkers on Torna Fort ridge', isPrimary: false, sortOrder: 2 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.torna[0], altText: 'Torna Fort in monsoon clouds', isPrimary: true, sortOrder: 0 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.torna[1], altText: 'Climbing trail on Torna during the rains', isPrimary: false, sortOrder: 1 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.torna[2], altText: 'Torna bastion in wet-season light', isPrimary: false, sortOrder: 2 },
       ],
       schedules: [0, 1, 2, 3].map((i) => ({
         date: weekends[i],
@@ -318,10 +319,10 @@ Multiple approach routes exist, with the Pachnai route being the most popular an
         { time: '02:00 PM', title: 'Arrive at Pune', description: 'Reach Shivajinagar. Trek concludes.' },
       ],
       images: [
-        { url: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?w=800', altText: 'Konkan Kada cliff face at Harishchandragad', isPrimary: true, sortOrder: 0 },
-        { url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800', altText: 'Harishchandragad trail through dense forest', isPrimary: false, sortOrder: 1 },
-        { url: 'https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?w=800', altText: 'Sunrise from Konkan Kada viewpoint', isPrimary: false, sortOrder: 2 },
-        { url: 'https://images.unsplash.com/photo-1501554728187-ce583db33af7?w=800', altText: 'Camping at Harishchandragad fort', isPrimary: false, sortOrder: 3 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.harishchandragad[0], altText: 'Pachnai trail to Harishchandragad in monsoon', isPrimary: true, sortOrder: 0 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.harishchandragad[1], altText: 'Trail towards Kokankada in the rains', isPrimary: false, sortOrder: 1 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.harishchandragad[2], altText: 'Harishchandragad cave temple during monsoon season', isPrimary: false, sortOrder: 2 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.harishchandragad[3], altText: 'Surroundings of Harishchandragad under cloudy skies', isPrimary: false, sortOrder: 3 },
       ],
       schedules: [0, 2, 4, 6].map((i) => ({
         date: weekends[i],
@@ -408,9 +409,9 @@ The trek is especially popular during the monsoon season when the entire landsca
         { time: '03:00 PM', title: 'Arrive at Kasara', description: 'Reach Kasara Station. Trek concludes.' },
       ],
       images: [
-        { url: 'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=800', altText: 'Kalsubai Peak summit with temple', isPrimary: true, sortOrder: 0 },
-        { url: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800', altText: 'Iron ladders on Kalsubai trail', isPrimary: false, sortOrder: 1 },
-        { url: 'https://images.unsplash.com/photo-1501554728187-ce583db33af7?w=800', altText: 'View from Kalsubai Peak summit', isPrimary: false, sortOrder: 2 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.kalsubai[0], altText: 'View from Kalsubai peak in the wet season', isPrimary: true, sortOrder: 0 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.kalsubai[1], altText: 'Misty Kalsubai slopes in monsoon weather', isPrimary: false, sortOrder: 1 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.kalsubai[2], altText: 'Steps on the Kalsubai climb during rains', isPrimary: false, sortOrder: 2 },
       ],
       schedules: [0, 1, 2, 3, 4, 5].map((i) => ({
         date: weekends[i],
@@ -493,9 +494,9 @@ Adjacent to Lohagad is Visapur Fort, which can be combined for a longer trek. Th
         { time: '12:00 PM', title: 'Reach Base & Depart', description: 'Return to Lohagadwadi. Optional visit to Bhaja Caves. Board vehicle for Lonavala station.' },
       ],
       images: [
-        { url: 'https://images.unsplash.com/photo-1501554728187-ce583db33af7?w=800', altText: 'Lohagad Fort entrance gate with misty mountains', isPrimary: true, sortOrder: 0 },
-        { url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800', altText: 'Vinchukata ridge at Lohagad Fort', isPrimary: false, sortOrder: 1 },
-        { url: 'https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?w=800', altText: 'Lohagad Fort during monsoon with clouds', isPrimary: false, sortOrder: 2 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.lohagad[0], altText: 'Lohagad hills during the monsoon', isPrimary: true, sortOrder: 0 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.lohagad[1], altText: 'Steps leading to Lohagad Fort in monsoon', isPrimary: false, sortOrder: 1 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.lohagad[2], altText: 'Rainy-season view across Lohagad Fort', isPrimary: false, sortOrder: 2 },
       ],
       schedules: [0, 1, 2, 3, 4, 5, 6, 7].map((i) => ({
         date: weekends[i],
@@ -585,10 +586,10 @@ The Rajmachi fort complex is well-preserved with intact bastions, doorways, and 
         { time: '12:30 PM', title: 'Depart for Karjat', description: 'Board vehicle for Karjat station. Trek concludes with great memories of the night adventure.' },
       ],
       images: [
-        { url: 'https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?w=800', altText: 'Rajmachi Fort at sunrise with golden light', isPrimary: true, sortOrder: 0 },
-        { url: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800', altText: 'Night trek trail with headlamps through forest', isPrimary: false, sortOrder: 1 },
-        { url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800', altText: 'Rajmachi twin forts aerial view', isPrimary: false, sortOrder: 2 },
-        { url: 'https://images.unsplash.com/photo-1501555088652-021faa106b9b?w=800', altText: 'Trekkers at Rajmachi Fort summit', isPrimary: false, sortOrder: 3 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.rajmachi[0], altText: 'Rainy Rajmachi view from the trek route', isPrimary: true, sortOrder: 0 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.rajmachi[1], altText: 'Trekkers climbing toward Rajmachi in monsoon', isPrimary: false, sortOrder: 1 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.rajmachi[2], altText: 'Waterfalls around Rajmachi during rainy season', isPrimary: false, sortOrder: 2 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.rajmachi[3], altText: 'Rajmachi fort landscape in the wet season', isPrimary: false, sortOrder: 3 },
       ],
       schedules: [0, 1, 3, 5].map((i) => ({
         date: weekends[i],
@@ -616,7 +617,7 @@ The Rajmachi fort complex is well-preserved with intact bastions, doorways, and 
   // ========== HERO IMAGES ==========
   const heroImages = [
     {
-      url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920',
+      url: MAHARASHTRA_MONSOON_IMAGES.seedHeroImages[0],
       title: 'Discover Maharashtra\'s Majestic Forts',
       subtitle: 'Expert-led treks through the Sahyadri mountains with safety, comfort, and unforgettable experiences',
       ctaText: 'Explore Treks',
@@ -625,7 +626,7 @@ The Rajmachi fort complex is well-preserved with intact bastions, doorways, and 
       isActive: true,
     },
     {
-      url: 'https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?w=1920',
+      url: MAHARASHTRA_MONSOON_IMAGES.seedHeroImages[1],
       title: 'Trek Under the Stars',
       subtitle: 'Join our thrilling night treks and witness breathtaking Sahyadri sunrises from ancient fort summits',
       ctaText: 'Night Treks',
@@ -634,7 +635,7 @@ The Rajmachi fort complex is well-preserved with intact bastions, doorways, and 
       isActive: true,
     },
     {
-      url: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920',
+      url: MAHARASHTRA_MONSOON_IMAGES.seedHeroImages[2],
       title: 'Your Next Adventure Awaits',
       subtitle: 'From easy beginner trails to challenging summit climbs, find the perfect trek for your skill level',
       ctaText: 'Book Now',

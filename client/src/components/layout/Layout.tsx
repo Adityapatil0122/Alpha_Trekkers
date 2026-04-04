@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import SiteCta from './SiteCta';
 import { useAuthStore } from '@/stores/authStore';
 
 export default function Layout() {
@@ -21,7 +22,7 @@ export default function Layout() {
   }, [location.pathname]);
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="site-shell flex min-h-screen flex-col">
       <Navbar />
       <AnimatePresence mode="wait">
         <motion.main
@@ -35,6 +36,7 @@ export default function Layout() {
           <Outlet />
         </motion.main>
       </AnimatePresence>
+      <SiteCta />
       <Footer />
     </div>
   );

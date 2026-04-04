@@ -9,12 +9,19 @@ import { createReviewSchema } from '../validators/review.js';
 
 const router = Router();
 
+function firstString(value: unknown): string | undefined {
+  if (typeof value === 'string') return value;
+  if (Array.isArray(value) && typeof value[0] === 'string') return value[0];
+  return undefined;
+}
+
 // GET /api/reviews/trip/:tripId - Public reviews for a trip
 router.get(
   '/trip/:tripId',
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { tripId } = req.params;
+      const tripId = firstString(req.params.tripId);
+      if (!tripId) throw new AppError(400, 'Invalid trip ID');
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
       const sortBy = (req.query.sortBy as string) || 'createdAt';
@@ -151,7 +158,8 @@ router.delete(
   auth,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id } = req.params;
+      const id = firstString(req.params.id);
+      if (!id) throw new AppError(400, 'Invalid review ID');
 
       const review = await prisma.review.findUnique({ where: { id } });
       if (!review) {

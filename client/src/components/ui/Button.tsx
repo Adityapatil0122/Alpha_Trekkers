@@ -15,21 +15,21 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<Variant, string> = {
   primary:
-    'bg-forest-500 text-white shadow-lg shadow-forest-500/25 hover:bg-forest-400 hover:shadow-forest-400/30 active:bg-forest-600',
+    'bg-gradient-to-r from-forest-500 to-forest-600 text-white shadow-[0_18px_38px_rgba(34,120,69,0.28)] hover:translate-y-[-1px] hover:from-forest-400 hover:to-forest-500',
   secondary:
-    'border-2 border-forest-500 text-forest-700 hover:bg-forest-500 hover:text-white active:bg-forest-600',
+    'border border-ink-900/12 bg-white text-ink-800 hover:border-forest-500/30 hover:bg-sand-100',
   accent:
-    'bg-amber-500 text-white shadow-lg shadow-amber-500/25 hover:bg-amber-400 hover:shadow-amber-400/30 active:bg-amber-600',
+    'bg-gradient-to-r from-gold-500 to-coral-500 text-ink-950 shadow-[0_18px_38px_rgba(223,157,53,0.28)] hover:translate-y-[-1px] hover:from-gold-400 hover:to-coral-500',
   ghost:
-    'text-forest-700 hover:bg-forest-100 active:bg-forest-200',
+    'bg-transparent text-ink-800 hover:bg-ink-900/5',
   danger:
-    'bg-red-500 text-white shadow-lg shadow-red-500/25 hover:bg-red-400 active:bg-red-600',
+    'bg-coral-500 text-white shadow-[0_18px_38px_rgba(191,79,58,0.22)] hover:bg-coral-600',
 };
 
 const sizeClasses: Record<Size, string> = {
-  sm: 'px-4 py-2 text-sm rounded-lg gap-1.5',
-  md: 'px-6 py-2.5 text-sm rounded-xl gap-2',
-  lg: 'px-8 py-3.5 text-base rounded-xl gap-2.5',
+  sm: 'gap-1.5 rounded-full px-4 py-2 text-sm',
+  md: 'gap-2 rounded-full px-6 py-3 text-sm',
+  lg: 'gap-2.5 rounded-full px-7 py-3.5 text-base',
 };
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -47,34 +47,26 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       ...props
     },
     ref,
-  ) => {
-    return (
-      <button
-        ref={ref}
-        disabled={disabled || isLoading}
-        className={`
-          inline-flex items-center justify-center font-semibold transition-all duration-300
-          disabled:cursor-not-allowed disabled:opacity-50
-          ${variantClasses[variant]}
-          ${sizeClasses[size]}
-          ${fullWidth ? 'w-full' : ''}
-          ${className}
-        `.trim()}
-        {...props}
-      >
-        {isLoading ? (
-          <SpinnerGap className="h-5 w-5 animate-spin" />
-        ) : (
-          <>
-            {leftIcon && <span className="shrink-0">{leftIcon}</span>}
-            {children}
-            {rightIcon && <span className="shrink-0">{rightIcon}</span>}
-          </>
-        )}
-      </button>
-    );
-  },
+  ) => (
+    <button
+      ref={ref}
+      disabled={disabled || isLoading}
+      className={`inline-flex items-center justify-center font-medium transition duration-200 disabled:cursor-not-allowed disabled:opacity-55 ${variantClasses[variant]} ${sizeClasses[size]} ${fullWidth ? 'w-full' : ''} ${className}`.trim()}
+      {...props}
+    >
+      {isLoading ? (
+        <SpinnerGap className="h-5 w-5 animate-spin" />
+      ) : (
+        <>
+          {leftIcon ? <span className="shrink-0">{leftIcon}</span> : null}
+          {children}
+          {rightIcon ? <span className="shrink-0">{rightIcon}</span> : null}
+        </>
+      )}
+    </button>
+  ),
 );
 
 Button.displayName = 'Button';
+
 export default Button;

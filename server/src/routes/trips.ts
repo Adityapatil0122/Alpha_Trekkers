@@ -13,6 +13,12 @@ import path from 'path';
 
 const router = Router();
 
+function firstString(value: unknown): string | undefined {
+  if (typeof value === 'string') return value;
+  if (Array.isArray(value) && typeof value[0] === 'string') return value[0];
+  return undefined;
+}
+
 function resolveTripSort(sortBy: string, sortOrder: 'asc' | 'desc') {
   switch (sortBy) {
     case 'popular':
@@ -129,8 +135,11 @@ router.get(
   '/id/:id',
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const id = firstString(req.params.id);
+      if (!id) throw new AppError(400, 'Invalid trip ID');
+
       const trip = await prisma.trip.findUnique({
-        where: { id: req.params.id },
+        where: { id },
         include: {
           images: { orderBy: { sortOrder: 'asc' } },
           schedules: {
@@ -191,8 +200,11 @@ router.get(
   '/:slug',
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const slug = firstString(req.params.slug);
+      if (!slug) throw new AppError(400, 'Invalid trip slug');
+
       const trip = await prisma.trip.findUnique({
-        where: { slug: req.params.slug },
+        where: { slug },
         include: {
           images: { orderBy: { sortOrder: 'asc' } },
           schedules: {
@@ -278,7 +290,8 @@ router.put(
   validate(updateTripSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id } = req.params;
+      const id = firstString(req.params.id);
+      if (!id) throw new AppError(400, 'Invalid trip ID');
       const { schedules, ...tripData } = req.body;
 
       const existing = await prisma.trip.findUnique({ where: { id } });
@@ -341,7 +354,8 @@ router.delete(
   adminOnly,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id } = req.params;
+      const id = firstString(req.params.id);
+      if (!id) throw new AppError(400, 'Invalid trip ID');
 
       const trip = await prisma.trip.findUnique({
         where: { id },
@@ -379,7 +393,8 @@ router.post(
   upload.array('images', 10),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id } = req.params;
+      const id = firstString(req.params.id);
+      if (!id) throw new AppError(400, 'Invalid trip ID');
 
       const trip = await prisma.trip.findUnique({ where: { id } });
       if (!trip) {
@@ -399,7 +414,9 @@ router.post(
             data: {
               tripId: id,
               url: `/uploads/${file.filename}`,
-              altText: req.body.altText?.[index] || trip.title,
+              altText:
+                (Array.isArray(req.body.altText) ? req.body.altText[index] : req.body.altText) ||
+                trip.title,
               isPrimary: existingCount === 0 && index === 0,
               sortOrder: existingCount + index,
             },
@@ -425,7 +442,8 @@ router.delete(
   adminOnly,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { imageId } = req.params;
+      const imageId = firstString(req.params.imageId);
+      if (!imageId) throw new AppError(400, 'Invalid image ID');
 
       const image = await prisma.tripImage.findUnique({ where: { id: imageId } });
       if (!image) {
@@ -434,7 +452,7 @@ router.delete(
 
       // Delete file from disk if it's a local upload
       if (image.url.startsWith('/uploads/')) {
-        const filePath = path.join(process.cwd(), image.url);
+        const filePath = path.join(process.cwd(), image.url.replace(/^\//, ''));
         try {
           await fs.unlink(filePath);
         } catch {

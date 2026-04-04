@@ -1,33 +1,33 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import {
+  ArrowRight,
   CalendarBlank,
   Compass,
-  Clock,
-  CheckCircle,
-  XCircle,
   Hourglass,
-  ArrowRight,
   Mountains,
+  XCircle,
+  CheckCircle,
+  Clock,
 } from '@phosphor-icons/react';
+import { MAHARASHTRA_MONSOON_IMAGES } from '@alpha-trekkers/shared';
 import type { ApiResponse, Booking, BookingStatus } from '@alpha-trekkers/shared';
 import api from '@/lib/axios';
-import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import Button from '@/components/ui/Button';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 const statusConfig: Record<
   BookingStatus,
-  { label: string; color: string; bgColor: string; Icon: typeof CheckCircle }
+  { label: string; Icon: typeof CheckCircle; className: string }
 > = {
-  PENDING: { label: 'Pending', color: 'text-amber-600', bgColor: 'bg-amber-50', Icon: Hourglass },
-  CONFIRMED: { label: 'Confirmed', color: 'text-green-600', bgColor: 'bg-green-50', Icon: CheckCircle },
-  CANCELLED: { label: 'Cancelled', color: 'text-red-600', bgColor: 'bg-red-50', Icon: XCircle },
-  COMPLETED: { label: 'Completed', color: 'text-blue-600', bgColor: 'bg-blue-50', Icon: CheckCircle },
-  REFUNDED: { label: 'Refunded', color: 'text-gray-600', bgColor: 'bg-gray-50', Icon: Clock },
+  PENDING: { label: 'Pending', Icon: Hourglass, className: 'bg-gold-500/12 text-gold-600' },
+  CONFIRMED: { label: 'Confirmed', Icon: CheckCircle, className: 'bg-forest-500/12 text-forest-500' },
+  CANCELLED: { label: 'Cancelled', Icon: XCircle, className: 'bg-coral-500/12 text-coral-600' },
+  COMPLETED: { label: 'Completed', Icon: CheckCircle, className: 'bg-ink-900/10 text-ink-800' },
+  REFUNDED: { label: 'Refunded', Icon: Clock, className: 'bg-sand-200 text-ink-700' },
 };
 
-const filterTabs: { key: 'all' | BookingStatus; label: string }[] = [
+const tabs: { key: 'all' | BookingStatus; label: string }[] = [
   { key: 'all', label: 'All' },
   { key: 'CONFIRMED', label: 'Confirmed' },
   { key: 'PENDING', label: 'Pending' },
@@ -43,39 +43,44 @@ export default function MyBookings() {
   useEffect(() => {
     api
       .get<ApiResponse<{ bookings: Booking[] }>>('/bookings')
-      .then((res) => setBookings(res.data.data.bookings))
+      .then((response) => setBookings(response.data.data.bookings))
       .catch(() => setBookings([]))
       .finally(() => setLoading(false));
   }, []);
 
-  const filtered =
-    filter === 'all' ? bookings : bookings.filter((b) => b.status === filter);
+  const filteredBookings = filter === 'all' ? bookings : bookings.filter((booking) => booking.status === filter);
 
   return (
     <>
-      {/* Hero */}
-      <section className="bg-forest-900 pt-20">
-        <div className="mx-auto max-w-7xl px-4 pb-8 pt-8 sm:px-6 lg:px-8">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <h1 className="font-heading text-3xl font-bold text-white">My Bookings</h1>
-            <p className="mt-2 text-forest-300/70">
-              Track and manage all your trek bookings
-            </p>
-          </motion.div>
+      <section className="travel-dark relative overflow-hidden pt-28">
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-18"
+          style={{ backgroundImage: `url(${MAHARASHTRA_MONSOON_IMAGES.heroes.myBookings})` }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-ink-950/88 via-ink-900/74 to-transparent" />
+        <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-[4.5rem] sm:px-6 lg:px-8">
+          <span className="section-label !bg-white/10 !text-sand-100 before:!bg-gold-400">
+            Traveler dashboard
+          </span>
+          <h1 className="mt-6 font-heading text-5xl text-white sm:text-6xl">My bookings</h1>
+          <p className="playful-text text-xl text-gold-400 mt-2">~ your trail diary ~</p>
+          <p className="mt-4 max-w-2xl text-lg leading-8 text-sand-100/76">
+            Manage confirmations, review pending reservations, and keep track of every departure in the redesigned interface.
+          </p>
         </div>
       </section>
 
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* Filter tabs */}
-        <div className="mb-8 flex gap-2 overflow-x-auto">
-          {filterTabs.map((tab) => (
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="mb-8 flex flex-wrap gap-3">
+          {tabs.map((tab) => (
             <button
               key={tab.key}
+              type="button"
               onClick={() => setFilter(tab.key)}
-              className={`whitespace-nowrap rounded-full px-5 py-2 text-sm font-medium transition-all ${
+              className={`rounded-full px-5 py-3 text-sm font-medium ${
                 filter === tab.key
                   ? 'bg-forest-500 text-white'
-                  : 'border border-forest-200 text-forest-600 hover:bg-forest-50'
+                  : 'travel-panel text-ink-700'
               }`}
             >
               {tab.label}
@@ -84,97 +89,83 @@ export default function MyBookings() {
         </div>
 
         {loading ? (
-          <LoadingSpinner text="Loading your bookings..." />
-        ) : filtered.length > 0 ? (
-          <div className="space-y-4">
-            {filtered.map((booking, i) => {
-              const config = statusConfig[booking.status];
+          <LoadingSpinner text="Loading your departures..." />
+        ) : filteredBookings.length > 0 ? (
+          <div className="space-y-5">
+            {filteredBookings.map((booking) => {
+              const status = statusConfig[booking.status];
               return (
-                <motion.div
-                  key={booking.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="overflow-hidden rounded-2xl border border-forest-100 bg-white shadow-sm transition-shadow hover:shadow-md"
-                >
-                  <div className="flex flex-col sm:flex-row">
-                    {/* Image */}
-                    <div className="relative h-40 w-full sm:h-auto sm:w-48">
-                      <img
-                        src={
-                          booking.trip?.images?.[0]?.url ||
-                          'https://images.unsplash.com/photo-1585409677983-0f6c41128c45?w=300'
-                        }
-                        alt={booking.trip?.title || 'Trek'}
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
-
-                    {/* Content */}
-                    <div className="flex flex-1 flex-col justify-between p-5">
-                      <div>
-                        <div className="mb-2 flex items-center gap-3">
-                          <h3 className="font-heading text-lg font-bold text-forest-900">
-                            {booking.trip?.title || 'Trek Booking'}
-                          </h3>
-                          <span
-                            className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold ${config.bgColor} ${config.color}`}
-                          >
-                            <config.Icon className="h-3.5 w-3.5" weight="fill" />
-                            {config.label}
-                          </span>
+                <div key={booking.id} className="travel-panel overflow-hidden rounded-[2rem]">
+                  <div className="grid gap-0 md:grid-cols-[240px_1fr]">
+                    <img
+                      src={booking.trip?.images?.[0]?.url ?? MAHARASHTRA_MONSOON_IMAGES.fallback.tripCard}
+                      alt={booking.trip?.title || 'Trek booking'}
+                      className="h-full min-h-[15rem] w-full object-cover"
+                    />
+                    <div className="p-6 sm:p-7">
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                          <p className="text-xs uppercase tracking-[0.16em] text-forest-500">Booking ID</p>
+                          <h2 className="mt-2 font-heading text-4xl text-ink-900">
+                            {booking.trip?.title || 'Departure reservation'}
+                          </h2>
                         </div>
-                        <div className="flex flex-wrap items-center gap-4 text-sm text-forest-500">
-                          <div className="flex items-center gap-1">
-                            <CalendarBlank className="h-4 w-4" />
+                        <span className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium ${status.className}`}>
+                          <status.Icon className="h-4 w-4" weight="fill" />
+                          {status.label}
+                        </span>
+                      </div>
+
+                      <div className="mt-6 grid gap-3 sm:grid-cols-3 text-sm text-ink-700">
+                        <div className="rounded-[1.4rem] bg-sand-100 px-4 py-3">
+                          <p className="inline-flex items-center gap-2"><CalendarBlank className="h-4 w-4 text-forest-500" /> Departure</p>
+                          <p className="mt-2 font-medium text-ink-900">
                             {booking.schedule?.date
                               ? new Date(booking.schedule.date).toLocaleDateString('en-IN', {
-                                  weekday: 'short',
-                                  month: 'short',
                                   day: 'numeric',
+                                  month: 'short',
                                   year: 'numeric',
                                 })
-                              : 'Date TBD'}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Compass className="h-4 w-4" />
-                            {booking.numberOfPeople} participant{booking.numberOfPeople > 1 ? 's' : ''}
-                          </div>
+                              : 'TBD'}
+                          </p>
+                        </div>
+                        <div className="rounded-[1.4rem] bg-sand-100 px-4 py-3">
+                          <p className="inline-flex items-center gap-2"><Compass className="h-4 w-4 text-forest-500" /> Travelers</p>
+                          <p className="mt-2 font-medium text-ink-900">{booking.numberOfPeople}</p>
+                        </div>
+                        <div className="rounded-[1.4rem] bg-sand-100 px-4 py-3">
+                          <p className="inline-flex items-center gap-2"><Mountains className="h-4 w-4 text-forest-500" /> Total</p>
+                          <p className="mt-2 font-medium text-ink-900">INR {booking.totalAmount.toLocaleString('en-IN')}</p>
                         </div>
                       </div>
 
-                      <div className="mt-4 flex items-center justify-between">
-                        <p className="font-heading text-lg font-bold text-forest-800">
-                          &#8377;{booking.totalAmount.toLocaleString('en-IN')}
-                        </p>
-                        {booking.trip?.slug && (
-                          <Link
-                            to={`/trips/${booking.trip.slug}`}
-                            className="flex items-center gap-1 text-sm font-medium text-forest-600 hover:text-forest-800"
-                          >
-                            View Trek <ArrowRight className="h-4 w-4" />
+                      <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+                        <p className="text-sm text-ink-700/68">Created on {new Date(booking.createdAt).toLocaleDateString('en-IN')}</p>
+                        {booking.trip?.slug ? (
+                          <Link to={`/trips/${booking.trip.slug}`}>
+                            <Button variant="secondary" rightIcon={<ArrowRight className="h-4 w-4" />}>
+                              View trek detail
+                            </Button>
                           </Link>
-                        )}
+                        ) : null}
                       </div>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               );
             })}
           </div>
         ) : (
-          /* Empty state */
-          <div className="flex flex-col items-center py-20 text-center">
-            <Mountains className="mb-4 h-16 w-16 text-forest-300" weight="duotone" />
-            <h3 className="mb-2 font-heading text-xl font-semibold text-forest-800">
-              No bookings yet
-            </h3>
-            <p className="mb-6 max-w-sm text-sm text-forest-500">
-              Your adventure awaits! Browse our treks and book your first experience.
+          <div className="travel-panel rounded-[2rem] px-8 py-16 text-center">
+            <h2 className="font-heading text-5xl text-ink-900">No bookings yet</h2>
+            <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-ink-700/72">
+              Start with the redesigned tour archive and book your first fort experience.
             </p>
-            <Link to="/trips">
-              <Button rightIcon={<ArrowRight className="h-4 w-4" />}>Explore Treks</Button>
-            </Link>
+            <div className="mt-6">
+              <Link to="/trips">
+                <Button rightIcon={<ArrowRight className="h-4 w-4" />}>Explore tours</Button>
+              </Link>
+            </div>
           </div>
         )}
       </div>

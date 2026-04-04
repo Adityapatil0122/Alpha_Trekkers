@@ -22,7 +22,7 @@ export default function LoadingSpinner({
       <div className="relative">
         {/* Outer ring */}
         <div
-          className={`animate-spin rounded-full border-2 border-forest-200 border-t-forest-500 ${
+          className={`animate-spin rounded-full border-2 border-mist-200 border-t-forest-500 ${
             size === 'sm' ? 'h-10 w-10' : size === 'md' ? 'h-16 w-16' : 'h-24 w-24'
           }`}
         />
@@ -35,14 +35,14 @@ export default function LoadingSpinner({
         </div>
       </div>
       {text && (
-        <p className="animate-pulse text-sm font-medium text-forest-600">{text}</p>
+        <p className="animate-pulse text-sm font-medium text-forest-500">{text}</p>
       )}
     </div>
   );
 
   if (fullPage) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-forest-50">
+      <div className="flex min-h-screen items-center justify-center bg-mist-50">
         {spinner}
       </div>
     );

@@ -39,8 +39,13 @@ const itineraryStepSchema = z.object({
   description: z.string().min(1),
 });
 
+const scheduleDateSchema = z
+  .string()
+  .min(1, 'Schedule date is required')
+  .refine((value) => !Number.isNaN(new Date(value).getTime()), 'Invalid schedule date');
+
 const scheduleInputSchema = z.object({
-  date: z.string().datetime({ offset: true }).or(z.string().date()),
+  date: scheduleDateSchema,
   availableSpots: z.number().int().positive(),
   priceOverride: z.number().positive().optional(),
   status: z.enum(['OPEN', 'FULL', 'CANCELLED']).default('OPEN'),

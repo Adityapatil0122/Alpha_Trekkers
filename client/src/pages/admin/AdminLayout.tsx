@@ -9,14 +9,14 @@ const links = [
 
 export default function AdminLayout() {
   return (
-    <div className="min-h-screen bg-stone-50 pt-20">
+    <div className="min-h-screen bg-sand-50 pt-28">
       <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-8 sm:px-6 lg:flex-row lg:px-8">
         <aside className="lg:w-72">
-          <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-400">
+          <div className="travel-panel rounded-[2rem] p-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-forest-500">
               Admin
             </p>
-            <h1 className="mt-2 font-heading text-2xl font-bold text-stone-900">
+            <h1 className="mt-2 font-heading text-3xl font-bold text-ink-900">
               Control Center
             </h1>
             <div className="mt-6 space-y-2">
@@ -28,8 +28,8 @@ export default function AdminLayout() {
                   className={({ isActive }) =>
                     `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
                       isActive
-                        ? 'bg-forest-600 text-white'
-                        : 'text-stone-600 hover:bg-stone-100'
+                        ? 'bg-forest-500 text-white'
+                        : 'text-ink-700 hover:bg-sand-100'
                     }`
                   }
                 >

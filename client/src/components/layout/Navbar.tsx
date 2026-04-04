@@ -1,194 +1,311 @@
-import { useState, useEffect } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
-  Mountains,
-  List,
-  X,
-  User,
-  SignOut,
-  CaretDown,
   CalendarBlank,
-  Compass,
+  CaretDown,
+  EnvelopeSimple,
+  List,
+  MapPinLine,
+  Mountains,
+  PhoneCall,
+  SignOut,
+  SuitcaseRolling,
+  Tree,
+  User,
+  X,
 } from '@phosphor-icons/react';
 import { useAuthStore } from '@/stores/authStore';
+import Button from '@/components/ui/Button';
 
-const navLinks = [
-  { to: '/', label: 'Home' },
+const tripMenuLinks = [
+  { to: '/trips', label: 'All Trips' },
   { to: '/weekend-trips', label: 'Weekend Trips' },
   { to: '/weekday-trips', label: 'Weekday Trips' },
-  { to: '/about', label: 'About' },
-  { to: '/contact', label: 'Contact' },
 ];
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [tripsMenuOpen, setTripsMenuOpen] = useState(false);
+  const [mobileTripsOpen, setMobileTripsOpen] = useState(false);
   const { isAuthenticated, user, logout } = useAuthStore();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isTripsSection = ['/trips', '/weekend-trips', '/weekday-trips'].includes(location.pathname);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
+    const onScroll = () => setScrolled(window.scrollY > 32);
+    onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setMobileOpen(false);
-  }, [navigate]);
+    setDropdownOpen(false);
+    setTripsMenuOpen(false);
+    setMobileTripsOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = () => {
     logout();
-    setDropdownOpen(false);
     navigate('/');
   };
 
   return (
     <>
-      <motion.header
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled
-            ? 'glass-dark shadow-lg shadow-forest-900/20'
-            : 'bg-transparent'
-        }`}
-      >
-        <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-          {/* Logo */}
-          <Link to="/" className="group flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-forest-500/20 transition-colors group-hover:bg-forest-500/30">
-              <Mountains className="h-6 w-6 text-forest-400" weight="duotone" />
-            </div>
-            <div>
-              <span className="font-heading text-xl font-bold text-white">
-                Alpha{' '}
-                <span className="text-forest-400">Trekkers</span>
+      <div className="fixed inset-x-0 top-0 z-50">
+        <div className="hidden border-b border-white/10 bg-ink-950/94 text-sand-100 lg:block">
+          <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 text-sm sm:px-6 lg:px-8">
+            <div className="flex items-center gap-6">
+              <span className="flex items-center gap-2 text-sand-200/80">
+                <PhoneCall className="h-4 w-4 text-gold-400" />
+                +91 98765 43210
+              </span>
+              <span className="flex items-center gap-2 text-sand-200/80">
+                <EnvelopeSimple className="h-4 w-4 text-gold-400" />
+                hello@alphatrekkers.com
+              </span>
+              <span className="flex items-center gap-2 text-sand-200/80">
+                <MapPinLine className="h-4 w-4 text-gold-400" />
+                Pune, Maharashtra
               </span>
             </div>
-          </Link>
+            <span className="text-sand-200/65">
+              Guided fort treks, custom departures, and curated escapes.
+            </span>
+          </div>
+        </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden items-center gap-1 lg:flex">
-            {navLinks.map((link) => (
+        <motion.header
+          initial={{ y: -18, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.35, ease: 'easeOut' }}
+          className={`border-b transition-all duration-300 ${
+            scrolled
+              ? 'border-ink-900/8 bg-mist-50/88 shadow-[0_18px_40px_rgba(8,17,28,0.08)] backdrop-blur-xl'
+              : 'border-white/10 bg-transparent'
+          }`}
+        >
+          <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+            <Link to="/" className="flex items-center gap-3">
+              <div
+                className={`flex h-12 w-12 items-center justify-center rounded-2xl border ${
+                  scrolled
+                    ? 'border-forest-500/20 bg-forest-500/10'
+                    : 'border-white/15 bg-white/10 backdrop-blur'
+                }`}
+              >
+                <Mountains
+                  className={`h-7 w-7 ${scrolled ? 'text-forest-500' : 'text-gold-400'}`}
+                  weight="duotone"
+                />
+              </div>
+              <div>
+                <p className={`text-xs uppercase tracking-[0.26em] ${scrolled ? 'text-forest-500' : 'text-sand-200/80'}`}>
+                  Alpha Trekkers
+                </p>
+                <p className={`font-heading text-2xl font-semibold ${scrolled ? 'text-ink-900' : 'text-white'}`}>
+                  Monsoon Trail Journeys
+                </p>
+                <p className={`font-playful-text text-[0.65rem] tracking-wide ${scrolled ? 'text-forest-600/70' : 'text-gold-400/80'}`}>
+                  into the wild
+                </p>
+              </div>
+            </Link>
+
+            <div className="hidden items-center gap-2 xl:flex">
               <NavLink
-                key={link.to}
-                to={link.to}
+                to="/"
                 className={({ isActive }) =>
-                  `rounded-lg px-4 py-2 text-sm font-medium transition-all duration-300 ${
+                  `rounded-full px-4 py-2 text-sm font-medium ${
                     isActive
-                      ? 'bg-forest-500/15 text-forest-300'
-                      : 'text-forest-100/80 hover:bg-white/5 hover:text-white'
+                      ? scrolled
+                        ? 'bg-forest-500 text-white'
+                        : 'bg-white/14 text-white'
+                      : scrolled
+                        ? 'text-ink-700 hover:bg-ink-900/5'
+                        : 'text-sand-100/82 hover:bg-white/10 hover:text-white'
                   }`
                 }
               >
-                {link.label}
+                Home
               </NavLink>
-            ))}
-          </div>
 
-          {/* Desktop Auth / User */}
-          <div className="hidden items-center gap-3 lg:flex">
-            {isAuthenticated && user ? (
-              <div className="relative">
+              <div
+                className="relative"
+                onMouseEnter={() => setTripsMenuOpen(true)}
+                onMouseLeave={() => setTripsMenuOpen(false)}
+              >
                 <button
-                  onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-white/15"
+                  type="button"
+                  onClick={() => setTripsMenuOpen((open) => !open)}
+                  className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium ${
+                    isTripsSection
+                      ? scrolled
+                        ? 'bg-forest-500 text-white'
+                        : 'bg-white/14 text-white'
+                      : scrolled
+                        ? 'text-ink-700 hover:bg-ink-900/5'
+                        : 'text-sand-100/82 hover:bg-white/10 hover:text-white'
+                  }`}
                 >
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-forest-500 text-xs font-bold text-white">
-                    {user.firstName[0]}
-                    {user.lastName[0]}
-                  </div>
-                  <span>{user.firstName}</span>
-                  <CaretDown
-                    className={`h-4 w-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}
-                  />
+                  Trips
+                  <CaretDown className={`h-4 w-4 transition-transform ${tripsMenuOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 <AnimatePresence>
-                  {dropdownOpen && (
+                  {tripsMenuOpen && (
                     <motion.div
-                      initial={{ opacity: 0, y: 8, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                      transition={{ duration: 0.15 }}
-                      className="glass-dark absolute right-0 mt-2 w-52 overflow-hidden rounded-xl py-1 shadow-xl"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 8 }}
+                      className="travel-panel absolute left-0 mt-3 w-64 rounded-[1.75rem] p-3"
                     >
-                      <Link
-                        to="/my-bookings"
-                        onClick={() => setDropdownOpen(false)}
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-forest-100 transition-colors hover:bg-white/10"
-                      >
-                        <CalendarBlank className="h-4 w-4" />
-                        My Bookings
-                      </Link>
-                      <Link
-                        to="/trips"
-                        onClick={() => setDropdownOpen(false)}
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-forest-100 transition-colors hover:bg-white/10"
-                      >
-                        <Compass className="h-4 w-4" />
-                        Explore Treks
-                      </Link>
-                      {user.role === 'ADMIN' && (
-                        <Link
-                          to="/admin"
-                          onClick={() => setDropdownOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-amber-400 transition-colors hover:bg-white/10"
-                        >
-                          <User className="h-4 w-4" />
-                          Admin Panel
-                        </Link>
-                      )}
-                      <div className="my-1 border-t border-white/10" />
-                      <button
-                        onClick={handleLogout}
-                        className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-400 transition-colors hover:bg-white/10"
-                      >
-                        <SignOut className="h-4 w-4" />
-                        Sign Out
-                      </button>
+                      {tripMenuLinks.map((link) => {
+                        const active = location.pathname === link.to;
+
+                        return (
+                          <Link
+                            key={link.to}
+                            to={link.to}
+                            className={`block rounded-2xl px-4 py-3 text-sm font-medium ${
+                              active ? 'bg-forest-500 text-white' : 'text-ink-700 hover:bg-sand-100'
+                            }`}
+                          >
+                            {link.label}
+                          </Link>
+                        );
+                      })}
                     </motion.div>
                   )}
                 </AnimatePresence>
               </div>
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="rounded-lg px-5 py-2 text-sm font-medium text-forest-100 transition-colors hover:text-white"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  to="/register"
-                  className="rounded-xl bg-forest-500 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-forest-500/25 transition-all hover:bg-forest-400 hover:shadow-forest-400/30"
-                >
-                  Register
-                </Link>
-              </>
-            )}
-          </div>
 
-          {/* Mobile hamburger */}
-          <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="rounded-lg p-2 text-white transition-colors hover:bg-white/10 lg:hidden"
-            aria-label="Toggle menu"
-          >
-            {mobileOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <List className="h-6 w-6" />
-            )}
-          </button>
-        </nav>
-      </motion.header>
+              <NavLink
+                to="/about"
+                className={({ isActive }) =>
+                  `rounded-full px-4 py-2 text-sm font-medium ${
+                    isActive
+                      ? scrolled
+                        ? 'bg-forest-500 text-white'
+                        : 'bg-white/14 text-white'
+                      : scrolled
+                        ? 'text-ink-700 hover:bg-ink-900/5'
+                        : 'text-sand-100/82 hover:bg-white/10 hover:text-white'
+                  }`
+                }
+              >
+                About
+              </NavLink>
 
-      {/* Mobile Drawer */}
+              <NavLink
+                to="/contact"
+                className={({ isActive }) =>
+                  `rounded-full px-4 py-2 text-sm font-medium ${
+                    isActive
+                      ? scrolled
+                        ? 'bg-forest-500 text-white'
+                        : 'bg-white/14 text-white'
+                      : scrolled
+                        ? 'text-ink-700 hover:bg-ink-900/5'
+                        : 'text-sand-100/82 hover:bg-white/10 hover:text-white'
+                  }`
+                }
+              >
+                Contact
+              </NavLink>
+            </div>
+
+            <div className="hidden items-center gap-3 xl:flex">
+              {isAuthenticated && user ? (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setDropdownOpen((open) => !open)}
+                    className={`flex items-center gap-3 rounded-full px-4 py-2.5 ${
+                      scrolled ? 'bg-ink-900/5 text-ink-900' : 'bg-white/10 text-white'
+                    }`}
+                  >
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gold-500 text-sm font-semibold text-ink-950">
+                      {user.firstName[0]}
+                      {user.lastName[0]}
+                    </span>
+                    <span className="text-sm font-medium">{user.firstName}</span>
+                    <CaretDown className={`h-4 w-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  <AnimatePresence>
+                    {dropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 8 }}
+                        className="travel-panel absolute right-0 mt-3 w-60 rounded-3xl p-3"
+                      >
+                        <Link
+                          to="/my-bookings"
+                          className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm text-ink-700 hover:bg-sand-100"
+                        >
+                          <CalendarBlank className="h-4 w-4 text-forest-500" />
+                          My Bookings
+                        </Link>
+                        {user.role === 'ADMIN' && (
+                          <Link
+                            to="/admin"
+                            className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm text-ink-700 hover:bg-sand-100"
+                          >
+                            <User className="h-4 w-4 text-forest-500" />
+                            Admin Panel
+                          </Link>
+                        )}
+                        <button
+                          type="button"
+                          onClick={handleLogout}
+                          className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm text-coral-600 hover:bg-coral-500/8"
+                        >
+                          <SignOut className="h-4 w-4" />
+                          Sign Out
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className={`rounded-full px-4 py-2.5 text-sm font-medium ${
+                      scrolled ? 'text-ink-700 hover:bg-ink-900/5' : 'text-white/88 hover:bg-white/10'
+                    }`}
+                  >
+                    Sign In
+                  </Link>
+                  <Link to="/trips">
+                    <Button size="md" variant="accent" rightIcon={<Tree className="h-4 w-4" weight="duotone" />}>
+                      Book Trek
+                    </Button>
+                  </Link>
+                </>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setMobileOpen((open) => !open)}
+              className={`rounded-2xl p-3 xl:hidden ${
+                scrolled ? 'bg-ink-900/5 text-ink-900' : 'bg-white/10 text-white'
+              }`}
+              aria-label="Toggle menu"
+            >
+              {mobileOpen ? <X className="h-5 w-5" /> : <List className="h-5 w-5" />}
+            </button>
+          </nav>
+        </motion.header>
+      </div>
+
       <AnimatePresence>
         {mobileOpen && (
           <>
@@ -196,115 +313,139 @@ export default function Navbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-40 bg-ink-950/45 backdrop-blur-sm xl:hidden"
               onClick={() => setMobileOpen(false)}
             />
-            <motion.div
+            <motion.aside
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 250 }}
-              className="fixed right-0 top-0 z-50 h-full w-80 max-w-[85vw] bg-forest-900 p-6 shadow-2xl lg:hidden"
+              transition={{ type: 'spring', damping: 24, stiffness: 260 }}
+              className="travel-panel fixed right-0 top-0 z-50 flex h-full w-80 max-w-[88vw] flex-col rounded-l-[2rem] p-6 xl:hidden"
             >
               <div className="mb-8 flex items-center justify-between">
-                <Link
-                  to="/"
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-2"
-                >
-                  <Mountains className="h-6 w-6 text-forest-400" weight="duotone" />
-                  <span className="font-heading text-lg font-bold text-white">
-                    Alpha <span className="text-forest-400">Trekkers</span>
-                  </span>
-                </Link>
-                <button
-                  onClick={() => setMobileOpen(false)}
-                  className="rounded-lg p-1 text-forest-300 hover:text-white"
-                >
-                  <X className="h-6 w-6" />
+                <div>
+                  <p className="text-xs uppercase tracking-[0.25em] text-forest-500">Alpha Trekkers</p>
+                  <p className="font-heading text-2xl text-ink-900">Travel Menu</p>
+                </div>
+                <button type="button" onClick={() => setMobileOpen(false)} className="rounded-2xl bg-sand-100 p-2 text-ink-800">
+                  <X className="h-5 w-5" />
                 </button>
               </div>
 
-              <div className="flex flex-col gap-1">
-                {navLinks.map((link) => (
-                  <NavLink
-                    key={link.to}
-                    to={link.to}
-                    onClick={() => setMobileOpen(false)}
-                    className={({ isActive }) =>
-                      `rounded-lg px-4 py-3 text-base font-medium transition-all ${
-                        isActive
-                          ? 'bg-forest-500/15 text-forest-300'
-                          : 'text-forest-100/80 hover:bg-white/5 hover:text-white'
-                      }`
-                    }
+              <div className="space-y-2">
+                <NavLink
+                  to="/"
+                  className={({ isActive }) =>
+                    `block rounded-2xl px-4 py-3 text-sm font-medium ${
+                      isActive ? 'bg-forest-500 text-white' : 'text-ink-700 hover:bg-sand-100'
+                    }`
+                  }
+                >
+                  Home
+                </NavLink>
+
+                <div className="rounded-[1.5rem] border border-ink-900/8 p-2">
+                  <button
+                    type="button"
+                    onClick={() => setMobileTripsOpen((open) => !open)}
+                    className={`flex w-full items-center justify-between rounded-2xl px-4 py-3 text-sm font-medium ${
+                      isTripsSection ? 'bg-forest-500 text-white' : 'text-ink-700 hover:bg-sand-100'
+                    }`}
                   >
-                    {link.label}
-                  </NavLink>
-                ))}
+                    <span>Trips</span>
+                    <CaretDown className={`h-4 w-4 transition-transform ${mobileTripsOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  <AnimatePresence initial={false}>
+                    {mobileTripsOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="mt-2 space-y-2 px-2 pb-2">
+                          {tripMenuLinks.map((link) => (
+                            <Link
+                              key={link.to}
+                              to={link.to}
+                              className={`block rounded-2xl px-4 py-3 text-sm ${
+                                location.pathname === link.to
+                                  ? 'bg-forest-500 text-white'
+                                  : 'text-ink-700 hover:bg-sand-100'
+                              }`}
+                            >
+                              {link.label}
+                            </Link>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                <NavLink
+                  to="/about"
+                  className={({ isActive }) =>
+                    `block rounded-2xl px-4 py-3 text-sm font-medium ${
+                      isActive ? 'bg-forest-500 text-white' : 'text-ink-700 hover:bg-sand-100'
+                    }`
+                  }
+                >
+                  About
+                </NavLink>
+
+                <NavLink
+                  to="/contact"
+                  className={({ isActive }) =>
+                    `block rounded-2xl px-4 py-3 text-sm font-medium ${
+                      isActive ? 'bg-forest-500 text-white' : 'text-ink-700 hover:bg-sand-100'
+                    }`
+                  }
+                >
+                  Contact
+                </NavLink>
               </div>
 
-              <div className="mt-8 border-t border-forest-700 pt-6">
+              <div className="mt-8 rounded-[1.75rem] bg-ink-950 px-5 py-6 text-sand-100">
+                <p className="text-xs uppercase tracking-[0.22em] text-gold-400">Direct Contact</p>
+                <div className="mt-4 space-y-3 text-sm text-sand-200/80">
+                  <p className="flex items-center gap-2"><PhoneCall className="h-4 w-4 text-gold-400" /> +91 98765 43210</p>
+                  <p className="flex items-center gap-2"><EnvelopeSimple className="h-4 w-4 text-gold-400" /> hello@alphatrekkers.com</p>
+                </div>
+              </div>
+
+              <div className="mt-auto space-y-3 pt-6">
                 {isAuthenticated && user ? (
-                  <div className="space-y-2">
-                    <div className="mb-4 flex items-center gap-3 rounded-lg bg-forest-800 px-4 py-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-forest-500 text-sm font-bold text-white">
-                        {user.firstName[0]}
-                        {user.lastName[0]}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-white">
-                          {user.firstName} {user.lastName}
-                        </p>
-                        <p className="text-xs text-forest-400">{user.email}</p>
-                      </div>
-                    </div>
-                    <Link
-                      to="/my-bookings"
-                      onClick={() => setMobileOpen(false)}
-                      className="block rounded-lg px-4 py-2.5 text-sm text-forest-100 hover:bg-white/5"
-                    >
+                  <>
+                    <Link to="/my-bookings" className="block rounded-2xl bg-sand-100 px-4 py-3 text-sm font-medium text-ink-800">
                       My Bookings
                     </Link>
-                    {user.role === 'ADMIN' && (
-                      <Link
-                        to="/admin"
-                        onClick={() => setMobileOpen(false)}
-                        className="block rounded-lg px-4 py-2.5 text-sm text-amber-400 hover:bg-white/5"
-                      >
-                        Admin Panel
-                      </Link>
-                    )}
                     <button
-                      onClick={() => {
-                        handleLogout();
-                        setMobileOpen(false);
-                      }}
-                      className="w-full rounded-lg px-4 py-2.5 text-left text-sm text-red-400 hover:bg-white/5"
+                      type="button"
+                      onClick={handleLogout}
+                      className="w-full rounded-2xl border border-coral-500/25 px-4 py-3 text-left text-sm font-medium text-coral-600"
                     >
                       Sign Out
                     </button>
-                  </div>
+                  </>
                 ) : (
-                  <div className="flex flex-col gap-3">
-                    <Link
-                      to="/login"
-                      onClick={() => setMobileOpen(false)}
-                      className="rounded-xl border border-forest-600 px-4 py-2.5 text-center text-sm font-medium text-white transition-colors hover:bg-forest-800"
-                    >
-                      Sign In
+                  <>
+                    <Link to="/login">
+                      <Button variant="secondary" size="md" fullWidth>
+                        Sign In
+                      </Button>
                     </Link>
-                    <Link
-                      to="/register"
-                      onClick={() => setMobileOpen(false)}
-                      className="rounded-xl bg-forest-500 px-4 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-forest-400"
-                    >
-                      Register
+                    <Link to="/trips">
+                      <Button variant="accent" size="md" fullWidth>
+                        Explore Tours
+                      </Button>
                     </Link>
-                  </div>
+                  </>
                 )}
               </div>
-            </motion.div>
+            </motion.aside>
           </>
         )}
       </AnimatePresence>

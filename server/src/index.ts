@@ -12,6 +12,7 @@ import bookingRoutes from './routes/bookings.js';
 import reviewRoutes from './routes/reviews.js';
 import adminRoutes from './routes/admin.js';
 import contactRoutes from './routes/contact.js';
+import siteRoutes from './routes/site.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -56,6 +57,7 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/site', siteRoutes);
 
 // 404 handler
 app.use((_req, res) => {

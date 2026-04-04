@@ -99,10 +99,10 @@ model Trip {
   totalBookings    Int          @default(0)
   latitude         Float?
   longitude        Float?
-  highlights       String[]
-  inclusions       String[]
-  exclusions       String[]
-  thingsToCarry    String[]
+  highlights       Json
+  inclusions       Json
+  exclusions       Json
+  thingsToCarry    Json
   itinerary        Json
   routeMapUrl      String?
   createdAt        DateTime     @default(now())
