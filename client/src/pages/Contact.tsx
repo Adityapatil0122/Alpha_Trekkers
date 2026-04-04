@@ -107,12 +107,12 @@ export default function Contact() {
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
                   <label className="mb-2 block text-sm font-medium text-ink-700">Name</label>
-                  <input {...register('name')} className="travel-input" placeholder="Your name" />
+                  <input {...register('name')} className="travel-input" />
                   {errors.name ? <p className="mt-2 text-xs text-coral-600">{errors.name.message}</p> : null}
                 </div>
                 <div>
                   <label className="mb-2 block text-sm font-medium text-ink-700">Email</label>
-                  <input {...register('email')} className="travel-input" placeholder="you@example.com" />
+                  <input {...register('email')} className="travel-input" autoComplete="email" />
                   {errors.email ? <p className="mt-2 text-xs text-coral-600">{errors.email.message}</p> : null}
                 </div>
               </div>
@@ -120,11 +120,11 @@ export default function Contact() {
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
                   <label className="mb-2 block text-sm font-medium text-ink-700">Phone</label>
-                  <input {...register('phone')} className="travel-input" placeholder="+91 98765 43210" />
+                  <input {...register('phone')} className="travel-input" autoComplete="tel" />
                 </div>
                 <div>
                   <label className="mb-2 block text-sm font-medium text-ink-700">Subject</label>
-                  <input {...register('subject')} className="travel-input" placeholder="How can we help?" />
+                  <input {...register('subject')} className="travel-input" />
                   {errors.subject ? <p className="mt-2 text-xs text-coral-600">{errors.subject.message}</p> : null}
                 </div>
               </div>
@@ -135,7 +135,6 @@ export default function Contact() {
                   {...register('message')}
                   rows={6}
                   className="travel-input resize-none"
-                  placeholder="Tell us the route, dates, or travel style you have in mind."
                 />
                 {errors.message ? <p className="mt-2 text-xs text-coral-600">{errors.message.message}</p> : null}
               </div>

@@ -124,7 +124,6 @@ function FilterPanel({
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Fort, region, or vibe"
               className="min-w-0 flex-1 bg-transparent text-sm focus:outline-none"
             />
           </div>

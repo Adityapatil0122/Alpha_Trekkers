@@ -87,6 +87,9 @@ export interface AdminTripSummary {
 export interface AdminTripDetail extends AdminTripInput {
   id: string;
   slug: string;
+  minAge: number;
+  isFeatured: boolean;
+  isActive: boolean;
   avgRating: number;
   totalReviews: number;
   totalBookings: number;

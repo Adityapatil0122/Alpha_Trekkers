@@ -117,7 +117,8 @@ export default function Footer() {
             <form onSubmit={(event) => event.preventDefault()} className="mt-6 flex items-center gap-3 rounded-full border border-white/12 bg-white/8 p-2 pl-4">
               <input
                 type="email"
-                placeholder="Your email for trip drops"
+                aria-label="Email address"
+                autoComplete="email"
                 className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-sand-200/44 focus:outline-none"
               />
               <button type="submit" className="flex h-11 w-11 items-center justify-center rounded-full bg-gold-500 text-ink-950 hover:bg-gold-400">

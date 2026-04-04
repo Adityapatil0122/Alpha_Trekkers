@@ -30,6 +30,25 @@ npm run db:seed
 npm run dev
 ```
 
+## PostgreSQL Setup
+
+1. Install PostgreSQL and create a database named `alpha_trekkers`.
+2. Copy `server/.env.example` to `server/.env`.
+3. Set `DATABASE_URL` in `server/.env`, for example:
+
+```env
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/alpha_trekkers?schema=public
+```
+
+4. Run Prisma against PostgreSQL:
+
+```bash
+npm run db:migrate
+npm run db:seed
+```
+
+The admin workspace is available at `/admin/trips` for trip editing, pricing changes, schedule management, and trip image management.
+
 ## Project Structure
 
 ```

@@ -5,14 +5,15 @@ import {
   CalendarBlank,
   CaretDown,
   EnvelopeSimple,
+  FacebookLogo,
+  InstagramLogo,
+  LinkedinLogo,
   List,
   MapPinLine,
   Mountains,
   PhoneCall,
   SignOut,
-  SuitcaseRolling,
-  Tree,
-  User,
+  TwitterLogo,
   X,
 } from '@phosphor-icons/react';
 import { useAuthStore } from '@/stores/authStore';
@@ -57,77 +58,73 @@ export default function Navbar() {
   return (
     <>
       <div className="fixed inset-x-0 top-0 z-50">
-        <div className="hidden border-b border-white/10 bg-ink-950/94 text-sand-100 lg:block">
-          <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 text-sm sm:px-6 lg:px-8">
+        {/* Top info bar */}
+        <div className="hidden border-b border-dark-200 bg-dark-900 text-white lg:block">
+          <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2.5 text-sm sm:px-6 lg:px-8">
             <div className="flex items-center gap-6">
-              <span className="flex items-center gap-2 text-sand-200/80">
-                <PhoneCall className="h-4 w-4 text-gold-400" />
-                +91 98765 43210
-              </span>
-              <span className="flex items-center gap-2 text-sand-200/80">
-                <EnvelopeSimple className="h-4 w-4 text-gold-400" />
+              <a href="mailto:hello@alphatrekkers.com" className="flex items-center gap-2 text-dark-300 hover:text-white">
+                <EnvelopeSimple className="h-4 w-4 text-primary-500" />
                 hello@alphatrekkers.com
-              </span>
-              <span className="flex items-center gap-2 text-sand-200/80">
-                <MapPinLine className="h-4 w-4 text-gold-400" />
+              </a>
+              <a href="tel:+919876543210" className="flex items-center gap-2 text-dark-300 hover:text-white">
+                <PhoneCall className="h-4 w-4 text-primary-500" />
+                +91 98765 43210
+              </a>
+              <span className="flex items-center gap-2 text-dark-300">
+                <MapPinLine className="h-4 w-4 text-primary-500" />
                 Pune, Maharashtra
               </span>
             </div>
-            <span className="text-sand-200/65">
-              Guided fort treks, custom departures, and curated escapes.
-            </span>
+            <div className="flex items-center gap-3">
+              {[FacebookLogo, TwitterLogo, InstagramLogo, LinkedinLogo].map((Icon, i) => (
+                <a
+                  key={i}
+                  href="#"
+                  className="flex h-8 w-8 items-center justify-center rounded-full text-dark-400 transition hover:bg-white/10 hover:text-white"
+                >
+                  <Icon className="h-4 w-4" weight="fill" />
+                </a>
+              ))}
+            </div>
           </div>
         </div>
 
+        {/* Main navigation */}
         <motion.header
           initial={{ y: -18, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.35, ease: 'easeOut' }}
           className={`border-b transition-all duration-300 ${
             scrolled
-              ? 'border-ink-900/8 bg-mist-50/88 shadow-[0_18px_40px_rgba(8,17,28,0.08)] backdrop-blur-xl'
-              : 'border-white/10 bg-transparent'
+              ? 'border-dark-200 bg-white shadow-lg'
+              : 'border-transparent bg-white/95 backdrop-blur-sm'
           }`}
         >
-          <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+          <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+            {/* Logo */}
             <Link to="/" className="flex items-center gap-3">
-              <div
-                className={`flex h-12 w-12 items-center justify-center rounded-2xl border ${
-                  scrolled
-                    ? 'border-forest-500/20 bg-forest-500/10'
-                    : 'border-white/15 bg-white/10 backdrop-blur'
-                }`}
-              >
-                <Mountains
-                  className={`h-7 w-7 ${scrolled ? 'text-forest-500' : 'text-gold-400'}`}
-                  weight="duotone"
-                />
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-500 text-white">
+                <Mountains className="h-6 w-6" weight="bold" />
               </div>
               <div>
-                <p className={`text-xs uppercase tracking-[0.26em] ${scrolled ? 'text-forest-500' : 'text-sand-200/80'}`}>
-                  Alpha Trekkers
+                <p className="text-xl font-bold text-dark-900">
+                  Alpha <span className="text-primary-500">Trekkers</span>
                 </p>
-                <p className={`font-heading text-2xl font-semibold ${scrolled ? 'text-ink-900' : 'text-white'}`}>
-                  Monsoon Trail Journeys
-                </p>
-                <p className={`font-playful-text text-[0.65rem] tracking-wide ${scrolled ? 'text-forest-600/70' : 'text-gold-400/80'}`}>
-                  into the wild
+                <p className="text-[0.65rem] font-medium uppercase tracking-wider text-dark-400">
+                  Adventure & Travel
                 </p>
               </div>
             </Link>
 
-            <div className="hidden items-center gap-2 xl:flex">
+            {/* Desktop nav links */}
+            <div className="hidden items-center gap-1 xl:flex">
               <NavLink
                 to="/"
                 className={({ isActive }) =>
-                  `rounded-full px-4 py-2 text-sm font-medium ${
+                  `px-4 py-2 text-[0.9rem] font-medium transition ${
                     isActive
-                      ? scrolled
-                        ? 'bg-forest-500 text-white'
-                        : 'bg-white/14 text-white'
-                      : scrolled
-                        ? 'text-ink-700 hover:bg-ink-900/5'
-                        : 'text-sand-100/82 hover:bg-white/10 hover:text-white'
+                      ? 'text-primary-500'
+                      : 'text-dark-700 hover:text-primary-500'
                   }`
                 }
               >
@@ -142,18 +139,14 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={() => setTripsMenuOpen((open) => !open)}
-                  className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium ${
+                  className={`inline-flex items-center gap-1.5 px-4 py-2 text-[0.9rem] font-medium transition ${
                     isTripsSection
-                      ? scrolled
-                        ? 'bg-forest-500 text-white'
-                        : 'bg-white/14 text-white'
-                      : scrolled
-                        ? 'text-ink-700 hover:bg-ink-900/5'
-                        : 'text-sand-100/82 hover:bg-white/10 hover:text-white'
+                      ? 'text-primary-500'
+                      : 'text-dark-700 hover:text-primary-500'
                   }`}
                 >
-                  Trips
-                  <CaretDown className={`h-4 w-4 transition-transform ${tripsMenuOpen ? 'rotate-180' : ''}`} />
+                  Tours
+                  <CaretDown className={`h-3.5 w-3.5 transition-transform ${tripsMenuOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 <AnimatePresence>
@@ -162,17 +155,16 @@ export default function Navbar() {
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 8 }}
-                      className="travel-panel absolute left-0 mt-3 w-64 rounded-[1.75rem] p-3"
+                      className="absolute left-0 mt-1 w-56 rounded-lg border border-dark-200 bg-white p-2 shadow-xl"
                     >
                       {tripMenuLinks.map((link) => {
                         const active = location.pathname === link.to;
-
                         return (
                           <Link
                             key={link.to}
                             to={link.to}
-                            className={`block rounded-2xl px-4 py-3 text-sm font-medium ${
-                              active ? 'bg-forest-500 text-white' : 'text-ink-700 hover:bg-sand-100'
+                            className={`block rounded-lg px-4 py-2.5 text-sm font-medium transition ${
+                              active ? 'bg-primary-500 text-white' : 'text-dark-700 hover:bg-primary-50 hover:text-primary-500'
                             }`}
                           >
                             {link.label}
@@ -187,14 +179,10 @@ export default function Navbar() {
               <NavLink
                 to="/about"
                 className={({ isActive }) =>
-                  `rounded-full px-4 py-2 text-sm font-medium ${
+                  `px-4 py-2 text-[0.9rem] font-medium transition ${
                     isActive
-                      ? scrolled
-                        ? 'bg-forest-500 text-white'
-                        : 'bg-white/14 text-white'
-                      : scrolled
-                        ? 'text-ink-700 hover:bg-ink-900/5'
-                        : 'text-sand-100/82 hover:bg-white/10 hover:text-white'
+                      ? 'text-primary-500'
+                      : 'text-dark-700 hover:text-primary-500'
                   }`
                 }
               >
@@ -204,14 +192,10 @@ export default function Navbar() {
               <NavLink
                 to="/contact"
                 className={({ isActive }) =>
-                  `rounded-full px-4 py-2 text-sm font-medium ${
+                  `px-4 py-2 text-[0.9rem] font-medium transition ${
                     isActive
-                      ? scrolled
-                        ? 'bg-forest-500 text-white'
-                        : 'bg-white/14 text-white'
-                      : scrolled
-                        ? 'text-ink-700 hover:bg-ink-900/5'
-                        : 'text-sand-100/82 hover:bg-white/10 hover:text-white'
+                      ? 'text-primary-500'
+                      : 'text-dark-700 hover:text-primary-500'
                   }`
                 }
               >
@@ -219,22 +203,21 @@ export default function Navbar() {
               </NavLink>
             </div>
 
+            {/* Right side actions */}
             <div className="hidden items-center gap-3 xl:flex">
               {isAuthenticated && user ? (
                 <div className="relative">
                   <button
                     type="button"
                     onClick={() => setDropdownOpen((open) => !open)}
-                    className={`flex items-center gap-3 rounded-full px-4 py-2.5 ${
-                      scrolled ? 'bg-ink-900/5 text-ink-900' : 'bg-white/10 text-white'
-                    }`}
+                    className="flex items-center gap-3 rounded-lg border border-dark-200 px-4 py-2.5 text-dark-700 transition hover:border-primary-500"
                   >
-                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gold-500 text-sm font-semibold text-ink-950">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-500 text-sm font-bold text-white">
                       {user.firstName[0]}
                       {user.lastName[0]}
                     </span>
                     <span className="text-sm font-medium">{user.firstName}</span>
-                    <CaretDown className={`h-4 w-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+                    <CaretDown className={`h-3.5 w-3.5 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
 
                   <AnimatePresence>
@@ -243,28 +226,19 @@ export default function Navbar() {
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 8 }}
-                        className="travel-panel absolute right-0 mt-3 w-60 rounded-3xl p-3"
+                        className="absolute right-0 mt-2 w-52 rounded-lg border border-dark-200 bg-white p-2 shadow-xl"
                       >
                         <Link
                           to="/my-bookings"
-                          className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm text-ink-700 hover:bg-sand-100"
+                          className="flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm text-dark-700 hover:bg-primary-50 hover:text-primary-500"
                         >
-                          <CalendarBlank className="h-4 w-4 text-forest-500" />
+                          <CalendarBlank className="h-4 w-4" />
                           My Bookings
                         </Link>
-                        {user.role === 'ADMIN' && (
-                          <Link
-                            to="/admin"
-                            className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm text-ink-700 hover:bg-sand-100"
-                          >
-                            <User className="h-4 w-4 text-forest-500" />
-                            Admin Panel
-                          </Link>
-                        )}
                         <button
                           type="button"
                           onClick={handleLogout}
-                          className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm text-coral-600 hover:bg-coral-500/8"
+                          className="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-left text-sm text-red-500 hover:bg-red-50"
                         >
                           <SignOut className="h-4 w-4" />
                           Sign Out
@@ -277,27 +251,24 @@ export default function Navbar() {
                 <>
                   <Link
                     to="/login"
-                    className={`rounded-full px-4 py-2.5 text-sm font-medium ${
-                      scrolled ? 'text-ink-700 hover:bg-ink-900/5' : 'text-white/88 hover:bg-white/10'
-                    }`}
+                    className="px-4 py-2 text-sm font-medium text-dark-700 hover:text-primary-500"
                   >
                     Sign In
                   </Link>
                   <Link to="/trips">
-                    <Button size="md" variant="accent" rightIcon={<Tree className="h-4 w-4" weight="duotone" />}>
-                      Book Trek
+                    <Button size="md" variant="primary">
+                      Book Now
                     </Button>
                   </Link>
                 </>
               )}
             </div>
 
+            {/* Mobile hamburger */}
             <button
               type="button"
               onClick={() => setMobileOpen((open) => !open)}
-              className={`rounded-2xl p-3 xl:hidden ${
-                scrolled ? 'bg-ink-900/5 text-ink-900' : 'bg-white/10 text-white'
-              }`}
+              className="rounded-lg border border-dark-200 p-2.5 text-dark-700 xl:hidden"
               aria-label="Toggle menu"
             >
               {mobileOpen ? <X className="h-5 w-5" /> : <List className="h-5 w-5" />}
@@ -306,6 +277,7 @@ export default function Navbar() {
         </motion.header>
       </div>
 
+      {/* Mobile menu */}
       <AnimatePresence>
         {mobileOpen && (
           <>
@@ -313,7 +285,7 @@ export default function Navbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-40 bg-ink-950/45 backdrop-blur-sm xl:hidden"
+              className="fixed inset-0 z-40 bg-dark-900/40 backdrop-blur-sm xl:hidden"
               onClick={() => setMobileOpen(false)}
             />
             <motion.aside
@@ -321,39 +293,40 @@ export default function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 24, stiffness: 260 }}
-              className="travel-panel fixed right-0 top-0 z-50 flex h-full w-80 max-w-[88vw] flex-col rounded-l-[2rem] p-6 xl:hidden"
+              className="fixed right-0 top-0 z-50 flex h-full w-80 max-w-[88vw] flex-col border-l border-dark-200 bg-white p-6 xl:hidden"
             >
               <div className="mb-8 flex items-center justify-between">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.25em] text-forest-500">Alpha Trekkers</p>
-                  <p className="font-heading text-2xl text-ink-900">Travel Menu</p>
+                  <p className="text-lg font-bold text-dark-900">
+                    Alpha <span className="text-primary-500">Trekkers</span>
+                  </p>
                 </div>
-                <button type="button" onClick={() => setMobileOpen(false)} className="rounded-2xl bg-sand-100 p-2 text-ink-800">
+                <button type="button" onClick={() => setMobileOpen(false)} className="rounded-lg border border-dark-200 p-2 text-dark-600">
                   <X className="h-5 w-5" />
                 </button>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <NavLink
                   to="/"
                   className={({ isActive }) =>
-                    `block rounded-2xl px-4 py-3 text-sm font-medium ${
-                      isActive ? 'bg-forest-500 text-white' : 'text-ink-700 hover:bg-sand-100'
+                    `block rounded-lg px-4 py-3 text-sm font-medium ${
+                      isActive ? 'bg-primary-500 text-white' : 'text-dark-700 hover:bg-primary-50'
                     }`
                   }
                 >
                   Home
                 </NavLink>
 
-                <div className="rounded-[1.5rem] border border-ink-900/8 p-2">
+                <div className="rounded-lg border border-dark-200 p-1">
                   <button
                     type="button"
                     onClick={() => setMobileTripsOpen((open) => !open)}
-                    className={`flex w-full items-center justify-between rounded-2xl px-4 py-3 text-sm font-medium ${
-                      isTripsSection ? 'bg-forest-500 text-white' : 'text-ink-700 hover:bg-sand-100'
+                    className={`flex w-full items-center justify-between rounded-lg px-4 py-3 text-sm font-medium ${
+                      isTripsSection ? 'bg-primary-500 text-white' : 'text-dark-700 hover:bg-primary-50'
                     }`}
                   >
-                    <span>Trips</span>
+                    <span>Tours</span>
                     <CaretDown className={`h-4 w-4 transition-transform ${mobileTripsOpen ? 'rotate-180' : ''}`} />
                   </button>
 
@@ -365,15 +338,15 @@ export default function Navbar() {
                         exit={{ height: 0, opacity: 0 }}
                         className="overflow-hidden"
                       >
-                        <div className="mt-2 space-y-2 px-2 pb-2">
+                        <div className="mt-1 space-y-1 px-2 pb-2">
                           {tripMenuLinks.map((link) => (
                             <Link
                               key={link.to}
                               to={link.to}
-                              className={`block rounded-2xl px-4 py-3 text-sm ${
+                              className={`block rounded-lg px-4 py-2.5 text-sm ${
                                 location.pathname === link.to
-                                  ? 'bg-forest-500 text-white'
-                                  : 'text-ink-700 hover:bg-sand-100'
+                                  ? 'bg-primary-500 text-white'
+                                  : 'text-dark-700 hover:bg-primary-50'
                               }`}
                             >
                               {link.label}
@@ -388,8 +361,8 @@ export default function Navbar() {
                 <NavLink
                   to="/about"
                   className={({ isActive }) =>
-                    `block rounded-2xl px-4 py-3 text-sm font-medium ${
-                      isActive ? 'bg-forest-500 text-white' : 'text-ink-700 hover:bg-sand-100'
+                    `block rounded-lg px-4 py-3 text-sm font-medium ${
+                      isActive ? 'bg-primary-500 text-white' : 'text-dark-700 hover:bg-primary-50'
                     }`
                   }
                 >
@@ -399,8 +372,8 @@ export default function Navbar() {
                 <NavLink
                   to="/contact"
                   className={({ isActive }) =>
-                    `block rounded-2xl px-4 py-3 text-sm font-medium ${
-                      isActive ? 'bg-forest-500 text-white' : 'text-ink-700 hover:bg-sand-100'
+                    `block rounded-lg px-4 py-3 text-sm font-medium ${
+                      isActive ? 'bg-primary-500 text-white' : 'text-dark-700 hover:bg-primary-50'
                     }`
                   }
                 >
@@ -408,24 +381,24 @@ export default function Navbar() {
                 </NavLink>
               </div>
 
-              <div className="mt-8 rounded-[1.75rem] bg-ink-950 px-5 py-6 text-sand-100">
-                <p className="text-xs uppercase tracking-[0.22em] text-gold-400">Direct Contact</p>
-                <div className="mt-4 space-y-3 text-sm text-sand-200/80">
-                  <p className="flex items-center gap-2"><PhoneCall className="h-4 w-4 text-gold-400" /> +91 98765 43210</p>
-                  <p className="flex items-center gap-2"><EnvelopeSimple className="h-4 w-4 text-gold-400" /> hello@alphatrekkers.com</p>
+              <div className="mt-6 rounded-lg bg-dark-900 px-5 py-5 text-white">
+                <p className="text-xs font-semibold uppercase tracking-wider text-primary-400">Contact</p>
+                <div className="mt-3 space-y-2.5 text-sm text-dark-300">
+                  <p className="flex items-center gap-2"><PhoneCall className="h-4 w-4 text-primary-400" /> +91 98765 43210</p>
+                  <p className="flex items-center gap-2"><EnvelopeSimple className="h-4 w-4 text-primary-400" /> hello@alphatrekkers.com</p>
                 </div>
               </div>
 
               <div className="mt-auto space-y-3 pt-6">
                 {isAuthenticated && user ? (
                   <>
-                    <Link to="/my-bookings" className="block rounded-2xl bg-sand-100 px-4 py-3 text-sm font-medium text-ink-800">
+                    <Link to="/my-bookings" className="block rounded-lg border border-dark-200 px-4 py-3 text-center text-sm font-medium text-dark-700">
                       My Bookings
                     </Link>
                     <button
                       type="button"
                       onClick={handleLogout}
-                      className="w-full rounded-2xl border border-coral-500/25 px-4 py-3 text-left text-sm font-medium text-coral-600"
+                      className="w-full rounded-lg border border-red-200 px-4 py-3 text-sm font-medium text-red-500"
                     >
                       Sign Out
                     </button>
@@ -438,8 +411,8 @@ export default function Navbar() {
                       </Button>
                     </Link>
                     <Link to="/trips">
-                      <Button variant="accent" size="md" fullWidth>
-                        Explore Tours
+                      <Button variant="primary" size="md" fullWidth>
+                        Book Now
                       </Button>
                     </Link>
                   </>

@@ -35,6 +35,13 @@ export default function Login() {
   const onSubmit = async (data: FormData) => {
     try {
       const response = await api.post<ApiResponse<AuthResponse & { refreshToken: string }>>('/auth/login', data);
+
+      if (response.data.data.user.role === 'ADMIN') {
+        toast.error('Administrator accounts must sign in from /admin/login');
+        navigate('/admin/login', { replace: true, state: { from: location.state?.from } });
+        return;
+      }
+
       login(response.data.data);
       toast.success(`Welcome back, ${response.data.data.user.firstName}`);
       navigate(from, { replace: true });
@@ -81,12 +88,17 @@ export default function Login() {
               </div>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5">
+            <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5" autoComplete="off">
               <div>
                 <label className="mb-2 block text-sm font-medium text-ink-700">Email</label>
                 <div className="travel-input flex items-center gap-3">
                   <EnvelopeSimple className="h-5 w-5 text-forest-500" />
-                  <input {...register('email')} type="email" className="min-w-0 flex-1 bg-transparent focus:outline-none" placeholder="you@example.com" />
+                  <input
+                    {...register('email')}
+                    type="email"
+                    autoComplete="section-user username"
+                    className="min-w-0 flex-1 bg-transparent focus:outline-none"
+                  />
                 </div>
                 {errors.email ? <p className="mt-2 text-xs text-coral-600">{errors.email.message}</p> : null}
               </div>
@@ -98,8 +110,8 @@ export default function Login() {
                   <input
                     {...register('password')}
                     type={showPassword ? 'text' : 'password'}
+                    autoComplete="section-user current-password"
                     className="min-w-0 flex-1 bg-transparent focus:outline-none"
-                    placeholder="Your password"
                   />
                   <button type="button" onClick={() => setShowPassword((current) => !current)} className="text-ink-600">
                     {showPassword ? <EyeSlash className="h-5 w-5" /> : <Eye className="h-5 w-5" />}

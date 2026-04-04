@@ -102,13 +102,17 @@ export default function Register() {
               </div>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5">
+            <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5" autoComplete="off">
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
                   <label className="mb-2 block text-sm font-medium text-ink-700">First name</label>
                   <div className="travel-input flex items-center gap-3">
                     <User className="h-5 w-5 text-forest-500" />
-                    <input {...register('firstName')} className="min-w-0 flex-1 bg-transparent focus:outline-none" placeholder="Aarav" />
+                    <input
+                      {...register('firstName')}
+                      autoComplete="section-user given-name"
+                      className="min-w-0 flex-1 bg-transparent focus:outline-none"
+                    />
                   </div>
                   {errors.firstName ? <p className="mt-2 text-xs text-coral-600">{errors.firstName.message}</p> : null}
                 </div>
@@ -116,7 +120,11 @@ export default function Register() {
                   <label className="mb-2 block text-sm font-medium text-ink-700">Last name</label>
                   <div className="travel-input flex items-center gap-3">
                     <User className="h-5 w-5 text-forest-500" />
-                    <input {...register('lastName')} className="min-w-0 flex-1 bg-transparent focus:outline-none" placeholder="Patil" />
+                    <input
+                      {...register('lastName')}
+                      autoComplete="section-user family-name"
+                      className="min-w-0 flex-1 bg-transparent focus:outline-none"
+                    />
                   </div>
                   {errors.lastName ? <p className="mt-2 text-xs text-coral-600">{errors.lastName.message}</p> : null}
                 </div>
@@ -126,7 +134,12 @@ export default function Register() {
                 <label className="mb-2 block text-sm font-medium text-ink-700">Email</label>
                 <div className="travel-input flex items-center gap-3">
                   <EnvelopeSimple className="h-5 w-5 text-forest-500" />
-                  <input {...register('email')} type="email" className="min-w-0 flex-1 bg-transparent focus:outline-none" placeholder="you@example.com" />
+                  <input
+                    {...register('email')}
+                    type="email"
+                    autoComplete="section-user email"
+                    className="min-w-0 flex-1 bg-transparent focus:outline-none"
+                  />
                 </div>
                 {errors.email ? <p className="mt-2 text-xs text-coral-600">{errors.email.message}</p> : null}
               </div>
@@ -135,7 +148,11 @@ export default function Register() {
                 <label className="mb-2 block text-sm font-medium text-ink-700">Phone</label>
                 <div className="travel-input flex items-center gap-3">
                   <Phone className="h-5 w-5 text-forest-500" />
-                  <input {...register('phone')} className="min-w-0 flex-1 bg-transparent focus:outline-none" placeholder="+91 98765 43210" />
+                  <input
+                    {...register('phone')}
+                    autoComplete="section-user tel"
+                    className="min-w-0 flex-1 bg-transparent focus:outline-none"
+                  />
                 </div>
               </div>
 
@@ -146,8 +163,8 @@ export default function Register() {
                   <input
                     {...register('password')}
                     type={showPassword ? 'text' : 'password'}
+                    autoComplete="section-user new-password"
                     className="min-w-0 flex-1 bg-transparent focus:outline-none"
-                    placeholder="Create a password"
                   />
                   <button type="button" onClick={() => setShowPassword((current) => !current)} className="text-ink-600">
                     {showPassword ? <EyeSlash className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -160,7 +177,12 @@ export default function Register() {
                 <label className="mb-2 block text-sm font-medium text-ink-700">Confirm password</label>
                 <div className="travel-input flex items-center gap-3">
                   <Lock className="h-5 w-5 text-forest-500" />
-                  <input {...register('confirmPassword')} type="password" className="min-w-0 flex-1 bg-transparent focus:outline-none" placeholder="Repeat your password" />
+                  <input
+                    {...register('confirmPassword')}
+                    type="password"
+                    autoComplete="section-user new-password"
+                    className="min-w-0 flex-1 bg-transparent focus:outline-none"
+                  />
                 </div>
                 {errors.confirmPassword ? <p className="mt-2 text-xs text-coral-600">{errors.confirmPassword.message}</p> : null}
               </div>

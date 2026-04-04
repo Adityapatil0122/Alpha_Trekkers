@@ -176,31 +176,31 @@ export default function BookingPage() {
                     <div className="grid gap-4 sm:grid-cols-3">
                       <div>
                         <label className="mb-2 block text-sm font-medium text-ink-700">Full name</label>
-                        <input {...register(`participants.${index}.fullName`)} className="travel-input" placeholder="Traveler name" />
+                        <input {...register(`participants.${index}.fullName`)} className="travel-input" />
                         {errors.participants?.[index]?.fullName ? <p className="mt-2 text-xs text-coral-600">{errors.participants[index]?.fullName?.message}</p> : null}
                       </div>
                       <div>
                         <label className="mb-2 block text-sm font-medium text-ink-700">Age</label>
-                        <input type="number" {...register(`participants.${index}.age`)} className="travel-input" placeholder="Age" />
+                        <input type="number" {...register(`participants.${index}.age`)} className="travel-input" />
                       </div>
                       <div>
                         <label className="mb-2 block text-sm font-medium text-ink-700">Phone</label>
-                        <input {...register(`participants.${index}.phone`)} className="travel-input" placeholder="+91 98765 43210" />
+                        <input {...register(`participants.${index}.phone`)} className="travel-input" />
                       </div>
                     </div>
 
                     <div className="mt-4 grid gap-4 sm:grid-cols-3">
                       <div>
                         <label className="mb-2 block text-sm font-medium text-ink-700">Emergency contact</label>
-                        <input {...register(`participants.${index}.emergencyName`)} className="travel-input" placeholder="Name" />
+                        <input {...register(`participants.${index}.emergencyName`)} className="travel-input" />
                       </div>
                       <div>
                         <label className="mb-2 block text-sm font-medium text-ink-700">Emergency phone</label>
-                        <input {...register(`participants.${index}.emergencyPhone`)} className="travel-input" placeholder="Phone" />
+                        <input {...register(`participants.${index}.emergencyPhone`)} className="travel-input" />
                       </div>
                       <div>
                         <label className="mb-2 block text-sm font-medium text-ink-700">Medical notes</label>
-                        <input {...register(`participants.${index}.medicalNotes`)} className="travel-input" placeholder="Optional notes" />
+                        <input {...register(`participants.${index}.medicalNotes`)} className="travel-input" />
                       </div>
                     </div>
                   </div>
@@ -214,13 +214,12 @@ export default function BookingPage() {
                 {...register('specialRequests')}
                 rows={4}
                 className="travel-input mt-5 resize-none"
-                placeholder="Dietary needs, transport constraints, or anything the team should know."
               />
             </div>
 
             <div className="travel-panel rounded-[2rem] p-6 sm:p-8">
               <h2 className="font-heading text-4xl text-ink-900">Promo code</h2>
-              <input {...register('promoCode')} className="travel-input mt-5" placeholder="Enter promo code if you have one" />
+              <input {...register('promoCode')} className="travel-input mt-5" />
             </div>
           </div>
 

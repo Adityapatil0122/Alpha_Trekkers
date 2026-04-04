@@ -7,31 +7,32 @@ import {
   Handshake,
   MapPinLine,
   Mountains,
+  Play,
   ShieldCheck,
+  Star,
   TreeEvergreen,
   Users,
 } from '@phosphor-icons/react';
-import Button from '@/components/ui/Button';
 
 const values = [
   {
     Icon: Eye,
-    title: 'Clear travel direction',
+    title: 'Clear Travel Direction',
     copy: 'We plan journeys with enough detail that guests always know what comes next, without losing the thrill of the route.',
   },
   {
     Icon: ShieldCheck,
-    title: 'Safety as a standard',
+    title: 'Safety As A Standard',
     copy: 'Route checks, leader briefing, and emergency readiness are built into operations, not treated as add-ons.',
   },
   {
     Icon: Handshake,
-    title: 'Human-led hosting',
+    title: 'Human-Led Hosting',
     copy: 'Treks feel warmer when they are guided by people who know the history, terrain, and group rhythm deeply.',
   },
   {
     Icon: TreeEvergreen,
-    title: 'Respect for the trail',
+    title: 'Respect For The Trail',
     copy: 'We design for low-friction travel, cleaner camps, and more mindful movement through the hills.',
   },
 ];
@@ -39,49 +40,48 @@ const values = [
 const destinations = [
   {
     title: 'Rajgad',
-    subtitle: 'Travel To',
     trips: '6 Routes',
     image: MAHARASHTRA_MONSOON_IMAGES.sections.aboutRajgad,
   },
   {
     title: 'Harishchandragad',
-    subtitle: 'Travel To',
     trips: '4 Routes',
     image: MAHARASHTRA_MONSOON_IMAGES.sections.aboutHarishchandragad,
   },
   {
     title: 'Torna',
-    subtitle: 'Travel To',
     trips: '5 Routes',
     image: MAHARASHTRA_MONSOON_IMAGES.sections.aboutTorna,
   },
   {
     title: 'Kalsubai',
-    subtitle: 'Travel To',
     trips: '3 Routes',
     image: MAHARASHTRA_MONSOON_IMAGES.sections.aboutKalsubai,
   },
   {
     title: 'Rajmachi',
-    subtitle: 'Travel To',
     trips: 'Night Treks',
     image: MAHARASHTRA_MONSOON_IMAGES.sections.aboutRajmachi,
   },
 ];
 
 const storyStats = [
-  { value: '2019', label: 'Operations started' },
-  { value: '12K+', label: 'Trekkers hosted' },
-  { value: 'Local-first', label: 'Maharashtra trail focus' },
+  { value: '2019', label: 'Operations Started' },
+  { value: '12K+', label: 'Trekkers Hosted' },
+  { value: 'Local-first', label: 'Maharashtra Focus' },
+];
+
+const teamMembers = [
+  { name: 'Trek Leader', role: 'Head Guide', avatar: 'TL' },
+  { name: 'Route Planner', role: 'Operations', avatar: 'RP' },
+  { name: 'Safety Officer', role: 'Emergency Lead', avatar: 'SO' },
 ];
 
 const container = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.12,
-    },
+    transition: { staggerChildren: 0.12 },
   },
 };
 
@@ -93,113 +93,81 @@ const item = {
 export default function About() {
   return (
     <>
-      <section className="travel-dark relative overflow-hidden pt-28">
+      {/* ─── HERO BANNER ─── */}
+      <section className="relative overflow-hidden bg-dark-900 pt-28">
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-28"
+          className="absolute inset-0 bg-cover bg-center opacity-30"
           style={{ backgroundImage: `url(${MAHARASHTRA_MONSOON_IMAGES.heroes.about})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-ink-950/88 via-ink-900/74 to-ink-900/24" />
-        <div className="absolute -left-16 top-32 h-48 w-48 rounded-full bg-gold-500/14 blur-3xl" />
-        <div className="absolute right-0 top-20 h-64 w-64 rounded-full bg-forest-500/18 blur-3xl" />
+        <div className="absolute inset-0 bg-gradient-to-r from-dark-900/90 via-dark-900/70 to-dark-900/40" />
 
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: 'easeOut' }}
-          className="relative mx-auto max-w-7xl px-4 pb-[5.5rem] pt-20 sm:px-6 lg:px-8"
+          className="relative mx-auto max-w-7xl px-4 pb-20 pt-20 sm:px-6 lg:px-8"
         >
-          <span className="section-label !bg-white/10 !text-sand-100 before:!bg-gold-400">
+          <p className="text-sm font-semibold uppercase tracking-wider text-primary-400">
             About Alpha Trekkers
-          </span>
-          <div className="mt-8 grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
+          </p>
+          <div className="mt-6 grid gap-10 lg:grid-cols-2 lg:items-end">
             <div>
-              <h1 className="max-w-4xl font-heading text-5xl leading-[0.94] text-white sm:text-6xl lg:text-7xl">
-                We shape Maharashtra treks to feel rich, calm, and worth remembering.
+              <h1 className="max-w-2xl text-5xl font-extrabold leading-tight text-white sm:text-6xl">
+                We Shape Maharashtra Treks To Feel{' '}
+                <span className="text-primary-400">Rich & Worth Remembering</span>
               </h1>
-              <p className="mt-6 max-w-2xl text-lg leading-8 text-sand-100/78">
+              <p className="mt-6 max-w-xl text-lg leading-8 text-dark-300">
                 Alpha Trekkers is built around guided fort journeys, trail timing, and local route
                 knowledge. The goal is simple: make outdoor travel feel premium without making it
                 feel artificial.
               </p>
-              <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+              <div className="mt-8 flex flex-wrap gap-4">
                 <Link to="/trips">
-                  <Button size="lg" variant="accent" rightIcon={<ArrowRight className="h-5 w-5" />}>
-                    Explore departures
-                  </Button>
+                  <button className="rounded-lg bg-primary-500 px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-primary-600">
+                    Explore Departures
+                  </button>
                 </Link>
                 <Link to="/contact">
-                  <Button
-                    size="lg"
-                    variant="secondary"
-                    className="border-white/20 bg-white/10 text-white hover:bg-white/16 hover:text-white"
-                  >
-                    Talk to the team
-                  </Button>
+                  <button className="rounded-lg border-2 border-white/30 px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-white transition hover:border-primary-400 hover:text-primary-400">
+                    Talk To The Team
+                  </button>
                 </Link>
               </div>
             </div>
 
-            <motion.div
-              variants={container}
-              initial="hidden"
-              animate="show"
-              className="grid gap-4 sm:grid-cols-2"
-            >
-              <motion.div
-                variants={item}
-                className="rounded-[2rem] border border-white/12 bg-white/10 p-6 backdrop-blur-md"
-              >
-                <p className="text-xs uppercase tracking-[0.18em] text-gold-400">Brand direction</p>
-                <p className="mt-4 font-heading text-4xl text-white">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+                <p className="text-xs font-semibold uppercase tracking-wider text-primary-400">Brand Direction</p>
+                <p className="mt-3 text-2xl font-bold text-white">
                   Editorial visuals with grounded trek operations.
                 </p>
-              </motion.div>
-              <motion.div
-                variants={item}
-                className="rounded-[2rem] border border-white/12 bg-white/10 p-6 backdrop-blur-md"
-              >
-                <p className="text-xs uppercase tracking-[0.18em] text-gold-400">Core belief</p>
-                <p className="mt-4 text-base leading-8 text-sand-100/76">
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+                <p className="text-xs font-semibold uppercase tracking-wider text-primary-400">Core Belief</p>
+                <p className="mt-3 text-sm leading-7 text-dark-300">
                   Better journeys come from clearer pacing, sharper planning, and guides who know the hills deeply.
                 </p>
-              </motion.div>
-              <motion.div
-                variants={item}
-                className="rounded-[2rem] border border-white/12 bg-white/10 p-6 backdrop-blur-md sm:col-span-2"
-              >
-                <div className="flex flex-wrap gap-3 text-sm text-sand-100/84">
-                  <span className="rounded-full border border-white/14 bg-white/8 px-4 py-2">
-                    Fort history and route storytelling
-                  </span>
-                  <span className="rounded-full border border-white/14 bg-white/8 px-4 py-2">
-                    Weekend and night departures
-                  </span>
-                  <span className="rounded-full border border-white/14 bg-white/8 px-4 py-2">
-                    Local support from pickup to descent
-                  </span>
-                </div>
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
           </div>
         </motion.div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="grid gap-10 lg:grid-cols-[1.02fr_0.98fr] lg:items-center">
+      {/* ─── OUR STORY SECTION ─── */}
+      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+        <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
           <motion.div
             initial={{ opacity: 0, x: -22 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, amount: 0.25 }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
-            className="travel-panel relative overflow-hidden rounded-[2.6rem] p-8 sm:p-10"
           >
-            <div className="absolute -right-8 top-0 h-40 w-40 rounded-full bg-forest-500/10 blur-3xl" />
-            <p className="playful-text text-xl text-forest-500 mb-2">~ Our Story ~</p>
-            <p className="text-xs uppercase tracking-[0.2em] text-forest-500">Our perspective</p>
-            <h2 className="mt-4 font-heading text-5xl leading-tight text-ink-900">
-              Adventure should feel polished, not chaotic.
+            <p className="text-sm font-semibold uppercase tracking-wider text-primary-500">Our Story</p>
+            <h2 className="mt-3 text-4xl font-bold leading-tight text-dark-900 sm:text-5xl">
+              Adventure Should Feel{' '}
+              <span className="playful-text text-primary-500">Polished</span>, Not Chaotic
             </h2>
-            <p className="mt-5 text-base leading-8 text-ink-700/74">
+            <p className="mt-5 leading-7 text-dark-500">
               We are not trying to make the mountains look like a resort product. We are trying to
               make the full journey feel better organized, more visually appealing, and easier to
               trust from the first click to the final descent.
@@ -209,172 +177,165 @@ export default function About() {
                 <motion.div
                   key={stat.label}
                   whileHover={{ y: -6 }}
-                  className="rounded-[1.7rem] bg-sand-100 p-5 shadow-[0_18px_36px_rgba(17,32,51,0.06)]"
+                  className="rounded-xl border border-dark-200 bg-dark-50 p-5 text-center shadow-sm"
                 >
-                  <p className="font-heading text-4xl text-ink-900">{stat.value}</p>
-                  <p className="mt-2 text-sm leading-6 text-ink-700/70">{stat.label}</p>
+                  <p className="text-3xl font-bold text-primary-600">{stat.value}</p>
+                  <p className="mt-2 text-sm text-dark-500">{stat.label}</p>
                 </motion.div>
               ))}
             </div>
           </motion.div>
 
           <motion.div
+            initial={{ opacity: 0, x: 22 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.25 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+            className="relative"
+          >
+            <img
+              src={MAHARASHTRA_MONSOON_IMAGES.sections.chooseUsRange}
+              alt="Sahyadri mountain range"
+              className="h-[450px] w-full rounded-2xl object-cover shadow-xl"
+            />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <button className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-500 text-white shadow-2xl transition hover:scale-110">
+                <Play className="h-7 w-7" weight="fill" />
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ─── VALUES SECTION ─── */}
+      <section className="bg-dark-50 py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <p className="text-sm font-semibold uppercase tracking-wider text-primary-500">Why Choose Us</p>
+            <h2 className="mt-3 text-4xl font-bold text-dark-900 sm:text-5xl">
+              What Makes <span className="playful-text text-primary-500">Alpha Trekkers</span> Different
+            </h2>
+          </div>
+
+          <motion.div
             variants={container}
             initial="hidden"
             whileInView="show"
             viewport={{ once: true, amount: 0.2 }}
-            className="grid gap-4"
+            className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4"
           >
             {values.map(({ Icon, title, copy }) => (
               <motion.div
                 key={title}
                 variants={item}
-                whileHover={{ y: -6, scale: 1.01 }}
-                className="travel-panel rounded-[1.9rem] p-6"
+                whileHover={{ y: -8 }}
+                className="rounded-2xl bg-white p-8 shadow-lg transition hover:shadow-xl"
               >
-                <div className="flex items-start gap-4">
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-forest-500/10">
-                    <Icon className="h-7 w-7 text-forest-500" weight="duotone" />
-                  </div>
-                  <div>
-                    <h3 className="font-heading text-3xl text-ink-900">{title}</h3>
-                    <p className="mt-2 text-sm leading-7 text-ink-700/72">{copy}</p>
-                  </div>
+                <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-xl bg-primary-50">
+                  <Icon className="h-8 w-8 text-primary-500" weight="duotone" />
                 </div>
+                <h3 className="text-xl font-bold text-dark-900">{title}</h3>
+                <p className="mt-3 text-sm leading-7 text-dark-500">{copy}</p>
               </motion.div>
             ))}
           </motion.div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.25 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="text-center"
-        >
-          <p className="playful-text text-3xl text-forest-500">Explore Maharashtra</p>
-          <h2 className="mt-2 font-body text-5xl font-semibold text-ink-900 sm:text-6xl">
+      {/* ─── DESTINATIONS SECTION ─── */}
+      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+        <div className="text-center">
+          <p className="playful-text text-3xl text-primary-500">Explore Maharashtra</p>
+          <h2 className="mt-2 text-4xl font-bold text-dark-900 sm:text-5xl">
             Popular Destinations
           </h2>
-        </motion.div>
+        </div>
 
         <motion.div
           variants={container}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.12 }}
-          className="mt-12 grid gap-5 lg:grid-cols-12"
+          className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
         >
-          {destinations.map((destination, index) => {
-            const wide = index === 0 || index === 1 || index === 4;
-
-            return (
-              <motion.div
-                key={destination.title}
-                variants={item}
-                whileHover={{ y: -8 }}
-                className={wide ? 'lg:col-span-4' : 'lg:col-span-4'}
+          {destinations.map((destination) => (
+            <motion.div
+              key={destination.title}
+              variants={item}
+              whileHover={{ y: -8 }}
+            >
+              <Link
+                to="/trips"
+                className="group relative block h-72 overflow-hidden rounded-2xl"
               >
-                <Link
-                  to="/trips"
-                  className={`group relative block overflow-hidden rounded-[1.35rem] ${
-                    wide ? 'min-h-[18rem] lg:min-h-[20rem]' : 'min-h-[18rem]'
-                  }`}
-                >
-                  <img
-                    src={destination.image}
-                    alt={destination.title}
-                    className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105 group-hover:rotate-[0.4deg]"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/35 to-transparent" />
-                  <div className="absolute right-4 top-4 rounded-lg bg-gold-500 px-4 py-2 text-xs font-semibold uppercase tracking-[0.06em] text-white">
-                    {destination.trips}
+                <img
+                  src={destination.image}
+                  alt={destination.title}
+                  className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-dark-900/70 via-transparent to-transparent" />
+                <div className="absolute right-4 top-4 rounded-lg bg-primary-500 px-3 py-1.5 text-xs font-bold text-white">
+                  {destination.trips}
+                </div>
+                <div className="absolute inset-x-0 bottom-0 p-6">
+                  <div className="flex items-center gap-2">
+                    <MapPinLine className="h-5 w-5 text-primary-400" weight="duotone" />
+                    <p className="text-2xl font-bold text-white">{destination.title}</p>
                   </div>
-                  <div className="absolute inset-x-0 bottom-0 p-6">
-                    <p className="playful-text text-2xl text-sand-100">{destination.subtitle}</p>
-                    <div className="mt-2 flex items-center gap-3">
-                      <MapPinLine className="h-5 w-5 text-gold-400" weight="duotone" />
-                      <p className="font-body text-3xl font-semibold text-white">{destination.title}</p>
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            );
-          })}
+                </div>
+              </Link>
+            </motion.div>
+          ))}
         </motion.div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.25 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="travel-dark relative overflow-hidden rounded-[2.8rem] p-8 text-white sm:p-10 lg:p-12"
-        >
-          <div className="absolute right-0 top-0 h-56 w-56 rounded-full bg-forest-500/18 blur-3xl" />
-          <div className="absolute bottom-0 left-0 h-56 w-56 rounded-full bg-gold-500/16 blur-3xl" />
-          <div className="relative grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+      {/* ─── WHO TRAVELS WITH US ─── */}
+      <section className="bg-dark-900 py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-gold-400">Who travels with us</p>
-              <h2 className="mt-4 max-w-3xl font-heading text-5xl leading-tight">
-                Weekend hikers, first-timers, repeat fort nerds, and everyone between.
+              <p className="text-sm font-semibold uppercase tracking-wider text-primary-400">Who Travels With Us</p>
+              <h2 className="mt-4 text-4xl font-bold leading-tight text-white sm:text-5xl">
+                Weekend Hikers, First-Timers & Repeat Fort Explorers
               </h2>
             </div>
-            <motion.div
-              whileHover={{ y: -6 }}
-              className="rounded-[2rem] border border-white/12 bg-white/8 p-6"
-            >
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-8">
               <div className="flex items-start gap-4">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/10">
-                  <Users className="h-8 w-8 text-gold-400" weight="duotone" />
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary-500/20">
+                  <Users className="h-8 w-8 text-primary-400" weight="duotone" />
                 </div>
                 <div>
-                  <p className="text-base leading-8 text-sand-100/76">
+                  <p className="leading-7 text-dark-300">
                     The direction may feel more premium now, but the core remains inclusive: easy
                     starts for beginners, structured departures for busy professionals, and enough
-                    depth for serious trekkers who care about route details and place history.
+                    depth for serious trekkers who care about route details.
                   </p>
-                  <div className="mt-6 flex flex-wrap gap-3 text-sm text-sand-100/84">
-                    <span className="rounded-full border border-white/12 bg-white/8 px-4 py-2">
-                      First-time friendly
-                    </span>
-                    <span className="rounded-full border border-white/12 bg-white/8 px-4 py-2">
-                      Strong local route knowledge
-                    </span>
-                    <span className="rounded-full border border-white/12 bg-white/8 px-4 py-2">
-                      Better group pacing
-                    </span>
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    {['First-time friendly', 'Local route knowledge', 'Better group pacing'].map((tag) => (
+                      <span key={tag} className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-dark-300">
+                        {tag}
+                      </span>
+                    ))}
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.96 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.55, ease: 'easeOut', delay: 0.12 }}
-            className="relative mt-10 rounded-[2rem] border border-white/10 bg-white/6 p-6"
-          >
+          <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-6">
             <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gold-500/14">
-                <Mountains className="h-8 w-8 text-gold-400" weight="duotone" />
+              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary-500/20">
+                <Mountains className="h-8 w-8 text-primary-400" weight="duotone" />
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.18em] text-gold-400">What makes it work</p>
-                <p className="mt-2 max-w-3xl text-base leading-8 text-sand-100/76">
-                  We keep the visual tone elevated, but the product itself stays practical: route
-                  clarity, meeting-point confidence, trained leaders, and better use of the terrain we already know well.
+                <p className="text-xs font-semibold uppercase tracking-wider text-primary-400">What Makes It Work</p>
+                <p className="mt-2 leading-7 text-dark-300">
+                  Route clarity, meeting-point confidence, trained leaders, and better use of the terrain we already know well.
                 </p>
               </div>
             </div>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </section>
     </>
   );

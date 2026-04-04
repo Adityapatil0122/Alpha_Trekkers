@@ -10,6 +10,7 @@ interface ProtectedRouteProps {
 export default function ProtectedRoute({ requireAdmin = false }: ProtectedRouteProps) {
   const { isAuthenticated, user, isLoading, checkAuth } = useAuthStore();
   const location = useLocation();
+  const loginPath = requireAdmin ? '/admin/login' : '/login';
 
   useEffect(() => {
     if (isAuthenticated && !user && !isLoading) {
@@ -22,11 +23,11 @@ export default function ProtectedRoute({ requireAdmin = false }: ProtectedRouteP
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to={loginPath} state={{ from: location }} replace />;
   }
 
   if (requireAdmin && user?.role !== 'ADMIN') {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/admin/login" state={{ from: location }} replace />;
   }
 
   return <Outlet />;
