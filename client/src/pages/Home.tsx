@@ -72,37 +72,43 @@ const destinationCards = [
     name: 'Rajgad',
     tours: '6 tours',
     image: '/destinations/rajgad.png',
-    tall: true,
+    cardClass: 'lg:h-[24rem] xl:h-[25rem]',
+    imageClass: 'object-center',
   },
   {
     name: 'Harishchandragad',
     tours: '4 tours',
     image: '/destinations/harishchandragad.png',
-    tall: false,
+    cardClass: 'lg:mt-8 lg:h-[18rem] xl:h-[19rem]',
+    imageClass: 'object-center',
   },
   {
     name: 'Torna Fort',
     tours: '5 tours',
     image: '/destinations/torna.png',
-    tall: false,
+    cardClass: 'lg:h-[17rem] xl:h-[18rem]',
+    imageClass: 'object-center',
   },
   {
     name: 'Kalsubai',
     tours: '3 tours',
     image: '/destinations/kalsubai.png',
-    tall: false,
+    cardClass: 'lg:-mt-2 lg:h-[19rem] xl:h-[20rem]',
+    imageClass: 'object-center',
   },
   {
     name: 'Lohagad',
     tours: '4 tours',
     image: '/destinations/lohagad.png',
-    tall: true,
+    cardClass: 'lg:mt-10 lg:h-[21rem] xl:h-[22rem]',
+    imageClass: 'object-center',
   },
   {
     name: 'Rajmachi',
     tours: '3 tours',
     image: '/destinations/rajmachi.png',
-    tall: false,
+    cardClass: 'lg:mt-2 lg:h-[19rem] xl:h-[20rem]',
+    imageClass: 'object-center',
   },
 ];
 
@@ -174,36 +180,6 @@ const featuredSlideVariants = {
   }),
 };
 
-const aboutMontageImages = [
-  {
-    src: '/destinations/lohagad.png',
-    alt: 'Lohagad fort view',
-    positionClass: 'left-1/2 top-0 -translate-x-1/2',
-    sizeClass: 'h-60 w-52 sm:h-72 sm:w-64',
-    clipPath: 'polygon(50% 0%, 72% 4%, 88% 14%, 98% 32%, 98% 54%, 88% 72%, 72% 88%, 50% 100%, 28% 88%, 12% 72%, 2% 54%, 2% 32%, 12% 14%, 28% 4%)',
-  },
-  {
-    src: '/destinations/rajgad.png',
-    alt: 'Rajgad fort landscape',
-    positionClass: 'left-0 top-1/2 -translate-y-1/2',
-    sizeClass: 'h-52 w-60 sm:h-64 sm:w-72',
-    clipPath: 'polygon(0% 50%, 4% 28%, 14% 12%, 32% 2%, 54% 2%, 72% 12%, 88% 28%, 100% 50%, 88% 72%, 72% 88%, 54% 98%, 32% 98%, 14% 88%, 4% 72%)',
-  },
-  {
-    src: '/destinations/harishchandragad.png',
-    alt: 'Harishchandragad mountain range',
-    positionClass: 'right-0 top-1/2 -translate-y-1/2',
-    sizeClass: 'h-52 w-60 sm:h-64 sm:w-72',
-    clipPath: 'polygon(100% 50%, 96% 28%, 86% 12%, 68% 2%, 46% 2%, 28% 12%, 12% 28%, 0% 50%, 12% 72%, 28% 88%, 46% 98%, 68% 98%, 86% 88%, 96% 72%)',
-  },
-  {
-    src: '/destinations/torna.png',
-    alt: 'Torna fort at sunset',
-    positionClass: 'bottom-0 left-1/2 -translate-x-1/2',
-    sizeClass: 'h-60 w-52 sm:h-72 sm:w-64',
-    clipPath: 'polygon(50% 100%, 72% 96%, 88% 86%, 98% 68%, 98% 46%, 88% 28%, 72% 12%, 50% 0%, 28% 12%, 12% 28%, 2% 46%, 2% 68%, 12% 86%, 28% 96%)',
-  },
-];
 
 /* ─── Animated Counter Hook ─── */
 
@@ -272,6 +248,7 @@ export default function Home() {
   const [featuredTrips, setFeaturedTrips] = useState<Trip[]>([]);
   const [activeCategory, setActiveCategory] = useState<(typeof trekCategories)[number]>('All');
   const [featuredStart, setFeaturedStart] = useState(0);
+  const [featuredDirection, setFeaturedDirection] = useState(1);
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const counterRef = useRef<HTMLDivElement>(null);
@@ -304,31 +281,43 @@ export default function Home() {
 
   useEffect(() => {
     setFeaturedStart(0);
+    setFeaturedDirection(1);
   }, [activeCategory]);
 
+  const featuredSource = useMemo(() => {
+    return filteredTrips.length > 0 ? filteredTrips : featuredTrips.slice(0, 8);
+  }, [featuredTrips, filteredTrips]);
+
   const visibleFeaturedTrips = useMemo(() => {
-    const source = filteredTrips.length > 0 ? filteredTrips : featuredTrips.slice(0, 8);
-    return source.slice(featuredStart, featuredStart + 3);
-  }, [featuredTrips, featuredStart, filteredTrips]);
+    return featuredSource.slice(featuredStart, featuredStart + FEATURED_PAGE_SIZE);
+  }, [featuredSource, featuredStart]);
 
   const featuredPageCount = Math.max(
     1,
-    Math.ceil((filteredTrips.length > 0 ? filteredTrips : featuredTrips.slice(0, 8)).length / 3),
+    Math.ceil(featuredSource.length / FEATURED_PAGE_SIZE),
   );
 
-  const featuredPage = Math.floor(featuredStart / 3);
+  const featuredPage = Math.floor(featuredStart / FEATURED_PAGE_SIZE);
 
   const nextFeaturedPage = () => {
-    const total = (filteredTrips.length > 0 ? filteredTrips : featuredTrips.slice(0, 8)).length;
-    const nextStart = featuredStart + 3 >= total ? 0 : featuredStart + 3;
+    const total = featuredSource.length;
+    setFeaturedDirection(1);
+    const nextStart = featuredStart + FEATURED_PAGE_SIZE >= total ? 0 : featuredStart + FEATURED_PAGE_SIZE;
     setFeaturedStart(nextStart);
   };
 
   const prevFeaturedPage = () => {
-    const source = filteredTrips.length > 0 ? filteredTrips : featuredTrips.slice(0, 8);
-    const total = source.length;
-    const prevStart = featuredStart - 3 < 0 ? Math.max(total - ((total % 3) || 3), 0) : featuredStart - 3;
+    const total = featuredSource.length;
+    setFeaturedDirection(-1);
+    const prevStart = featuredStart - FEATURED_PAGE_SIZE < 0
+      ? Math.max(total - ((total % FEATURED_PAGE_SIZE) || FEATURED_PAGE_SIZE), 0)
+      : featuredStart - FEATURED_PAGE_SIZE;
     setFeaturedStart(prevStart);
+  };
+
+  const jumpToFeaturedPage = (pageIndex: number) => {
+    setFeaturedDirection(pageIndex >= featuredPage ? 1 : -1);
+    setFeaturedStart(pageIndex * FEATURED_PAGE_SIZE);
   };
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
@@ -469,22 +458,12 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             className="relative"
           >
-            <div className="relative mx-auto h-[34rem] w-full max-w-[42rem] sm:h-[38rem]">
-              <div className="absolute inset-x-14 inset-y-16 rounded-full bg-[radial-gradient(circle,rgba(125,180,72,0.18),rgba(255,255,255,0))] blur-3xl" />
-              {aboutMontageImages.map(({ src, alt, positionClass, sizeClass, clipPath }) => (
-                <div
-                  key={src}
-                  className={`absolute overflow-hidden shadow-[0_24px_50px_rgba(15,23,42,0.18)] ${positionClass} ${sizeClass}`}
-                  style={{ clipPath }}
-                >
-                  <img
-                    src={src}
-                    alt={alt}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-              ))}
-            </div>
+            <img
+              src="/destinations/Exploring Maharashtra's ancient hilltop forts.png"
+              alt="Exploring Maharashtra's ancient hilltop forts"
+              className="mx-auto w-full max-w-[48rem] object-contain drop-shadow-[0_24px_45px_rgba(0,0,0,0.18)]"
+              style={{ height: '720px' }}
+            />
             <div className="absolute -bottom-6 -right-6 hidden rounded-2xl bg-white p-4 shadow-xl lg:block">
               <p className="playful-text text-2xl text-primary-500">Enjoy Travel</p>
             </div>
@@ -569,21 +548,34 @@ export default function Home() {
           <div className="relative mt-10">
             <button
               onClick={prevFeaturedPage}
-              className="absolute left-0 top-1/2 z-10 hidden h-12 w-12 -translate-x-[140%] -translate-y-1/2 items-center justify-center rounded-full border border-primary-500 bg-white text-primary-500 transition hover:bg-primary-500 hover:text-white lg:flex"
+              className="absolute left-0 top-1/2 z-10 hidden h-14 w-14 -translate-x-[135%] -translate-y-1/2 items-center justify-center rounded-full border border-primary-500 bg-white text-primary-500 shadow-[0_14px_35px_rgba(15,23,42,0.08)] transition hover:bg-primary-500 hover:text-white xl:flex"
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
             <button
               onClick={nextFeaturedPage}
-              className="absolute right-0 top-1/2 z-10 hidden h-12 w-12 translate-x-[140%] -translate-y-1/2 items-center justify-center rounded-full bg-primary-500 text-white transition hover:bg-primary-600 lg:flex"
+              className="absolute right-0 top-1/2 z-10 hidden h-14 w-14 translate-x-[135%] -translate-y-1/2 items-center justify-center rounded-full bg-primary-500 text-white shadow-[0_14px_35px_rgba(52,152,75,0.22)] transition hover:bg-primary-600 xl:flex"
             >
               <ArrowRight className="h-5 w-5" />
             </button>
 
-            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              {visibleFeaturedTrips.map((trip) => (
-                <TripCard key={trip.id} trip={trip} />
-              ))}
+            <div className="overflow-hidden rounded-[2rem]">
+              <AnimatePresence custom={featuredDirection} initial={false} mode="wait">
+                <motion.div
+                  key={`${activeCategory}-${featuredPage}`}
+                  custom={featuredDirection}
+                  variants={featuredSlideVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  className="grid gap-6 md:grid-cols-2 xl:grid-cols-4"
+                >
+                  {visibleFeaturedTrips.map((trip) => (
+                    <TripCard key={trip.id} trip={trip} />
+                  ))}
+                </motion.div>
+              </AnimatePresence>
             </div>
           </div>
 
@@ -592,7 +584,7 @@ export default function Home() {
               <button
                 key={index}
                 type="button"
-                onClick={() => setFeaturedStart(index * 3)}
+                onClick={() => jumpToFeaturedPage(index)}
                 className={`h-3 rounded-full transition-all ${
                   index === featuredPage ? 'w-8 bg-primary-500' : 'w-3 bg-dark-300'
                 }`}
@@ -684,37 +676,37 @@ export default function Home() {
           </h2>
         </div>
 
-        {/* Staggered masonry-style grid */}
-        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-7">
           {destinationCards.map((dest, idx) => (
             <motion.div
               key={dest.name}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 36 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: idx * 0.1 }}
+              transition={{ duration: 0.55, delay: idx * 0.08 }}
               whileHover={{ y: -8 }}
-              className={idx % 3 === 1 ? 'sm:mt-10' : ''}
+              className={dest.cardClass}
             >
               <Link
                 to="/trips"
-                className={`group relative block overflow-hidden rounded-2xl ${
-                  dest.tall ? 'h-96' : 'h-72'
-                }`}
+                className="group relative block h-[18rem] overflow-hidden rounded-[1.75rem] sm:h-[20rem] lg:h-full"
               >
                 <img
                   src={dest.image}
                   alt={dest.name}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  className={`h-full w-full ${dest.imageClass} scale-[1.01] object-cover transition-transform duration-700 ease-out group-hover:scale-110`}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-dark-900/80 via-dark-900/20 to-transparent" />
-                <div className="absolute right-4 top-4 rounded-lg bg-primary-500 px-3 py-1.5 text-xs font-bold text-white shadow-lg">
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,17,31,0.06)_0%,rgba(10,17,31,0.14)_34%,rgba(10,17,31,0.76)_100%)]" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent opacity-85 transition duration-500 group-hover:opacity-100" />
+                <div className="absolute right-4 top-4 rounded-xl bg-primary-500 px-4 py-2 text-sm font-bold text-white shadow-[0_10px_24px_rgba(76,175,80,0.28)]">
                   {dest.tours}
                 </div>
-                <div className="absolute inset-x-0 bottom-0 p-6">
-                  <p className="text-2xl font-bold text-white drop-shadow-lg">{dest.name}</p>
-                  <div className="mt-2 flex items-center gap-2 text-sm text-white/80">
-                    <MapPinLine className="h-4 w-4" weight="bold" />
+                <div className="absolute inset-x-0 bottom-0 p-6 sm:p-7">
+                  <p className="text-[1.9rem] font-bold leading-tight tracking-[-0.03em] text-white drop-shadow-[0_8px_30px_rgba(0,0,0,0.35)]">
+                    {dest.name}
+                  </p>
+                  <div className="mt-2 flex items-center gap-2 text-base text-white/85">
+                    <MapPinLine className="h-4 w-4 shrink-0" weight="bold" />
                     Maharashtra, India
                   </div>
                 </div>
