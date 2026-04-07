@@ -55,10 +55,10 @@ export default function Contact() {
     <>
       <section className="travel-dark relative overflow-hidden pt-28">
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-22"
-          style={{ backgroundImage: `url(${MAHARASHTRA_MONSOON_IMAGES.heroes.contact})` }}
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${MAHARASHTRA_MONSOON_IMAGES.trips.rajmachi[0]})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-ink-950/88 via-ink-900/74 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-dark-900/80 via-dark-900/50 to-transparent" />
         <div className="relative mx-auto max-w-7xl px-4 pb-[4.5rem] pt-20 sm:px-6 lg:px-8">
           <span className="section-label !bg-white/10 !text-sand-100 before:!bg-gold-400">
             Contact & planning
@@ -91,7 +91,7 @@ export default function Contact() {
             ))}
 
             <div className="travel-dark rounded-[2rem] p-7 text-white">
-              <p className="text-xs uppercase tracking-[0.18em] text-gold-400">Fast path</p>
+              <p className="playful-text text-2xl text-white/80">Fast path</p>
               <h2 className="mt-4 font-heading text-4xl">Need a custom team outing?</h2>
               <p className="mt-3 text-sm leading-7 text-sand-100/74">
                 Send the group size, preferred month, and fort preference. We can shape a private departure plan.
@@ -100,7 +100,7 @@ export default function Contact() {
           </div>
 
           <div className="travel-panel rounded-[2.3rem] p-8 sm:p-10">
-            <p className="text-xs uppercase tracking-[0.18em] text-forest-500">Send a message</p>
+            <p className="section-script">Send a message</p>
             <p className="playful-text text-xl text-forest-500">~ drop us a line ~</p>
             <h2 className="mt-4 font-heading text-5xl text-ink-900">Start the conversation</h2>
             <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5">

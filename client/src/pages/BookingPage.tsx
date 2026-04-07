@@ -118,10 +118,10 @@ export default function BookingPage() {
     <>
       <section className="travel-dark relative overflow-hidden pt-28">
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-18"
+          className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${MAHARASHTRA_MONSOON_IMAGES.heroes.booking})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-ink-950/88 via-ink-900/74 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-dark-900/80 via-dark-900/50 to-transparent" />
         <div className="relative mx-auto max-w-7xl px-4 pb-14 pt-[4.5rem] sm:px-6 lg:px-8">
           <div className="flex items-center gap-2 text-sm text-sand-100/70">
             <Link to="/" className="hover:text-white">Home</Link>
@@ -144,7 +144,7 @@ export default function BookingPage() {
             <div className="travel-panel rounded-[2rem] p-6 sm:p-8">
               <div className="mb-6 flex items-center justify-between">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.18em] text-forest-500">Travelers</p>
+                  <p className="section-script">Travelers</p>
                   <h2 className="font-heading text-4xl text-ink-900">Participant details</h2>
                 </div>
                 <Button
@@ -209,7 +209,8 @@ export default function BookingPage() {
             </div>
 
             <div className="travel-panel rounded-[2rem] p-6 sm:p-8">
-              <h2 className="font-heading text-4xl text-ink-900">Special requests</h2>
+              <p className="section-script">Need anything else?</p>
+              <h2 className="mt-2 font-heading text-4xl text-ink-900">Special requests</h2>
               <textarea
                 {...register('specialRequests')}
                 rows={4}
@@ -218,7 +219,8 @@ export default function BookingPage() {
             </div>
 
             <div className="travel-panel rounded-[2rem] p-6 sm:p-8">
-              <h2 className="font-heading text-4xl text-ink-900">Promo code</h2>
+              <p className="section-script">Save on the trail</p>
+              <h2 className="mt-2 font-heading text-4xl text-ink-900">Promo code</h2>
               <input {...register('promoCode')} className="travel-input mt-5" />
             </div>
           </div>

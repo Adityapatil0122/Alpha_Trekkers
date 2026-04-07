@@ -111,7 +111,7 @@ function FilterPanel({
           <SlidersHorizontal className="h-5 w-5 text-forest-500" />
         </div>
         <div>
-          <p className="text-xs uppercase tracking-[0.18em] text-forest-500">Filter journeys</p>
+          <p className="section-script">Trail filters</p>
           <h3 className="font-heading text-3xl text-ink-900">Find your route</h3>
         </div>
       </div>
@@ -303,10 +303,10 @@ export default function Trips() {
     <>
       <section className="travel-dark relative overflow-hidden pt-28">
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-28"
+          className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${MAHARASHTRA_MONSOON_IMAGES.heroes.trips})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-ink-950/88 via-ink-900/74 to-ink-900/32" />
+        <div className="absolute inset-0 bg-gradient-to-r from-dark-900/80 via-dark-900/50 to-transparent" />
         <div className="relative mx-auto max-w-7xl px-4 pb-[4.5rem] pt-20 sm:px-6 lg:px-8">
           <span className="section-label !bg-white/10 !text-sand-100 before:!bg-gold-400">
             Trip collection
@@ -346,10 +346,10 @@ export default function Trips() {
                 <img
                   src={lastChanceTrip.images[0].url}
                   alt={lastChanceTrip.images[0].altText || lastChanceTrip.title}
-                  className="absolute inset-0 h-full w-full object-cover opacity-28"
+                  className="absolute inset-0 h-full w-full object-cover"
                 />
               ) : null}
-              <div className="absolute inset-0 bg-gradient-to-r from-ink-950/88 via-ink-900/78 to-ink-900/58" />
+              <div className="absolute inset-0 bg-gradient-to-r from-dark-900/80 via-dark-900/50 to-transparent" />
               <div className="absolute right-0 top-0 h-48 w-48 rounded-full bg-forest-500/16 blur-3xl" />
               <div className="absolute bottom-0 left-0 h-40 w-40 rounded-full bg-gold-500/14 blur-3xl" />
               <div className="relative">
@@ -412,7 +412,7 @@ export default function Trips() {
 
             <div className="grid gap-4">
               <div className="travel-panel rounded-[2rem] p-6">
-                <p className="text-xs uppercase tracking-[0.18em] text-forest-500">Scheduled Trips</p>
+                <p className="section-script">Scheduled trips</p>
                 <h2 className="mt-3 font-heading text-4xl text-ink-900">Next departures open now</h2>
                 <p className="mt-3 text-sm leading-7 text-ink-700/70">
                   These upcoming trips already have live schedules and are ready for immediate booking.
@@ -476,7 +476,7 @@ export default function Trips() {
 
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-forest-500">Collection snapshot</p>
+            <p className="section-script">Collection snapshot</p>
             <h2 className="font-heading text-3xl text-ink-900">
               {pagination.total} journeys available
             </h2>
@@ -623,7 +623,8 @@ export default function Trips() {
               </>
             ) : (
               <div className="travel-panel rounded-[2rem] px-8 py-16 text-center">
-                <h3 className="font-heading text-4xl text-ink-900">No matching departures</h3>
+                <p className="section-script">Adjust your route</p>
+                <h3 className="mt-2 font-heading text-4xl text-ink-900">No matching departures</h3>
                 <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-ink-700/72">
                   Try broadening the filters or reset the journey criteria to browse the full collection.
                 </p>

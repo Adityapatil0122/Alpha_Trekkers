@@ -95,59 +95,42 @@ export default function About() {
     <>
       {/* ─── HERO BANNER ─── */}
       <section className="relative overflow-hidden bg-dark-900 pt-28">
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-30"
-          style={{ backgroundImage: `url(${MAHARASHTRA_MONSOON_IMAGES.heroes.about})` }}
+        <img
+          src="/images/Devkund Waterfall and rushing stream.png"
+          alt="Devkund waterfall"
+          className="absolute inset-0 h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-dark-900/90 via-dark-900/70 to-dark-900/40" />
+        <div className="absolute inset-0 bg-gradient-to-r from-dark-900/80 via-dark-900/50 to-transparent" />
 
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: 'easeOut' }}
-          className="relative mx-auto max-w-7xl px-4 pb-20 pt-20 sm:px-6 lg:px-8"
+          className="relative mx-auto max-w-7xl px-4 pb-10 pt-10 sm:px-6 sm:pb-12 sm:pt-12 lg:px-8"
         >
           <p className="text-sm font-semibold uppercase tracking-wider text-primary-400">
             About Alpha Trekkers
           </p>
-          <div className="mt-6 grid gap-10 lg:grid-cols-2 lg:items-end">
-            <div>
-              <h1 className="max-w-2xl text-5xl font-extrabold leading-tight text-white sm:text-6xl">
-                We Shape Maharashtra Treks To Feel{' '}
-                <span className="text-primary-400">Rich & Worth Remembering</span>
-              </h1>
-              <p className="mt-6 max-w-xl text-lg leading-8 text-dark-300">
-                Alpha Trekkers is built around guided fort journeys, trail timing, and local route
-                knowledge. The goal is simple: make outdoor travel feel premium without making it
-                feel artificial.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-4">
-                <Link to="/trips">
-                  <button className="rounded-lg bg-primary-500 px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-primary-600">
-                    Explore Departures
-                  </button>
-                </Link>
-                <Link to="/contact">
-                  <button className="rounded-lg border-2 border-white/30 px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-white transition hover:border-primary-400 hover:text-primary-400">
-                    Talk To The Team
-                  </button>
-                </Link>
-              </div>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-                <p className="text-xs font-semibold uppercase tracking-wider text-primary-400">Brand Direction</p>
-                <p className="mt-3 text-2xl font-bold text-white">
-                  Editorial visuals with grounded trek operations.
-                </p>
-              </div>
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-                <p className="text-xs font-semibold uppercase tracking-wider text-primary-400">Core Belief</p>
-                <p className="mt-3 text-sm leading-7 text-dark-300">
-                  Better journeys come from clearer pacing, sharper planning, and guides who know the hills deeply.
-                </p>
-              </div>
+          <div className="mt-6 max-w-2xl">
+            <h1 className="text-5xl font-extrabold leading-tight text-white sm:text-6xl">
+              We Shape Maharashtra Treks To Feel Rich &amp; Worth Remembering
+            </h1>
+            <p className="mt-6 max-w-xl text-lg leading-8 text-dark-300">
+              Alpha Trekkers is built around guided fort journeys, trail timing, and local route
+              knowledge. The goal is simple: make outdoor travel feel premium without making it
+              feel artificial.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-4">
+              <Link to="/trips">
+                <button className="rounded-lg bg-primary-500 px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-primary-600">
+                  Explore Departures
+                </button>
+              </Link>
+              <Link to="/contact">
+                <button className="rounded-lg border-2 border-white/30 px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-white transition hover:border-primary-400 hover:text-primary-400">
+                  Talk To The Team
+                </button>
+              </Link>
             </div>
           </div>
         </motion.div>
@@ -162,7 +145,7 @@ export default function About() {
             viewport={{ once: true, amount: 0.25 }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
           >
-            <p className="text-sm font-semibold uppercase tracking-wider text-primary-500">Our Story</p>
+            <p className="section-script">Our story</p>
             <h2 className="mt-3 text-4xl font-bold leading-tight text-dark-900 sm:text-5xl">
               Adventure Should Feel{' '}
               <span className="playful-text text-primary-500">Polished</span>, Not Chaotic
@@ -211,7 +194,7 @@ export default function About() {
       <section className="bg-dark-50 py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <p className="text-sm font-semibold uppercase tracking-wider text-primary-500">Why Choose Us</p>
+            <p className="section-script">Why choose us</p>
             <h2 className="mt-3 text-4xl font-bold text-dark-900 sm:text-5xl">
               What Makes <span className="playful-text text-primary-500">Alpha Trekkers</span> Different
             </h2>
@@ -294,7 +277,7 @@ export default function About() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-wider text-primary-400">Who Travels With Us</p>
+              <p className="section-script text-primary-400">Who travels with us</p>
               <h2 className="mt-4 text-4xl font-bold leading-tight text-white sm:text-5xl">
                 Weekend Hikers, First-Timers & Repeat Fort Explorers
               </h2>

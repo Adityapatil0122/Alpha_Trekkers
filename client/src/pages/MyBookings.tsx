@@ -54,10 +54,10 @@ export default function MyBookings() {
     <>
       <section className="travel-dark relative overflow-hidden pt-28">
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-18"
+          className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${MAHARASHTRA_MONSOON_IMAGES.heroes.myBookings})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-ink-950/88 via-ink-900/74 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-dark-900/80 via-dark-900/50 to-transparent" />
         <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-[4.5rem] sm:px-6 lg:px-8">
           <span className="section-label !bg-white/10 !text-sand-100 before:!bg-gold-400">
             Traveler dashboard
@@ -157,7 +157,8 @@ export default function MyBookings() {
           </div>
         ) : (
           <div className="travel-panel rounded-[2rem] px-8 py-16 text-center">
-            <h2 className="font-heading text-5xl text-ink-900">No bookings yet</h2>
+            <p className="section-script">Start your trail diary</p>
+            <h2 className="mt-2 font-heading text-5xl text-ink-900">No bookings yet</h2>
             <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-ink-700/72">
               Start with the redesigned tour archive and book your first fort experience.
             </p>

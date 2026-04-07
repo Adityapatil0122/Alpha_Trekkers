@@ -108,10 +108,10 @@ export default function TripDetail() {
     <>
       <section className="travel-dark relative overflow-hidden pt-28">
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-22"
+          className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${MAHARASHTRA_MONSOON_IMAGES.heroes.tripDetail})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-ink-950/92 via-ink-900/70 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-dark-900/80 via-dark-900/50 to-transparent" />
         <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-[4.5rem] sm:px-6 lg:px-8">
           <div className="flex items-center gap-2 text-sm text-sand-100/70">
             <Link to="/" className="hover:text-white">Home</Link>
@@ -213,13 +213,15 @@ export default function TripDetail() {
               {activeTab === 'overview' ? (
                 <div className="space-y-8">
                   <div>
-                    <h2 className="font-heading text-4xl text-ink-900">About this journey</h2>
+                    <p className="section-script">About this journey</p>
+                    <h2 className="mt-2 font-heading text-4xl text-ink-900">About this journey</h2>
                     <p className="mt-4 whitespace-pre-line text-base leading-8 text-ink-700/74">
                       {trip.description}
                     </p>
                   </div>
                   <div>
-                    <h3 className="font-heading text-3xl text-ink-900">Highlights</h3>
+                    <p className="section-script">Highlights</p>
+                    <h3 className="mt-2 font-heading text-3xl text-ink-900">Highlights</h3>
                     <div className="mt-4 grid gap-3 sm:grid-cols-2">
                       {trip.highlights.map((item) => (
                         <div key={item} className="rounded-[1.5rem] bg-sand-100 px-5 py-4 text-sm text-ink-800">
@@ -229,7 +231,8 @@ export default function TripDetail() {
                     </div>
                   </div>
                   <div>
-                    <h3 className="font-heading text-3xl text-ink-900">Things to carry</h3>
+                    <p className="section-script">Things to carry</p>
+                    <h3 className="mt-2 font-heading text-3xl text-ink-900">Things to carry</h3>
                     <div className="mt-4 grid gap-3 sm:grid-cols-2">
                       {trip.thingsToCarry.map((item) => (
                         <div key={item} className="flex items-center gap-3 rounded-[1.5rem] bg-sand-100 px-5 py-4 text-sm text-ink-800">
@@ -244,7 +247,8 @@ export default function TripDetail() {
 
               {activeTab === 'itinerary' ? (
                 <div>
-                  <h2 className="font-heading text-4xl text-ink-900">Day flow</h2>
+                  <p className="section-script">Day flow</p>
+                  <h2 className="mt-2 font-heading text-4xl text-ink-900">Day flow</h2>
                   <div className="mt-6 space-y-5">
                     {trip.itinerary.map((step, index) => (
                       <div key={`${step.time}-${index}`} className="rounded-[1.7rem] border border-ink-900/8 bg-sand-50 p-5">
@@ -260,7 +264,8 @@ export default function TripDetail() {
               {activeTab === 'inclusions' ? (
                 <div className="grid gap-8 sm:grid-cols-2">
                   <div>
-                    <h2 className="font-heading text-4xl text-ink-900">Included</h2>
+                    <p className="section-script">Included</p>
+                    <h2 className="mt-2 font-heading text-4xl text-ink-900">Included</h2>
                     <div className="mt-5 space-y-3">
                       {trip.inclusions.map((item) => (
                         <div key={item} className="flex items-start gap-3 rounded-[1.4rem] bg-sand-100 px-5 py-4 text-sm text-ink-800">
@@ -271,7 +276,8 @@ export default function TripDetail() {
                     </div>
                   </div>
                   <div>
-                    <h2 className="font-heading text-4xl text-ink-900">Not included</h2>
+                    <p className="section-script">Not included</p>
+                    <h2 className="mt-2 font-heading text-4xl text-ink-900">Not included</h2>
                     <div className="mt-5 space-y-3">
                       {trip.exclusions.map((item) => (
                         <div key={item} className="flex items-start gap-3 rounded-[1.4rem] bg-sand-100 px-5 py-4 text-sm text-ink-800">
@@ -286,7 +292,8 @@ export default function TripDetail() {
 
               {activeTab === 'reviews' ? (
                 <div>
-                  <h2 className="font-heading text-4xl text-ink-900">Traveler feedback</h2>
+                  <p className="section-script">Traveler feedback</p>
+                  <h2 className="mt-2 font-heading text-4xl text-ink-900">Traveler feedback</h2>
                   <div className="mt-6 space-y-4">
                     {reviews.length > 0 ? (
                       reviews.map((review) => (

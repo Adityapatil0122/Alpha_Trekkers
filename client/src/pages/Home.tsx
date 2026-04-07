@@ -1,28 +1,21 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
 import {
   ArrowRight,
   ArrowLeft,
   CalendarBlank,
   CaretRight,
-  Campfire,
-  Compass,
   Globe,
   Handshake,
-  MagnifyingGlass,
   MapPinLine,
   Mountains,
-  Path,
-  Play,
-  ShieldCheck,
   Star,
-  Tent,
   Trophy,
-  UsersThree,
 } from '@phosphor-icons/react';
+import type { IconProps } from '@phosphor-icons/react';
 import { MAHARASHTRA_MONSOON_IMAGES } from '@alpha-trekkers/shared';
-import type { ApiResponse, HeroImage, Trip } from '@alpha-trekkers/shared';
+import type { ApiResponse, Trip } from '@alpha-trekkers/shared';
 import api from '@/lib/axios';
 import Button from '@/components/ui/Button';
 import TripCard from '@/components/ui/TripCard';
@@ -31,21 +24,21 @@ import TripCard from '@/components/ui/TripCard';
 
 const heroSlides = [
   {
-    image: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1920',
+    image: MAHARASHTRA_MONSOON_IMAGES.trips.lohagad[0],
     tagline: 'Explore the world',
     title: 'Tour Travel &\nAdventure',
     highlight: 'Trekking',
     description: 'Join guided treks across Maharashtra\'s historic forts, lush trails, and monsoon ridges with experienced local leaders.',
   },
   {
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920',
+    image: MAHARASHTRA_MONSOON_IMAGES.trips.kalsubai[0],
     tagline: 'Discover nature',
     title: 'Mountain Peaks &\nFort',
     highlight: 'Circuits',
     description: 'From Rajgad to Kalsubai, explore dramatic ridge walks and ancient fortifications in the Sahyadri ranges.',
   },
   {
-    image: 'https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?w=1920',
+    image: MAHARASHTRA_MONSOON_IMAGES.trips.torna[0],
     tagline: 'Feel the rain',
     title: 'Monsoon Trails &\nGreen',
     highlight: 'Valleys',
@@ -67,24 +60,6 @@ const aboutFeatures = [
 ];
 
 const trekCategories = ['All', 'Weekend', 'Monsoon', 'Night Trek', 'Fort Circuit'] as const;
-
-const destinations = [
-  'All Destinations',
-  'Rajgad',
-  'Torna',
-  'Harishchandragad',
-  'Kalsubai',
-  'Lohagad',
-  'Rajmachi',
-];
-
-const activityItems = [
-  { Icon: Campfire, label: 'Camping' },
-  { Icon: Mountains, label: 'Climbing' },
-  { Icon: Path, label: 'Hiking' },
-  { Icon: Tent, label: 'Night Treks' },
-  { Icon: Compass, label: 'Exploration' },
-];
 
 const counterStats = [
   { end: 5489, label: 'Happy Traveller', suffix: '', icon: Mountains },
@@ -158,27 +133,27 @@ const testimonials = [
 
 const blogPosts = [
   {
-    title: 'The 8 Best Fort Treks Near Pune for Beginners',
-    category: 'Trekking',
-    date: '02 Apr 2026',
-    comments: 3,
-    image: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600',
-    excerpt: 'Discover the most beginner-friendly fort treks within 3 hours of Pune, complete with route tips and seasonal advice.',
-  },
-  {
     title: 'Monsoon Trekking Safety: Complete Guide',
     category: 'Safety',
     date: '15 Mar 2026',
     comments: 5,
-    image: 'https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?w=600',
+    image: MAHARASHTRA_MONSOON_IMAGES.sections.monsoonTrails,
     excerpt: 'Essential safety tips for trekking during Maharashtra\'s monsoon season, from gear to route planning.',
+  },
+  {
+    title: 'The 8 Best Fort Treks Near Pune for Beginners',
+    category: 'Trekking',
+    date: '02 Apr 2026',
+    comments: 3,
+    image: MAHARASHTRA_MONSOON_IMAGES.sections.chooseUsRange,
+    excerpt: 'Discover the most beginner-friendly fort treks within 3 hours of Pune, complete with route tips and seasonal advice.',
   },
   {
     title: 'Night Treks: Experience the Sahyadri After Dark',
     category: 'Adventure',
     date: '28 Feb 2026',
     comments: 2,
-    image: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=600',
+    image: MAHARASHTRA_MONSOON_IMAGES.trips.rajmachi[0],
     excerpt: 'Why night treks offer a completely different perspective on the Western Ghats and how to prepare.',
   },
 ];
@@ -226,20 +201,20 @@ function CounterCard({
   suffix: string;
   decimals?: number;
   active: boolean;
-  icon: React.ComponentType<{ className?: string; weight?: string }>;
+  icon: React.ComponentType<IconProps>;
 }) {
   const value = useCountUp(end, 2200, decimals, active);
   return (
-    <div className="rounded-2xl bg-white p-8 text-center shadow-lg">
-      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border-2 border-dashed border-accent-500/30">
+    <div className="flex h-full flex-col rounded-[2rem] border border-white/15 bg-black/30 p-8 text-center shadow-[0_28px_70px_rgba(0,0,0,0.32)] backdrop-blur-sm">
+      <div className="mx-auto mb-6 flex h-18 w-18 items-center justify-center rounded-full border border-primary-500/50">
         <Icon className="h-8 w-8 text-accent-500" weight="duotone" />
       </div>
-      <p className="text-4xl font-bold text-primary-600 sm:text-5xl">
+      <p className="text-4xl font-bold text-primary-400 sm:text-5xl">
         {decimals > 0 ? value.toFixed(decimals) : value.toLocaleString('en-IN')}
         {suffix}
       </p>
-      <div className="mx-auto my-3 w-12 border-t-2 border-dashed border-accent-500/30" />
-      <p className="text-sm font-medium text-dark-500">{label}</p>
+      <div className="mx-auto my-5 w-14 border-t-2 border-primary-500/60" />
+      <p className="mt-auto text-sm font-medium text-white">{label}</p>
     </div>
   );
 }
@@ -248,11 +223,9 @@ function CounterCard({
 
 export default function Home() {
   const [featuredTrips, setFeaturedTrips] = useState<Trip[]>([]);
-  const [heroImages, setHeroImages] = useState<HeroImage[]>([]);
   const [activeCategory, setActiveCategory] = useState<(typeof trekCategories)[number]>('All');
-  const [searchDest, setSearchDest] = useState('All Destinations');
+  const [featuredStart, setFeaturedStart] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const navigate = useNavigate();
 
   const counterRef = useRef<HTMLDivElement>(null);
   const counterInView = useInView(counterRef, { once: true, amount: 0.4 });
@@ -262,13 +235,6 @@ export default function Home() {
       .get<ApiResponse<{ trips: Trip[] }>>('/trips/featured')
       .then((response) => setFeaturedTrips(response.data.data.trips))
       .catch(() => setFeaturedTrips([]));
-  }, []);
-
-  useEffect(() => {
-    api
-      .get<ApiResponse<{ heroImages: HeroImage[] }>>('/site/hero-images')
-      .then((response) => setHeroImages(response.data.data.heroImages))
-      .catch(() => setHeroImages([]));
   }, []);
 
   // Auto-rotate hero slides
@@ -289,11 +255,34 @@ export default function Home() {
       .slice(0, 8);
   }, [featuredTrips, activeCategory]);
 
-  const handleSearch = useCallback(() => {
-    const params = new URLSearchParams();
-    if (searchDest !== 'All Destinations') params.set('search', searchDest);
-    navigate(`/trips${params.toString() ? `?${params.toString()}` : ''}`);
-  }, [navigate, searchDest]);
+  useEffect(() => {
+    setFeaturedStart(0);
+  }, [activeCategory]);
+
+  const visibleFeaturedTrips = useMemo(() => {
+    const source = filteredTrips.length > 0 ? filteredTrips : featuredTrips.slice(0, 8);
+    return source.slice(featuredStart, featuredStart + 3);
+  }, [featuredTrips, featuredStart, filteredTrips]);
+
+  const featuredPageCount = Math.max(
+    1,
+    Math.ceil((filteredTrips.length > 0 ? filteredTrips : featuredTrips.slice(0, 8)).length / 3),
+  );
+
+  const featuredPage = Math.floor(featuredStart / 3);
+
+  const nextFeaturedPage = () => {
+    const total = (filteredTrips.length > 0 ? filteredTrips : featuredTrips.slice(0, 8)).length;
+    const nextStart = featuredStart + 3 >= total ? 0 : featuredStart + 3;
+    setFeaturedStart(nextStart);
+  };
+
+  const prevFeaturedPage = () => {
+    const source = filteredTrips.length > 0 ? filteredTrips : featuredTrips.slice(0, 8);
+    const total = source.length;
+    const prevStart = featuredStart - 3 < 0 ? Math.max(total - ((total % 3) || 3), 0) : featuredStart - 3;
+    setFeaturedStart(prevStart);
+  };
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
@@ -319,13 +308,13 @@ export default function Home() {
 
         <div className="relative z-10 flex h-full items-center">
           <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="max-w-3xl">
+            <div className="hero-copy max-w-3xl">
               <motion.p
                 key={`tagline-${currentSlide}`}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="playful-text text-2xl text-primary-400 sm:text-3xl"
+                className="playful-text !text-primary-400 text-2xl sm:text-3xl"
               >
                 {heroSlides[currentSlide].tagline}
               </motion.p>
@@ -378,13 +367,13 @@ export default function Home() {
         {/* Slide nav arrows */}
         <button
           onClick={prevSlide}
-          className="absolute right-20 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition hover:bg-white/40"
+          className="absolute left-4 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-primary-500 text-white transition hover:bg-primary-600 sm:left-8"
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
         <button
           onClick={nextSlide}
-          className="absolute right-4 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition hover:bg-white/40"
+          className="absolute right-4 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-primary-500 text-white transition hover:bg-primary-600 sm:right-8"
         >
           <ArrowRight className="h-5 w-5" />
         </button>
@@ -413,70 +402,12 @@ export default function Home() {
             style={{ transformOrigin: 'top center' }}
             className="relative"
           >
-            <div className="rounded-xl border-2 border-amber-400/50 bg-dark-900/80 px-8 py-5 text-center shadow-2xl backdrop-blur-md">
-              <p className="playful-text text-3xl text-amber-400 drop-shadow-lg">Booking</p>
+            <div className="booking-hang-sign rounded-xl px-8 py-5 text-center shadow-2xl">
+              <p className="playful-text text-3xl text-white drop-shadow-lg">Booking</p>
               <p className="mt-1 text-[10px] font-medium uppercase tracking-[0.25em] text-white/60">Open Now</p>
             </div>
             {/* Nail dots */}
             <div className="absolute -top-1 left-1/2 h-3 w-3 -translate-x-1/2 rounded-full border border-amber-400/60 bg-amber-500 shadow-md" />
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ─── SEARCH BAR ─── */}
-      <section className="relative z-20 -mt-12">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.5 }}
-            className="flex flex-col gap-4 rounded-2xl bg-white p-6 shadow-2xl sm:flex-row sm:items-end sm:gap-3"
-          >
-            <div className="flex-1">
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-dark-500">
-                <MapPinLine className="mr-1 inline h-3.5 w-3.5" weight="bold" />
-                Destination
-              </label>
-              <select
-                value={searchDest}
-                onChange={(e) => setSearchDest(e.target.value)}
-                className="travel-input"
-              >
-                {destinations.map((d) => (
-                  <option key={d} value={d}>{d}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex-1">
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-dark-500">
-                <CalendarBlank className="mr-1 inline h-3.5 w-3.5" weight="bold" />
-                When
-              </label>
-              <input type="date" className="travel-input" />
-            </div>
-
-            <div className="flex-1">
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-dark-500">
-                <UsersThree className="mr-1 inline h-3.5 w-3.5" weight="bold" />
-                Guests
-              </label>
-              <select className="travel-input">
-                <option>1 Person</option>
-                <option>2 People</option>
-                <option>3-5 People</option>
-                <option>6-10 People</option>
-                <option>10+ People</option>
-              </select>
-            </div>
-
-            <button
-              onClick={handleSearch}
-              className="flex items-center justify-center gap-2 rounded-xl bg-primary-500 px-8 py-3.5 text-sm font-bold text-white transition hover:bg-primary-600"
-            >
-              <MagnifyingGlass className="h-4 w-4" weight="bold" />
-              Search
-            </button>
           </motion.div>
         </div>
       </section>
@@ -492,16 +423,11 @@ export default function Home() {
             className="relative"
           >
             <img
-              src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800"
-              alt="Adventure travel"
-              className="w-full rounded-2xl object-cover shadow-xl"
+              src="/destinations/Exploring Maharashtra's forts and landscapes.png"
+              alt="Exploring Maharashtra forts and landscapes"
+              className="mx-auto w-full rounded-2xl object-contain shadow-xl"
               style={{ height: '500px' }}
             />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <button className="flex h-20 w-20 items-center justify-center rounded-full bg-primary-500 text-white shadow-2xl transition hover:scale-110 hover:bg-primary-600">
-                <Play className="h-8 w-8" weight="fill" />
-              </button>
-            </div>
             <div className="absolute -bottom-6 -right-6 hidden rounded-2xl bg-white p-4 shadow-xl lg:block">
               <p className="playful-text text-2xl text-primary-500">Enjoy Travel</p>
             </div>
@@ -583,9 +509,37 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-            {(filteredTrips.length > 0 ? filteredTrips : featuredTrips.slice(0, 8)).map((trip) => (
-              <TripCard key={trip.id} trip={trip} />
+          <div className="relative mt-10">
+            <button
+              onClick={prevFeaturedPage}
+              className="absolute left-0 top-1/2 z-10 hidden h-12 w-12 -translate-x-[140%] -translate-y-1/2 items-center justify-center rounded-full border border-primary-500 bg-white text-primary-500 transition hover:bg-primary-500 hover:text-white lg:flex"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <button
+              onClick={nextFeaturedPage}
+              className="absolute right-0 top-1/2 z-10 hidden h-12 w-12 translate-x-[140%] -translate-y-1/2 items-center justify-center rounded-full bg-primary-500 text-white transition hover:bg-primary-600 lg:flex"
+            >
+              <ArrowRight className="h-5 w-5" />
+            </button>
+
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {visibleFeaturedTrips.map((trip) => (
+                <TripCard key={trip.id} trip={trip} />
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-8 flex justify-center gap-2">
+            {Array.from({ length: featuredPageCount }).map((_, index) => (
+              <button
+                key={index}
+                type="button"
+                onClick={() => setFeaturedStart(index * 3)}
+                className={`h-3 rounded-full transition-all ${
+                  index === featuredPage ? 'w-8 bg-primary-500' : 'w-3 bg-dark-300'
+                }`}
+              />
             ))}
           </div>
 
@@ -599,105 +553,64 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── ACTIVITY / ADVENTURE CTA SECTION ─── */}
-      <section className="relative overflow-hidden bg-primary-500 py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-10 lg:grid-cols-[1fr_1.2fr] lg:items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="relative"
-            >
-              <img
-                src="https://images.unsplash.com/photo-1580674684081-7617fbf3d745?w=800"
-                alt="Adventure"
-                className="h-[400px] w-full rounded-2xl object-cover shadow-xl"
-              />
-            </motion.div>
+      {/* ─── STATS CTA SECTION ─── */}
+      <section ref={counterRef} className="relative mt-8 overflow-visible bg-white px-4 pb-20 pt-0 sm:mt-10 sm:px-6 lg:px-8">
+        <div className="relative mx-auto max-w-7xl">
+          <div className="absolute left-1/2 top-0 z-20 w-full max-w-[1280px] -translate-x-1/2 -translate-y-1/2 px-4 sm:px-6 lg:px-8">
+            <div className="mx-4 overflow-hidden rounded-xl bg-primary-600 px-8 py-5 shadow-[0_24px_70px_rgba(64,162,64,0.25)] sm:mx-6 sm:px-10 sm:py-6 lg:mx-8">
+              <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                <div className="max-w-3xl">
+                  <h2 className="text-[2.2rem] font-bold leading-none text-dark-900 sm:text-[2.6rem]">
+                    Ready To Adventure And Enjoy Natural
+                  </h2>
+                  <p className="mt-2 max-w-2xl text-sm text-white/85 sm:text-base">
+                    Join thousands of happy travelers who have explored Maharashtra&apos;s hidden gems with us.
+                  </p>
+                </div>
+                <Link to="/contact" className="relative z-10 inline-flex shrink-0 items-center justify-center rounded-lg bg-white px-9 py-3.5 text-sm font-bold uppercase tracking-[0.08em] text-primary-600 transition hover:bg-white/90">
+                  Let&apos;s Get Started
+                </Link>
+                <div className="pointer-events-none absolute right-20 top-1/2 hidden h-36 w-56 -translate-y-1/2 opacity-80 lg:block">
+                  <svg viewBox="0 0 220 140" className="h-full w-full">
+                    <path
+                      d="M18 120 C30 56, 90 24, 126 52 C150 72, 144 102, 164 114 C180 122, 196 104, 202 74"
+                      fill="none"
+                      stroke="rgba(255,255,255,0.7)"
+                      strokeWidth="2.2"
+                      strokeDasharray="5 6"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <span className="absolute right-0 top-0 text-2xl text-white">✈</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="text-white"
-            >
-              <p className="text-sm font-medium uppercase tracking-wider text-white/80">
-                Welcome to Alpha Trekkers
-              </p>
-              <h2 className="mt-3 text-4xl font-bold leading-tight sm:text-5xl">
-                Real Adventure & Enjoy Your Dream Tours
-              </h2>
+          <div className="relative left-1/2 mt-0 w-screen -translate-x-1/2 overflow-hidden bg-[#0f0e09] pb-28 pt-32 sm:pb-32 sm:pt-36 lg:pb-36 lg:pt-32">
+            <img
+              src="/destinations/torna.png"
+              alt="Camp background"
+              className="absolute inset-0 h-full w-full object-cover opacity-30"
+            />
+            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(15,14,9,0.92),rgba(15,14,9,0.55)),linear-gradient(180deg,rgba(15,14,9,0.1),rgba(15,14,9,0.45))]" />
 
-              <div className="mt-8 flex flex-wrap gap-6">
-                {activityItems.slice(0, 2).map(({ Icon, label }) => (
-                  <div key={label} className="flex items-center gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/20">
-                      <Icon className="h-6 w-6 text-white" weight="duotone" />
-                    </div>
-                    <span className="text-base font-semibold">{label}</span>
-                  </div>
+            <div className="relative mx-auto max-w-7xl">
+              <div className="relative grid auto-rows-fr grid-cols-2 gap-6 px-6 pt-10 sm:px-8 sm:pt-12 lg:grid-cols-4 lg:px-10 lg:pt-14 xl:px-16">
+                {counterStats.map(({ end, label, suffix, decimals, icon }) => (
+                  <motion.div key={label} className="h-full" initial={{ opacity: 0, y: 26 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }}>
+                    <CounterCard
+                      end={end}
+                      label={label}
+                      suffix={suffix}
+                      decimals={decimals}
+                      active={counterInView}
+                      icon={icon}
+                    />
+                  </motion.div>
                 ))}
               </div>
-
-              <div className="my-8 border-t border-white/20" />
-
-              <Link to="/trips">
-                <button className="flex items-center gap-3 rounded-full bg-dark-800/40 px-8 py-4 text-sm font-bold text-white transition hover:bg-dark-800/60">
-                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10">
-                    <ArrowRight className="h-5 w-5" />
-                  </span>
-                  Get Started Today
-                </button>
-              </Link>
-            </motion.div>
-          </div>
-
-          <div className="pointer-events-none absolute right-20 top-10 hidden opacity-30 lg:block">
-            <svg width="200" height="120" viewBox="0 0 200 120">
-              <path d="M10 110 Q50 20 100 60 Q130 80 140 50 Q160 10 190 5" fill="none" stroke="white" strokeWidth="2" strokeDasharray="6 4" />
-            </svg>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── STATS COUNTER SECTION ─── */}
-      <section
-        ref={counterRef}
-        className="counter-section relative overflow-hidden py-24 sm:py-28"
-      >
-        <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-12 text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center">
-              <Mountains className="h-10 w-10 text-white" weight="duotone" />
             </div>
-            <h2 className="text-3xl font-bold text-white sm:text-4xl">
-              Ready To Adventure And Enjoy Natural
-            </h2>
-            <p className="mx-auto mt-3 max-w-lg text-white/70">
-              Join thousands of happy travelers who have explored Maharashtra's hidden gems with us
-            </p>
-            <Link to="/contact" className="mt-6 inline-block">
-              <button className="rounded-lg border-2 border-white bg-white px-8 py-3 text-sm font-bold uppercase tracking-wider text-primary-600 transition hover:bg-transparent hover:text-white">
-                Let's Get Started
-              </button>
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-            {counterStats.map(({ end, label, suffix, decimals, icon }) => (
-              <CounterCard
-                key={label}
-                end={end}
-                label={label}
-                suffix={suffix}
-                decimals={decimals}
-                active={counterInView}
-                icon={icon}
-              />
-            ))}
           </div>
         </div>
       </section>

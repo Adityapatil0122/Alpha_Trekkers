@@ -56,10 +56,10 @@ export default function Login() {
   return (
     <section className="travel-dark relative min-h-screen overflow-hidden pt-28">
       <div
-        className="absolute inset-0 bg-cover bg-center opacity-18"
+        className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${MAHARASHTRA_MONSOON_IMAGES.heroes.login})` }}
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-ink-950/88 via-ink-900/78 to-ink-900/35" />
+      <div className="absolute inset-0 bg-gradient-to-r from-dark-900/80 via-dark-900/50 to-transparent" />
 
       <div className="relative mx-auto flex max-w-7xl items-center px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid w-full gap-10 lg:grid-cols-[0.95fr_0.75fr] lg:items-center">
