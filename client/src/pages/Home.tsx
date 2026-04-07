@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useInView } from 'framer-motion';
+import { AnimatePresence, motion, useInView } from 'framer-motion';
 import {
   ArrowRight,
   ArrowLeft,
@@ -17,7 +17,6 @@ import type { IconProps } from '@phosphor-icons/react';
 import { MAHARASHTRA_MONSOON_IMAGES } from '@alpha-trekkers/shared';
 import type { ApiResponse, Trip } from '@alpha-trekkers/shared';
 import api from '@/lib/axios';
-import Button from '@/components/ui/Button';
 import TripCard from '@/components/ui/TripCard';
 
 /* ─── Static Data ─── */
@@ -155,6 +154,54 @@ const blogPosts = [
     comments: 2,
     image: MAHARASHTRA_MONSOON_IMAGES.trips.rajmachi[0],
     excerpt: 'Why night treks offer a completely different perspective on the Western Ghats and how to prepare.',
+  },
+];
+
+const FEATURED_PAGE_SIZE = 4;
+
+const featuredSlideVariants = {
+  enter: (direction: number) => ({
+    opacity: 0,
+    x: direction > 0 ? 72 : -72,
+  }),
+  center: {
+    opacity: 1,
+    x: 0,
+  },
+  exit: (direction: number) => ({
+    opacity: 0,
+    x: direction > 0 ? -72 : 72,
+  }),
+};
+
+const aboutMontageImages = [
+  {
+    src: '/destinations/lohagad.png',
+    alt: 'Lohagad fort view',
+    positionClass: 'left-1/2 top-0 -translate-x-1/2',
+    sizeClass: 'h-60 w-52 sm:h-72 sm:w-64',
+    clipPath: 'polygon(50% 0%, 72% 4%, 88% 14%, 98% 32%, 98% 54%, 88% 72%, 72% 88%, 50% 100%, 28% 88%, 12% 72%, 2% 54%, 2% 32%, 12% 14%, 28% 4%)',
+  },
+  {
+    src: '/destinations/rajgad.png',
+    alt: 'Rajgad fort landscape',
+    positionClass: 'left-0 top-1/2 -translate-y-1/2',
+    sizeClass: 'h-52 w-60 sm:h-64 sm:w-72',
+    clipPath: 'polygon(0% 50%, 4% 28%, 14% 12%, 32% 2%, 54% 2%, 72% 12%, 88% 28%, 100% 50%, 88% 72%, 72% 88%, 54% 98%, 32% 98%, 14% 88%, 4% 72%)',
+  },
+  {
+    src: '/destinations/harishchandragad.png',
+    alt: 'Harishchandragad mountain range',
+    positionClass: 'right-0 top-1/2 -translate-y-1/2',
+    sizeClass: 'h-52 w-60 sm:h-64 sm:w-72',
+    clipPath: 'polygon(100% 50%, 96% 28%, 86% 12%, 68% 2%, 46% 2%, 28% 12%, 12% 28%, 0% 50%, 12% 72%, 28% 88%, 46% 98%, 68% 98%, 86% 88%, 96% 72%)',
+  },
+  {
+    src: '/destinations/torna.png',
+    alt: 'Torna fort at sunset',
+    positionClass: 'bottom-0 left-1/2 -translate-x-1/2',
+    sizeClass: 'h-60 w-52 sm:h-72 sm:w-64',
+    clipPath: 'polygon(50% 100%, 72% 96%, 88% 86%, 98% 68%, 98% 46%, 88% 28%, 72% 12%, 50% 0%, 28% 12%, 12% 28%, 2% 46%, 2% 68%, 12% 86%, 28% 96%)',
   },
 ];
 
@@ -422,12 +469,22 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             className="relative"
           >
-            <img
-              src="/destinations/Exploring Maharashtra's forts and landscapes.png"
-              alt="Exploring Maharashtra forts and landscapes"
-              className="mx-auto w-full rounded-2xl object-contain shadow-xl"
-              style={{ height: '500px' }}
-            />
+            <div className="relative mx-auto h-[34rem] w-full max-w-[42rem] sm:h-[38rem]">
+              <div className="absolute inset-x-14 inset-y-16 rounded-full bg-[radial-gradient(circle,rgba(125,180,72,0.18),rgba(255,255,255,0))] blur-3xl" />
+              {aboutMontageImages.map(({ src, alt, positionClass, sizeClass, clipPath }) => (
+                <div
+                  key={src}
+                  className={`absolute overflow-hidden shadow-[0_24px_50px_rgba(15,23,42,0.18)] ${positionClass} ${sizeClass}`}
+                  style={{ clipPath }}
+                >
+                  <img
+                    src={src}
+                    alt={alt}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              ))}
+            </div>
             <div className="absolute -bottom-6 -right-6 hidden rounded-2xl bg-white p-4 shadow-xl lg:block">
               <p className="playful-text text-2xl text-primary-500">Enjoy Travel</p>
             </div>

@@ -2,136 +2,130 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
-  CalendarBlank,
+  BookmarkSimple,
+  CalendarDots,
+  Camera,
   Clock,
-  Crown,
-  MapPinLine,
+  MapPin,
   Star,
-  UsersThree,
+  Users,
 } from '@phosphor-icons/react';
 import { MAHARASHTRA_MONSOON_IMAGES } from '@alpha-trekkers/shared';
-import type { Difficulty, Trip } from '@alpha-trekkers/shared';
-import { DIFFICULTIES } from '@alpha-trekkers/shared';
+import type { Trip } from '@alpha-trekkers/shared';
 
 interface TripCardProps {
   trip: Trip;
 }
 
-const difficultyTone: Record<Difficulty, string> = {
-  EASY: 'bg-sea-500/12 text-sea-600',
-  MODERATE: 'bg-gold-500/12 text-gold-600',
-  DIFFICULT: 'bg-coral-500/12 text-coral-600',
-  EXTREME: 'bg-ink-900/12 text-ink-900',
-};
+function formatDuration(durationHours: number) {
+  if (durationHours >= 24) {
+    const days = Math.round(durationHours / 24);
+    return `${days} day${days > 1 ? 's' : ''}`;
+  }
+
+  return `${durationHours} hour${durationHours > 1 ? 's' : ''}`;
+}
+
+function formatLocation(trip: Trip) {
+  return [trip.startLocation, trip.region].filter(Boolean).join(', ');
+}
 
 export default function TripCard({ trip }: TripCardProps) {
   const hero = trip.images.find((image) => image.isPrimary) ?? trip.images[0];
   const price = trip.discountPrice ?? trip.basePrice;
-  const earliestDate = trip.schedules?.[0]?.date;
-  const isBestseller = trip.avgRating >= 4.5;
+  const galleryCount = trip.images.length;
+  const departureCount = trip.schedules?.length ?? 0;
+  const rating = trip.avgRating > 0 ? trip.avgRating : 5;
+  const reviewCount = trip.totalReviews > 0 ? trip.totalReviews : 1;
+  const filledStars = Math.max(1, Math.min(5, Math.round(rating)));
 
   return (
     <motion.article
       whileHover={{ y: -8 }}
-      transition={{ duration: 0.25, ease: 'easeOut' }}
-      className="monsoon-card travel-panel overflow-hidden rounded-[2rem]"
+      transition={{ duration: 0.28, ease: 'easeOut' }}
+      className="group overflow-hidden rounded-[1.35rem] bg-white shadow-[0_18px_50px_rgba(15,23,42,0.08)]"
     >
       <Link to={`/trips/${trip.slug}`} className="block">
-        <div className="relative h-72 overflow-hidden">
+        <div className="relative h-64 overflow-hidden">
           <img
             src={hero?.url ?? MAHARASHTRA_MONSOON_IMAGES.fallback.tripCard}
             alt={hero?.altText || trip.title}
-            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+            className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
           />
-          {/* Subtle rain pattern overlay */}
-          <div
-            className="pointer-events-none absolute inset-0 opacity-[0.07]"
-            style={{
-              backgroundImage:
-                'repeating-linear-gradient(105deg, transparent, transparent 3px, rgba(255,255,255,0.4) 3px, transparent 4px)',
-              backgroundSize: '8px 20px',
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-ink-950/82 via-ink-950/15 to-transparent" />
-          <div className="absolute left-5 top-5 flex items-center gap-2">
-            <span className={`rounded-full px-3 py-1 text-xs font-semibold ${difficultyTone[trip.difficulty]}`}>
-              {DIFFICULTIES[trip.difficulty].label}
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/28 via-transparent to-white/10" />
+
+          <div className="absolute left-4 top-4 flex items-center gap-2">
+            <span className="rounded-md bg-cyan-500 px-4 py-2 text-sm font-semibold text-white shadow-sm">
+              Featured
             </span>
-            <span className="rounded-full bg-white/85 px-3 py-1 text-xs font-medium text-ink-800">
-              {trip.category.replace('_', ' ')}
+            <span className="inline-flex items-center gap-1.5 rounded-md bg-slate-900/72 px-3 py-2 text-sm font-medium text-white backdrop-blur-sm">
+              <Camera className="h-4 w-4" weight="fill" />
+              {galleryCount}
             </span>
-          </div>
-          {isBestseller && (
-            <div className="absolute right-5 top-5">
-              <span className="inline-flex items-center gap-1 rounded-full bg-gold-500/90 px-3 py-1 text-xs font-bold text-ink-950 shadow-lg">
-                <Crown className="h-3.5 w-3.5" weight="fill" />
-                Bestseller
-              </span>
-            </div>
-          )}
-          <div className="absolute inset-x-5 bottom-5">
-            <p className="text-sm font-medium text-gold-400">{trip.region}</p>
-            <h3 className="font-heading text-3xl font-semibold text-white">{trip.title}</h3>
+            <span className="inline-flex items-center gap-1.5 rounded-md bg-slate-900/72 px-3 py-2 text-sm font-medium text-white backdrop-blur-sm">
+              <CalendarDots className="h-4 w-4" weight="fill" />
+              {departureCount}
+            </span>
           </div>
         </div>
 
-        <div className="p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm text-ink-700">
-              <Star className="h-4 w-4 text-gold-500" weight="fill" />
-              <span>{trip.avgRating > 0 ? trip.avgRating.toFixed(1) : 'New'}</span>
-              <span className="text-ink-600/60">({trip.totalReviews} reviews)</span>
-            </div>
-            <div className="rounded-full bg-forest-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-forest-500">
-              Trending
-            </div>
+        <div className="rounded-t-[1.35rem] bg-white px-7 pb-7 pt-5">
+          <div className="flex items-center gap-2 text-[0.95rem] text-slate-600">
+            <MapPin className="h-4 w-4 text-lime-500" weight="fill" />
+            <span className="line-clamp-1">{formatLocation(trip)}</span>
           </div>
 
-          <p className="mt-4 line-clamp-2 text-sm leading-7 text-ink-700/74">
-            {trip.shortDescription}
-          </p>
+          <h3 className="mt-3 line-clamp-2 text-[2rem] font-semibold leading-tight tracking-[-0.03em] text-slate-950">
+            {trip.title}
+          </h3>
 
-          <div className="mt-5 grid grid-cols-2 gap-3 text-sm text-ink-700">
-            <span className="flex items-center gap-2 rounded-2xl bg-sand-100 px-3 py-2">
-              <Clock className="h-4 w-4 text-forest-600" />
-              {trip.durationHours} hours
-            </span>
-            <span className="flex items-center gap-2 rounded-2xl bg-sand-100 px-3 py-2">
-              <UsersThree className="h-4 w-4 text-forest-600" />
-              Up to {trip.maxGroupSize}
-            </span>
-            <span className="flex items-center gap-2 rounded-2xl bg-sand-100 px-3 py-2">
-              <MapPinLine className="h-4 w-4 text-forest-600" />
-              {trip.startLocation}
-            </span>
-            <span className="flex items-center gap-2 rounded-2xl bg-sand-100 px-3 py-2">
-              <CalendarBlank className="h-4 w-4 text-forest-600" />
-              {earliestDate
-                ? new Date(earliestDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
-                : 'On request'}
+          <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-slate-600">
+            <div className="flex items-center gap-1 text-amber-400">
+              {Array.from({ length: 5 }).map((_, index) => (
+                <Star
+                  key={`${trip.id}-star-${index}`}
+                  className="h-4 w-4"
+                  weight={index < filledStars ? 'fill' : 'regular'}
+                />
+              ))}
+            </div>
+            <span className="text-slate-700">
+              ({reviewCount} Review{reviewCount > 1 ? 's' : ''})
             </span>
           </div>
 
-          <div className="mt-6 flex items-end justify-between border-t border-ink-900/8 pt-5">
-            <div>
-              {trip.discountPrice ? (
-                <p className="relative inline-block text-sm text-ink-600/55">
-                  <span>INR {trip.basePrice.toLocaleString('en-IN')}</span>
-                  <span
-                    className="absolute inset-0 flex items-center"
-                    aria-hidden="true"
-                  >
-                    <span className="h-[1.5px] w-full origin-center -rotate-12 bg-coral-500/70" />
-                  </span>
+          <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 text-[0.95rem] text-slate-500">
+            <span className="inline-flex items-center gap-2">
+              <Clock className="h-5 w-5 text-lime-500" />
+              {formatDuration(trip.durationHours)}
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <Users className="h-5 w-5 text-lime-500" />
+              {trip.maxGroupSize} Person
+            </span>
+          </div>
+
+          <div className="mt-6 border-t border-slate-200 pt-5">
+            <div className="flex items-end justify-between gap-4">
+              <div className="flex items-end gap-2">
+                <p className="text-[1.05rem] text-slate-500">From</p>
+                <p className="text-[1.9rem] font-semibold leading-none text-lime-600">
+                  INR {price.toLocaleString('en-IN')}
                 </p>
-              ) : null}
-              <p className="font-heading text-3xl font-semibold text-ink-900">
-                INR {price.toLocaleString('en-IN')}
-              </p>
-              <p className="text-sm text-ink-600/68">per traveler</p>
+                {trip.discountPrice ? (
+                  <p className="pb-0.5 text-base text-slate-400 line-through">
+                    INR {trip.basePrice.toLocaleString('en-IN')}
+                  </p>
+                ) : null}
+              </div>
+
+              <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-lime-500 text-lime-500 transition duration-200 group-hover:bg-lime-500 group-hover:text-white">
+                <BookmarkSimple className="h-5 w-5" />
+              </span>
             </div>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-ink-950 px-4 py-2 text-sm font-medium text-white transition-colors duration-200 hover:bg-forest-500">
-              View journey
+
+            <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-cyan-600">
+              View Journey
               <ArrowRight className="h-4 w-4" weight="bold" />
             </span>
           </div>
