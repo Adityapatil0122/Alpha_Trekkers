@@ -97,32 +97,38 @@ const destinationCards = [
   {
     name: 'Rajgad',
     tours: '6 tours',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600',
+    image: '/destinations/rajgad.png',
+    tall: true,
   },
   {
     name: 'Harishchandragad',
     tours: '4 tours',
-    image: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=600',
+    image: '/destinations/harishchandragad.png',
+    tall: false,
   },
   {
     name: 'Torna Fort',
     tours: '5 tours',
-    image: 'https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?w=600',
+    image: '/destinations/torna.png',
+    tall: false,
   },
   {
     name: 'Kalsubai',
     tours: '3 tours',
-    image: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600',
+    image: '/destinations/kalsubai.png',
+    tall: false,
   },
   {
     name: 'Lohagad',
     tours: '4 tours',
-    image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600',
+    image: '/destinations/lohagad.png',
+    tall: true,
   },
   {
     name: 'Rajmachi',
     tours: '3 tours',
-    image: 'https://images.unsplash.com/photo-1518173946687-a243e2bc1ae0?w=600',
+    image: '/destinations/rajmachi.png',
+    tall: false,
   },
 ];
 
@@ -396,11 +402,24 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Booking badge */}
-        <div className="absolute right-8 top-32 z-20 hidden lg:block">
-          <div className="rounded-xl border border-white/20 bg-dark-900/60 px-6 py-4 text-center backdrop-blur-md">
-            <p className="playful-text text-2xl text-white">Booking</p>
-          </div>
+        {/* Animated hanging Booking sign */}
+        <div className="absolute right-8 top-24 z-20 hidden lg:block">
+          {/* Rope */}
+          <div className="mx-auto h-10 w-[2px] bg-gradient-to-b from-transparent via-amber-400/70 to-amber-400" />
+          {/* Sign board */}
+          <motion.div
+            animate={{ rotate: [0, 3, -3, 2, -2, 0] }}
+            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+            style={{ transformOrigin: 'top center' }}
+            className="relative"
+          >
+            <div className="rounded-xl border-2 border-amber-400/50 bg-dark-900/80 px-8 py-5 text-center shadow-2xl backdrop-blur-md">
+              <p className="playful-text text-3xl text-amber-400 drop-shadow-lg">Booking</p>
+              <p className="mt-1 text-[10px] font-medium uppercase tracking-[0.25em] text-white/60">Open Now</p>
+            </div>
+            {/* Nail dots */}
+            <div className="absolute -top-1 left-1/2 h-3 w-3 -translate-x-1/2 rounded-full border border-amber-400/60 bg-amber-500 shadow-md" />
+          </motion.div>
         </div>
       </section>
 
@@ -635,12 +654,12 @@ export default function Home() {
               </Link>
             </motion.div>
           </div>
-        </div>
 
-        <div className="pointer-events-none absolute right-20 top-10 hidden opacity-30 lg:block">
-          <svg width="200" height="120" viewBox="0 0 200 120">
-            <path d="M10 110 Q50 20 100 60 Q130 80 140 50 Q160 10 190 5" fill="none" stroke="white" strokeWidth="2" strokeDasharray="6 4" />
-          </svg>
+          <div className="pointer-events-none absolute right-20 top-10 hidden opacity-30 lg:block">
+            <svg width="200" height="120" viewBox="0 0 200 120">
+              <path d="M10 110 Q50 20 100 60 Q130 80 140 50 Q160 10 190 5" fill="none" stroke="white" strokeWidth="2" strokeDasharray="6 4" />
+            </svg>
+          </div>
         </div>
       </section>
 
@@ -683,7 +702,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── DESTINATIONS SECTION ─── */}
+      {/* ─── DESTINATIONS SECTION — Staggered Grid ─── */}
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="text-center">
           <p className="text-sm font-semibold uppercase tracking-wider text-primary-500">
@@ -695,31 +714,39 @@ export default function Home() {
           </h2>
         </div>
 
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {destinationCards.map((dest) => (
+        {/* Staggered masonry-style grid */}
+        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {destinationCards.map((dest, idx) => (
             <motion.div
               key={dest.name}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.5, delay: idx * 0.1 }}
               whileHover={{ y: -8 }}
+              className={idx % 3 === 1 ? 'sm:mt-10' : ''}
             >
               <Link
                 to="/trips"
-                className="group relative block h-72 overflow-hidden rounded-2xl"
+                className={`group relative block overflow-hidden rounded-2xl ${
+                  dest.tall ? 'h-96' : 'h-72'
+                }`}
               >
                 <img
                   src={dest.image}
                   alt={dest.name}
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-dark-900/70 via-transparent to-transparent" />
-                <div className="absolute right-4 top-4 rounded-lg bg-primary-500 px-3 py-1.5 text-xs font-bold text-white">
+                <div className="absolute inset-0 bg-gradient-to-t from-dark-900/80 via-dark-900/20 to-transparent" />
+                <div className="absolute right-4 top-4 rounded-lg bg-primary-500 px-3 py-1.5 text-xs font-bold text-white shadow-lg">
                   {dest.tours}
                 </div>
                 <div className="absolute inset-x-0 bottom-0 p-6">
-                  <p className="text-2xl font-bold text-white">{dest.name}</p>
+                  <p className="text-2xl font-bold text-white drop-shadow-lg">{dest.name}</p>
+                  <div className="mt-2 flex items-center gap-2 text-sm text-white/80">
+                    <MapPinLine className="h-4 w-4" weight="bold" />
+                    Maharashtra, India
+                  </div>
                 </div>
               </Link>
             </motion.div>
