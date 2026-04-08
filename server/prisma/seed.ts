@@ -53,6 +53,27 @@ async function main() {
 
   const weekends = getUpcomingWeekends(8);
 
+  function getUpcomingWeekdays(count: number): Date[] {
+    const dates: Date[] = [];
+    const current = new Date();
+    current.setDate(current.getDate() + 1);
+    current.setHours(6, 0, 0, 0);
+
+    while (dates.length < count) {
+      const day = current.getDay();
+      if (day !== 0 && day !== 6) {
+        dates.push(new Date(current));
+      }
+      current.setDate(current.getDate() + 1);
+    }
+
+    return dates;
+  }
+
+  const weekdays = getUpcomingWeekdays(12);
+  const mapUrl = (latitude: number, longitude: number) =>
+    `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+
   // ========== TRIPS ==========
 
   const tripsData = [
@@ -86,6 +107,7 @@ This trek is ideal for intermediate trekkers who want to experience both the phy
       isFeatured: true,
       latitude: 18.2428,
       longitude: 73.6818,
+      routeMapUrl: mapUrl(18.2428, 73.6818),
       highlights: [
         'Explore the former capital of the Maratha Empire',
         'Visit the ancient Padmavati Temple',
@@ -176,6 +198,7 @@ Torna is a moderately challenging trek suitable for those who have completed at 
       isFeatured: true,
       latitude: 18.2747,
       longitude: 73.6233,
+      routeMapUrl: mapUrl(18.2747, 73.6233),
       highlights: [
         'First fort captured by Chhatrapati Shivaji Maharaj in 1643',
         'Highest fort in Pune district at 1,403 metres',
@@ -226,6 +249,7 @@ Torna is a moderately challenging trek suitable for those who have completed at 
         { url: MAHARASHTRA_MONSOON_IMAGES.trips.torna[0], altText: 'Torna Fort in monsoon clouds', isPrimary: true, sortOrder: 0 },
         { url: MAHARASHTRA_MONSOON_IMAGES.trips.torna[1], altText: 'Climbing trail on Torna during the rains', isPrimary: false, sortOrder: 1 },
         { url: MAHARASHTRA_MONSOON_IMAGES.trips.torna[2], altText: 'Torna bastion in wet-season light', isPrimary: false, sortOrder: 2 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.torna[3], altText: 'Torna fort in lush monsoon weather', isPrimary: false, sortOrder: 3 },
       ],
       schedules: [0, 1, 2, 3].map((i) => ({
         date: weekends[i],
@@ -263,6 +287,7 @@ Multiple approach routes exist, with the Pachnai route being the most popular an
       isFeatured: true,
       latitude: 19.3889,
       longitude: 73.7778,
+      routeMapUrl: mapUrl(19.3889, 73.7778),
       highlights: [
         'Witness the breathtaking Konkan Kada cliff overhang',
         'Visit the ancient Kedareshwar Cave temple with Shiva Linga in water',
@@ -360,6 +385,7 @@ The trek is especially popular during the monsoon season when the entire landsca
       isFeatured: true,
       latitude: 19.6014,
       longitude: 73.7106,
+      routeMapUrl: mapUrl(19.6014, 73.7106),
       highlights: [
         'Summit the highest peak in Maharashtra (1,646m)',
         'Climb fixed iron ladders on the rock face',
@@ -412,6 +438,7 @@ The trek is especially popular during the monsoon season when the entire landsca
         { url: MAHARASHTRA_MONSOON_IMAGES.trips.kalsubai[0], altText: 'View from Kalsubai peak in the wet season', isPrimary: true, sortOrder: 0 },
         { url: MAHARASHTRA_MONSOON_IMAGES.trips.kalsubai[1], altText: 'Misty Kalsubai slopes in monsoon weather', isPrimary: false, sortOrder: 1 },
         { url: MAHARASHTRA_MONSOON_IMAGES.trips.kalsubai[2], altText: 'Steps on the Kalsubai climb during rains', isPrimary: false, sortOrder: 2 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.kalsubai[3], altText: 'Kalsubai summit temple visit', isPrimary: false, sortOrder: 3 },
       ],
       schedules: [0, 1, 2, 3, 4, 5].map((i) => ({
         date: weekends[i],
@@ -449,6 +476,7 @@ Adjacent to Lohagad is Visapur Fort, which can be combined for a longer trek. Th
       isFeatured: true,
       latitude: 18.7087,
       longitude: 73.4748,
+      routeMapUrl: mapUrl(18.7087, 73.4748),
       highlights: [
         'Beginner-friendly fort trek with paved paths',
         'Walk the thrilling Vinchukata (Scorpion Tail) ridge',
@@ -497,9 +525,348 @@ Adjacent to Lohagad is Visapur Fort, which can be combined for a longer trek. Th
         { url: MAHARASHTRA_MONSOON_IMAGES.trips.lohagad[0], altText: 'Lohagad hills during the monsoon', isPrimary: true, sortOrder: 0 },
         { url: MAHARASHTRA_MONSOON_IMAGES.trips.lohagad[1], altText: 'Steps leading to Lohagad Fort in monsoon', isPrimary: false, sortOrder: 1 },
         { url: MAHARASHTRA_MONSOON_IMAGES.trips.lohagad[2], altText: 'Rainy-season view across Lohagad Fort', isPrimary: false, sortOrder: 2 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.lohagad[3], altText: 'Monsoon view near Lohagad and Visapur', isPrimary: false, sortOrder: 3 },
       ],
       schedules: [0, 1, 2, 3, 4, 5, 6, 7].map((i) => ({
         date: weekends[i],
+        availableSpots: 35,
+        status: 'OPEN' as const,
+      })),
+    },
+    {
+      title: 'Harihar Fort Trek',
+      slug: 'harihar-fort-trek',
+      description: `Harihar Fort, also known as Harshagad, is one of the most visually unforgettable forts in Maharashtra because of its near-vertical staircase carved directly into the rock face. Located near Trimbakeshwar in the Nashik district, the fort rises on a triangular rock massif and feels dramatically fortified even before you begin the climb. The fort stands at around 1,120 metres above sea level and is famous across the Sahyadris for its steep, iconic stairway.
+
+The trek usually starts from Nirgudpada village and reaches the famous staircase after a scenic walk through open fields, forested patches, and rocky sections. The final rock-cut steps are narrow, steep, and thrilling, making Harihar a favorite among trekkers looking for a high-adrenaline day trek without committing to an overnight expedition.
+
+Once on top, the fort opens into a broad plateau with small ruins, a temple area, water cisterns, and wide views of nearby peaks in the Trimbak range. On clear days, you can spot Basgad, Brahmagiri, and the surrounding Nashik hills. In monsoon and post-monsoon months, the fort looks especially dramatic with moving clouds, deep green valleys, and mist flowing past the stairway.
+
+Harihar works especially well as a weekday trek because it is compact, memorable, and easy to complete in a single day while still feeling like a major Sahyadri achievement.`,
+      shortDescription: 'A dramatic day trek near Nashik known for its near-vertical rock-cut staircase and sweeping views from the summit plateau.',
+      difficulty: 'MODERATE' as const,
+      category: 'WEEKDAY' as const,
+      durationHours: 8,
+      distanceKm: 6,
+      elevationM: 500,
+      maxAltitudeM: 1120,
+      region: 'Nashik',
+      fortName: 'Harihar',
+      startLocation: 'Nirgudpada Village, Nashik',
+      endLocation: 'Nirgudpada Village, Nashik',
+      meetingPoint: 'Kasara Railway Station',
+      meetingTime: '05:15 AM',
+      basePrice: 1499,
+      discountPrice: 1099,
+      maxGroupSize: 24,
+      minAge: 14,
+      isFeatured: true,
+      latitude: 19.9075,
+      longitude: 73.4703,
+      routeMapUrl: mapUrl(19.9075, 73.4703),
+      highlights: [
+        'Climb the iconic 80-degree rock-cut staircase',
+        'Panoramic views of the Trimbak range and nearby forts',
+        'Compact trek with a high adventure payoff',
+        'Ancient fort ruins and summit water cisterns',
+        'Excellent monsoon and post-monsoon photography route',
+        'One of the most distinctive fort silhouettes in Maharashtra',
+      ],
+      inclusions: [
+        'Expert trek leader and support staff',
+        'Breakfast and packed lunch',
+        'Base transport from Kasara and return',
+        'First aid kit and safety equipment',
+        'Forest and entry permissions where applicable',
+        'Group photos',
+      ],
+      exclusions: [
+        'Travel to and from Kasara',
+        'Personal expenses and snacks',
+        'Travel insurance',
+        'Anything not mentioned in inclusions',
+      ],
+      thingsToCarry: [
+        'Minimum 2 litres of water',
+        'Trekking shoes with strong grip',
+        'Rain jacket or poncho in monsoon',
+        'Cap and sunscreen for exposed sections',
+        'Energy snacks',
+        'ID proof (mandatory)',
+        'Compact backpack with rain cover',
+        'Personal medication if any',
+      ],
+      itinerary: [
+        { time: '05:15 AM', title: 'Assembly at Kasara', description: 'Meet at Kasara Railway Station. Attendance, introductions, and briefing.' },
+        { time: '06:00 AM', title: 'Drive to Nirgudpada', description: 'Travel by local vehicle to Nirgudpada village through the Igatpuri-Nashik belt.' },
+        { time: '07:00 AM', title: 'Breakfast at Base', description: 'Quick breakfast, warm-up session, and trail briefing before starting the trek.' },
+        { time: '07:30 AM', title: 'Begin Trek', description: 'Walk through village fields and gradually gain height on the approach trail.' },
+        { time: '09:00 AM', title: 'Reach the Staircase Section', description: 'Take a short halt before the famous rock-cut steps. Guides manage spacing and movement.' },
+        { time: '09:45 AM', title: 'Summit Plateau Exploration', description: 'Reach the top, explore the fort remains, cisterns, and summit viewpoints.' },
+        { time: '11:00 AM', title: 'Packed Lunch with Views', description: 'Enjoy lunch on the plateau while taking in the surrounding Sahyadri ridges.' },
+        { time: '11:45 AM', title: 'Begin Descent', description: 'Descend carefully via the staircase and retrace the approach trail.' },
+        { time: '02:00 PM', title: 'Reach Base & Depart', description: 'Return to Nirgudpada, refresh, and board transport for Kasara.' },
+        { time: '03:30 PM', title: 'Arrive at Kasara', description: 'Trip concludes with enough time to continue the rest of the weekday smoothly.' },
+      ],
+      images: [
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.harihar[0], altText: 'Harihar Fort profile in monsoon', isPrimary: true, sortOrder: 0 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.harihar[1], altText: 'Rock face at Harihar Fort', isPrimary: false, sortOrder: 1 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.harihar[2], altText: 'Harihar Fort staircase', isPrimary: false, sortOrder: 2 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.harihar[3], altText: 'View from Harihar summit', isPrimary: false, sortOrder: 3 },
+      ],
+      schedules: [0, 2, 4, 6, 8].map((i) => ({
+        date: weekdays[i],
+        availableSpots: 24,
+        status: 'OPEN' as const,
+      })),
+    },
+    {
+      title: 'Devkund Waterfall Trek',
+      slug: 'devkund-waterfall-trek',
+      description: `Devkund is one of Maharashtra's best-known monsoon waterfall trails, located near Bhira in Raigad district. The trek leads through a lush forest corridor, river crossings, and open rocky sections before reaching a striking plunge pool framed by steep cliffs. The combination of easy access, dense greenery, and a dramatic waterfall finale has made Devkund a favorite for nature-focused day trips.
+
+Unlike fort treks that revolve around climbs and summit exploration, Devkund is driven by the journey through water-fed terrain. The route passes along streams and through sections that feel completely transformed in peak monsoon, with fresh green cover and rushing side cascades at every turn.
+
+At the end of the trail, the waterfall drops into a deep blue-green pool that creates one of the most recognizable scenic spots in the Sahyadris. Safety management around water conditions is important during peak rains, which is why guided departures work well for first-time visitors.
+
+This location fits perfectly into the weekday category because it delivers a full monsoon experience in a compact one-day format with less physical strain than a high-elevation fort.`,
+      shortDescription: 'A compact forest-and-stream trek to one of Maharashtra’s most famous plunge-pool waterfalls near Bhira.',
+      difficulty: 'EASY' as const,
+      category: 'WEEKDAY' as const,
+      durationHours: 8,
+      distanceKm: 6,
+      elevationM: 220,
+      maxAltitudeM: 820,
+      region: 'Raigad',
+      startLocation: 'Bhira Village, Raigad',
+      endLocation: 'Bhira Village, Raigad',
+      meetingPoint: 'Mulund Check Naka, Mumbai',
+      meetingTime: '05:00 AM',
+      basePrice: 1199,
+      discountPrice: 999,
+      maxGroupSize: 30,
+      minAge: 10,
+      isFeatured: true,
+      latitude: 18.4144,
+      longitude: 73.3819,
+      routeMapUrl: mapUrl(18.4144, 73.3819),
+      highlights: [
+        'Reach the famous turquoise plunge pool at Devkund',
+        'Scenic forest trail with stream crossings',
+        'Ideal introductory monsoon trek',
+        'Strong photography and nature experience',
+        'Great weekday escape from Mumbai or Pune',
+        'Lush valley scenery throughout the route',
+      ],
+      inclusions: [
+        'Expert trek leader and support staff',
+        'Breakfast and lunch',
+        'Transport from Mumbai pickup and return',
+        'First aid kit and safety support',
+        'Local guide and entry permits where applicable',
+        'Group photos',
+      ],
+      exclusions: [
+        'Personal expenses',
+        'Snacks en route',
+        'Travel insurance',
+        'Anything not mentioned in inclusions',
+      ],
+      thingsToCarry: [
+        'Minimum 2 litres of water',
+        'Trekking or sports shoes with grip',
+        'Quick-dry clothes',
+        'Rainwear and backpack cover',
+        'Spare clothes in waterproof bag',
+        'ID proof (mandatory)',
+        'Electrolytes and light snacks',
+        'Personal medication',
+      ],
+      itinerary: [
+        { time: '05:00 AM', title: 'Assembly at Mumbai Pickup', description: 'Meet at Mulund Check Naka and depart toward Bhira village.' },
+        { time: '08:00 AM', title: 'Reach Bhira & Breakfast', description: 'Breakfast at base, registration formalities, and safety briefing.' },
+        { time: '08:45 AM', title: 'Begin Trek', description: 'Start the trail through village outskirts, forests, and stream crossings.' },
+        { time: '10:30 AM', title: 'Reach Devkund', description: 'Arrive at the waterfall basin. Rest, photography, and controlled exploration.' },
+        { time: '11:30 AM', title: 'Packed Lunch', description: 'Lunch in the designated safe zone near the waterfall route.' },
+        { time: '12:15 PM', title: 'Begin Return Walk', description: 'Retrace the forest trail back toward Bhira.' },
+        { time: '02:00 PM', title: 'Reach Base & Depart', description: 'Freshen up, have refreshments, and start the return journey.' },
+        { time: '05:30 PM', title: 'Arrive Back', description: 'Trip ends with a same-day return ideal for weekday schedules.' },
+      ],
+      images: [
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.devkund[0], altText: 'Devkund waterfall in monsoon', isPrimary: true, sortOrder: 0 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.devkund[1], altText: 'Devkund waterfall plunge pool', isPrimary: false, sortOrder: 1 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.devkund[2], altText: 'View of Devkund valley', isPrimary: false, sortOrder: 2 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.devkund[3], altText: 'Devkund waterfall trail', isPrimary: false, sortOrder: 3 },
+      ],
+      schedules: [1, 3, 5, 7, 9].map((i) => ({
+        date: weekdays[i],
+        availableSpots: 30,
+        status: 'OPEN' as const,
+      })),
+    },
+    {
+      title: 'Andharban Jungle Trek',
+      slug: 'andharban-jungle-trek',
+      description: `Andharban, literally meaning "dark forest", is one of the most atmospheric monsoon trails in Maharashtra. Located along the Tamhini Ghat belt, the route is known for dense canopy, valley views, persistent mist, and numerous streams and side waterfalls that come alive during the rains. Unlike most Sahyadri treks, Andharban is more of a forest traverse than a summit push.
+
+The trail starts near Pimpri and gradually descends through a corridor of thick vegetation, wet roots, mossy rocks, and cloud-filled openings over the Kundalika valley. The combination of long shaded sections and dramatic valley cutouts gives the trek a highly immersive feel from start to finish.
+
+Monsoon is the defining season here. The forest becomes deeply saturated, the trail edges fill with water, and several waterfall pockets appear along the route. Because the trek is long but not steep in the classic fort-trek sense, it attracts hikers who want movement, scenery, and monsoon texture rather than just a summit photo.
+
+Andharban is ideal for weekday departures when you want a full outdoor day, but not the commitment of a long fort circuit or overnight camp.`,
+      shortDescription: 'A cloud-wrapped forest traverse through Tamhini’s dark green valley with streams, side waterfalls, and immersive monsoon scenery.',
+      difficulty: 'MODERATE' as const,
+      category: 'WEEKDAY' as const,
+      durationHours: 9,
+      distanceKm: 13,
+      elevationM: 180,
+      maxAltitudeM: 690,
+      region: 'Pune',
+      fortName: 'Andharban',
+      startLocation: 'Pimpri, Tamhini Ghat, Pune',
+      endLocation: 'Bhira Dam, Raigad',
+      meetingPoint: 'Deccan Bus Stop, Pune',
+      meetingTime: '05:30 AM',
+      basePrice: 1299,
+      discountPrice: 1099,
+      maxGroupSize: 28,
+      minAge: 12,
+      isFeatured: false,
+      latitude: 18.4072,
+      longitude: 73.4208,
+      routeMapUrl: mapUrl(18.4072, 73.4208),
+      highlights: [
+        'Dense rainforest-like trail during monsoon',
+        'Long valley views over the Kundalika basin',
+        'Multiple side waterfalls and streams on the route',
+        'One of Maharashtra’s best cloud-and-canopy hikes',
+        'Excellent weekday monsoon trail for experienced walkers',
+        'Strong birdlife and deep forest atmosphere',
+      ],
+      inclusions: [
+        'Expert trek leader and support staff',
+        'Breakfast and packed lunch',
+        'Transport from Pune to trailhead and return from exit point',
+        'First aid kit and safety support',
+        'Local guide and permissions',
+        'Group photos',
+      ],
+      exclusions: [
+        'Personal expenses',
+        'Travel insurance',
+        'Anything not mentioned in inclusions',
+      ],
+      thingsToCarry: [
+        'Minimum 2.5 litres of water',
+        'Trekking shoes with reliable grip',
+        'Full rainwear and backpack cover',
+        'Extra socks and quick-dry clothing',
+        'Electrolytes and trail snacks',
+        'ID proof (mandatory)',
+        'Towel and change clothes in waterproof cover',
+        'Personal medication',
+      ],
+      itinerary: [
+        { time: '05:30 AM', title: 'Assembly in Pune', description: 'Meet at Deccan Bus Stop and begin travel toward Tamhini.' },
+        { time: '07:30 AM', title: 'Breakfast & Briefing', description: 'Breakfast stop near base, followed by route briefing and weather check.' },
+        { time: '08:15 AM', title: 'Begin Forest Traverse', description: 'Start descending into the Andharban trail under thick canopy.' },
+        { time: '10:30 AM', title: 'Waterfall and Valley Stops', description: 'Regroup at major viewpoints and waterfall pockets for hydration and photography.' },
+        { time: '12:30 PM', title: 'Lunch Break', description: 'Packed lunch at a safe open patch along the forest route.' },
+        { time: '01:00 PM', title: 'Continue Toward Exit', description: 'Resume the long traverse, gradually moving toward the Bhira side.' },
+        { time: '03:30 PM', title: 'Reach End Point', description: 'Exit the trail near the dam side, refresh, and board the return vehicle.' },
+        { time: '06:30 PM', title: 'Arrive Back in Pune', description: 'Trip concludes as a full but efficient weekday monsoon adventure.' },
+      ],
+      images: [
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.andharban[0], altText: 'Andharban forest trail', isPrimary: true, sortOrder: 0 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.andharban[1], altText: 'Andharban valley viewpoint', isPrimary: false, sortOrder: 1 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.andharban[2], altText: 'Andharban waterfall section', isPrimary: false, sortOrder: 2 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.andharban[3], altText: 'Andharban waterfall view', isPrimary: false, sortOrder: 3 },
+      ],
+      schedules: [0, 3, 5, 8, 10].map((i) => ({
+        date: weekdays[i],
+        availableSpots: 28,
+        status: 'OPEN' as const,
+      })),
+    },
+    {
+      title: 'Thoseghar Waterfalls Trail',
+      slug: 'thoseghar-waterfalls-trail',
+      description: `Thoseghar is a well-known monsoon waterfall zone near Satara, famous for a series of seasonal cascades that pour into a deep valley once the rains strengthen across western Maharashtra. The site combines easy walking access, dramatic viewpoints, and sweeping valley scenery, making it one of the most approachable waterfall experiences in the state.
+
+The outing focuses on moving between viewpoint decks, short trail sections, and landscape stops rather than on a demanding summit climb. During peak monsoon, the mist, wind, and noise of the falls create a full sensory experience that works especially well for groups looking for a lighter outdoor day.
+
+Thoseghar also suits travelers who prefer photography, scenic viewpoints, and road-trip pacing over strenuous trekking. The route can be combined with short walks through nearby plateau sections and roadside monsoon points around Satara.
+
+Because the physical demand is lighter than a fort or long forest trek, Thoseghar fits naturally into the weekday category and broadens the trip mix beyond only summit-based adventures.`,
+      shortDescription: 'A relaxed monsoon outing near Satara with dramatic valley waterfalls, short walks, and scenic viewpoints.',
+      difficulty: 'EASY' as const,
+      category: 'WEEKDAY' as const,
+      durationHours: 7,
+      distanceKm: 4,
+      elevationM: 120,
+      maxAltitudeM: 950,
+      region: 'Satara',
+      fortName: 'Thoseghar',
+      startLocation: 'Thoseghar Village, Satara',
+      endLocation: 'Thoseghar Village, Satara',
+      meetingPoint: 'Satara Bus Stand',
+      meetingTime: '07:00 AM',
+      basePrice: 899,
+      discountPrice: 749,
+      maxGroupSize: 35,
+      minAge: 8,
+      isFeatured: false,
+      latitude: 17.5966,
+      longitude: 73.8458,
+      routeMapUrl: mapUrl(17.5966, 73.8458),
+      highlights: [
+        'Witness the famous Thoseghar waterfall chain in peak monsoon',
+        'Easy access with scenic viewpoints and short trails',
+        'Perfect for mixed-age and relaxed travel groups',
+        'Strong monsoon road-trip and photography location',
+        'Valley mist, wind, and panoramic green landscapes',
+        'Good same-day weekday experience from Satara and Pune side',
+      ],
+      inclusions: [
+        'Trip host and local support',
+        'Breakfast and lunch',
+        'Local transport for the waterfall circuit where applicable',
+        'First aid kit',
+        'Entry charges where required',
+        'Group photos',
+      ],
+      exclusions: [
+        'Personal purchases',
+        'Travel insurance',
+        'Anything not mentioned in inclusions',
+      ],
+      thingsToCarry: [
+        'Minimum 1.5 litres of water',
+        'Sports shoes or trekking shoes',
+        'Rainwear in monsoon',
+        'Small backpack',
+        'Cap or hood for wind at viewpoints',
+        'ID proof',
+        'Phone pouch for water protection',
+        'Personal medication',
+      ],
+      itinerary: [
+        { time: '07:00 AM', title: 'Assembly at Satara', description: 'Meet at Satara Bus Stand and depart toward the waterfall zone.' },
+        { time: '08:00 AM', title: 'Breakfast Stop', description: 'Breakfast en route with monsoon route briefing and weather update.' },
+        { time: '09:00 AM', title: 'Viewpoint Circuit Begins', description: 'Visit the main Thoseghar viewpoints and short walking trails.' },
+        { time: '11:00 AM', title: 'Scenic Plateau and Waterfall Stops', description: 'Spend time at secondary viewpoints and photography zones.' },
+        { time: '12:30 PM', title: 'Lunch', description: 'Lunch at a local stop near the waterfall circuit.' },
+        { time: '01:15 PM', title: 'Final Monsoon Stops', description: 'Short final walk and wrap-up around the viewpoint area.' },
+        { time: '03:00 PM', title: 'Return to Satara', description: 'Depart the waterfall zone and head back to the city.' },
+      ],
+      images: [
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.thoseghar[0], altText: 'Thoseghar waterfall during monsoon', isPrimary: true, sortOrder: 0 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.thoseghar[1], altText: 'Thoseghar falls close view', isPrimary: false, sortOrder: 1 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.thoseghar[2], altText: 'Thoseghar waterfall viewpoint', isPrimary: false, sortOrder: 2 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.thoseghar[3], altText: 'Monsoon valley waterfall scene', isPrimary: false, sortOrder: 3 },
+      ],
+      schedules: [2, 4, 6, 9, 11].map((i) => ({
+        date: weekdays[i],
         availableSpots: 35,
         status: 'OPEN' as const,
       })),
@@ -534,6 +901,7 @@ The Rajmachi fort complex is well-preserved with intact bastions, doorways, and 
       isFeatured: true,
       latitude: 18.8375,
       longitude: 73.3975,
+      routeMapUrl: mapUrl(18.8375, 73.3975),
       highlights: [
         'Thrilling night trek through dense forest',
         'Explore twin forts: Shrivardhan and Manaranjan',

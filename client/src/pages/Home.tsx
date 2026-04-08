@@ -251,6 +251,49 @@ const heroContentItemVariants = {
   }),
 };
 
+const featuredPageVariants = {
+  enter: (direction: number) => ({
+    opacity: 0,
+    x: direction > 0 ? 72 : -72,
+    scale: 0.985,
+  }),
+  center: {
+    opacity: 1,
+    x: 0,
+    scale: 1,
+    transition: {
+      duration: 0.58,
+      ease: [0.22, 1, 0.36, 1],
+      staggerChildren: 0.08,
+      delayChildren: 0.04,
+    },
+  },
+  exit: (direction: number) => ({
+    opacity: 0,
+    x: direction > 0 ? -56 : 56,
+    scale: 0.985,
+    transition: {
+      duration: 0.38,
+      ease: [0.4, 0, 1, 1],
+    },
+  }),
+};
+
+const featuredCardVariants = {
+  enter: {
+    opacity: 0,
+    y: 20,
+  },
+  center: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.44,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+};
+
 
 /* ─── Animated Counter Hook ─── */
 
@@ -319,6 +362,7 @@ export default function Home() {
   const [featuredTrips, setFeaturedTrips] = useState<Trip[]>([]);
   const [activeCategory, setActiveCategory] = useState<(typeof trekCategories)[number]>('All');
   const [featuredStart, setFeaturedStart] = useState(0);
+  const [featuredDirection, setFeaturedDirection] = useState(1);
   const [heroDirection, setHeroDirection] = useState(1);
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -353,6 +397,7 @@ export default function Home() {
 
   useEffect(() => {
     setFeaturedStart(0);
+    setFeaturedDirection(1);
   }, [activeCategory]);
 
   const featuredSource = useMemo(() => {
@@ -376,6 +421,7 @@ export default function Home() {
   const nextFeaturedPage = () => {
     const total = featuredSource.length;
     const nextStart = featuredStart + FEATURED_PAGE_SIZE >= total ? 0 : featuredStart + FEATURED_PAGE_SIZE;
+    setFeaturedDirection(1);
     setFeaturedStart(nextStart);
   };
 
@@ -384,10 +430,13 @@ export default function Home() {
     const prevStart = featuredStart - FEATURED_PAGE_SIZE < 0
       ? Math.max(total - ((total % FEATURED_PAGE_SIZE) || FEATURED_PAGE_SIZE), 0)
       : featuredStart - FEATURED_PAGE_SIZE;
+    setFeaturedDirection(-1);
     setFeaturedStart(prevStart);
   };
 
   const jumpToFeaturedPage = (pageIndex: number) => {
+    const nextStart = pageIndex * FEATURED_PAGE_SIZE;
+    setFeaturedDirection(nextStart >= featuredStart ? 1 : -1);
     setFeaturedStart(pageIndex * FEATURED_PAGE_SIZE);
   };
 
@@ -626,7 +675,7 @@ export default function Home() {
       </section>
 
       {/* ─── FEATURED TOURS with Category Tabs ─── */}
-      <section className="bg-dark-50 py-20">
+      <section className="bg-dark-50 pb-32 pt-20 sm:pb-36">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <p className="text-sm font-semibold uppercase tracking-wider text-primary-500">
@@ -665,33 +714,31 @@ export default function Home() {
             </button>
 
             <div className="overflow-hidden rounded-[2rem]">
-              <motion.div
-                animate={{ x: `-${featuredPage * 100}%` }}
-                transition={{
-                  type: 'spring',
-                  stiffness: 108,
-                  damping: 24,
-                  mass: 0.95,
-                }}
-                className="flex"
-              >
-                {featuredPages.map((pageTrips, pageIndex) => (
-                  <div
-                    key={`${activeCategory}-${pageIndex}`}
-                    className="grid w-full shrink-0 gap-6 md:grid-cols-2 xl:grid-cols-4"
-                  >
-                    {pageTrips.map((trip, tripIndex) => (
+              <AnimatePresence custom={featuredDirection} initial={false} mode="wait">
+                <motion.div
+                  key={`${activeCategory}-${featuredPage}`}
+                  custom={featuredDirection}
+                  variants={featuredPageVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  className="grid w-full gap-6 md:grid-cols-2 xl:grid-cols-4"
+                >
+                  {(featuredPages[featuredPage] ?? []).map((trip, tripIndex) => (
+                    <motion.div
+                      key={trip.id}
+                      variants={featuredCardVariants}
+                    >
                       <TripCard
-                        key={trip.id}
                         trip={trip}
                         variant="featuredCompact"
                         revealOnScroll
                         revealIndex={tripIndex}
                       />
-                    ))}
-                  </div>
-                ))}
-              </motion.div>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </AnimatePresence>
             </div>
           </div>
 
@@ -719,7 +766,7 @@ export default function Home() {
       </section>
 
       {/* ─── STATS CTA SECTION ─── */}
-      <section ref={counterRef} className="relative mt-8 overflow-visible bg-white px-4 pb-20 pt-0 sm:mt-10 sm:px-6 lg:px-8">
+      <section ref={counterRef} className="relative overflow-visible bg-white px-4 pb-20 pt-0 sm:px-6 lg:px-8">
         <div className="relative mx-auto max-w-7xl">
           <div className="absolute left-1/2 top-0 z-20 w-full max-w-[1280px] -translate-x-1/2 -translate-y-1/2 px-4 sm:px-6 lg:px-8">
             <div className="mx-4 overflow-hidden rounded-xl bg-primary-600 px-8 py-5 shadow-[0_24px_70px_rgba(64,162,64,0.25)] sm:mx-6 sm:px-10 sm:py-6 lg:mx-8">
