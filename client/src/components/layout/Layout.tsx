@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import SiteCta from './SiteCta';
+import FloatingWhatsAppBot from './FloatingWhatsAppBot';
 import { useAuthStore } from '@/stores/authStore';
 
 export default function Layout() {
@@ -36,6 +37,7 @@ export default function Layout() {
           <Outlet />
         </motion.main>
       </AnimatePresence>
+      <FloatingWhatsAppBot />
       <SiteCta />
       <Footer />
     </div>
