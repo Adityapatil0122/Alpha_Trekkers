@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -43,8 +43,30 @@ export default function Register() {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
-  } = useForm<FormData>({ resolver: zodResolver(schema) });
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      password: '',
+      confirmPassword: '',
+    },
+  });
+
+  useEffect(() => {
+    reset({
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      password: '',
+      confirmPassword: '',
+    });
+  }, [reset]);
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -68,7 +90,7 @@ export default function Register() {
   };
 
   return (
-    <section className="travel-dark relative min-h-screen overflow-hidden pt-28">
+    <section className="travel-dark relative mb-12 min-h-screen overflow-hidden pt-28 sm:mb-14 lg:mb-16">
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${MAHARASHTRA_MONSOON_IMAGES.heroes.register})` }}
@@ -77,15 +99,12 @@ export default function Register() {
 
       <div className="relative mx-auto flex max-w-7xl items-center px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid w-full gap-10 lg:grid-cols-[0.95fr_0.8fr] lg:items-center">
-          <div className="max-w-2xl text-white">
-            <span className="section-label !bg-white/10 !text-sand-100 before:!bg-gold-400">
-              Join the journey
-            </span>
-            <p className="playful-text text-2xl text-gold-400 mt-3">~ start your adventure ~</p>
-            <h1 className="mt-6 font-heading text-5xl leading-[0.95] sm:text-6xl">
+          <div className="hero-copy max-w-2xl text-white">
+            <p className="playful-text mt-3 text-2xl !text-primary-400">~ start your adventure ~</p>
+            <h1 className="mt-5 font-heading text-5xl leading-[0.95] !text-white sm:text-6xl">
               Create an account and keep the new booking experience connected.
             </h1>
-            <p className="mt-5 text-lg leading-8 text-sand-100/76">
+            <p className="mt-5 text-lg leading-8 text-white/82">
               Save your spot, revisit departures, and move from discovery to payment with a cleaner
               travel-template inspired account flow.
             </p>
@@ -103,6 +122,9 @@ export default function Register() {
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5" autoComplete="off">
+              <input type="text" name="fake_register_name" autoComplete="name" className="hidden" tabIndex={-1} />
+              <input type="email" name="fake_register_email" autoComplete="email" className="hidden" tabIndex={-1} />
+              <input type="password" name="fake_register_password" autoComplete="new-password" className="hidden" tabIndex={-1} />
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
                   <label className="mb-2 block text-sm font-medium text-ink-700">First name</label>
@@ -110,7 +132,7 @@ export default function Register() {
                     <User className="h-5 w-5 text-forest-500" />
                     <input
                       {...register('firstName')}
-                      autoComplete="section-user given-name"
+                      autoComplete="off"
                       className="min-w-0 flex-1 bg-transparent focus:outline-none"
                     />
                   </div>
@@ -122,7 +144,7 @@ export default function Register() {
                     <User className="h-5 w-5 text-forest-500" />
                     <input
                       {...register('lastName')}
-                      autoComplete="section-user family-name"
+                      autoComplete="off"
                       className="min-w-0 flex-1 bg-transparent focus:outline-none"
                     />
                   </div>
@@ -137,7 +159,7 @@ export default function Register() {
                   <input
                     {...register('email')}
                     type="email"
-                    autoComplete="section-user email"
+                    autoComplete="off"
                     className="min-w-0 flex-1 bg-transparent focus:outline-none"
                   />
                 </div>
@@ -150,7 +172,7 @@ export default function Register() {
                   <Phone className="h-5 w-5 text-forest-500" />
                   <input
                     {...register('phone')}
-                    autoComplete="section-user tel"
+                    autoComplete="off"
                     className="min-w-0 flex-1 bg-transparent focus:outline-none"
                   />
                 </div>
@@ -163,7 +185,7 @@ export default function Register() {
                   <input
                     {...register('password')}
                     type={showPassword ? 'text' : 'password'}
-                    autoComplete="section-user new-password"
+                    autoComplete="new-password"
                     className="min-w-0 flex-1 bg-transparent focus:outline-none"
                   />
                   <button type="button" onClick={() => setShowPassword((current) => !current)} className="text-ink-600">
@@ -180,7 +202,7 @@ export default function Register() {
                   <input
                     {...register('confirmPassword')}
                     type="password"
-                    autoComplete="section-user new-password"
+                    autoComplete="new-password"
                     className="min-w-0 flex-1 bg-transparent focus:outline-none"
                   />
                 </div>

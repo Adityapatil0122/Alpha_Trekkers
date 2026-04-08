@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -29,8 +29,19 @@ export default function Login() {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
-  } = useForm<FormData>({ resolver: zodResolver(schema) });
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
+
+  useEffect(() => {
+    reset({ email: '', password: '' });
+  }, [reset]);
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -54,7 +65,7 @@ export default function Login() {
   };
 
   return (
-    <section className="travel-dark relative min-h-screen overflow-hidden pt-28">
+    <section className="travel-dark relative mb-12 min-h-screen overflow-hidden pt-28 sm:mb-14 lg:mb-16">
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${MAHARASHTRA_MONSOON_IMAGES.heroes.login})` }}
@@ -63,15 +74,12 @@ export default function Login() {
 
       <div className="relative mx-auto flex max-w-7xl items-center px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid w-full gap-10 lg:grid-cols-[0.95fr_0.75fr] lg:items-center">
-          <div className="max-w-2xl text-white">
-            <span className="section-label !bg-white/10 !text-sand-100 before:!bg-gold-400">
-              Return to your account
-            </span>
-            <p className="playful-text text-2xl text-gold-400 mt-3">~ welcome back, explorer ~</p>
-            <h1 className="mt-6 font-heading text-5xl leading-[0.95] sm:text-6xl">
+          <div className="hero-copy max-w-2xl text-white">
+            <p className="playful-text mt-3 text-2xl !text-primary-400">~ welcome back, explorer ~</p>
+            <h1 className="mt-5 font-heading text-5xl leading-[0.95] !text-white sm:text-6xl">
               Continue from discovery to booking without losing the travel mood.
             </h1>
-            <p className="mt-5 text-lg leading-8 text-sand-100/76">
+            <p className="mt-5 text-lg leading-8 text-white/82">
               Sign in to manage bookings, revisit saved departures, and move through the redesigned
               journey flow.
             </p>
@@ -89,6 +97,8 @@ export default function Login() {
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5" autoComplete="off">
+              <input type="text" name="fake_username" autoComplete="username" className="hidden" tabIndex={-1} />
+              <input type="password" name="fake_password" autoComplete="current-password" className="hidden" tabIndex={-1} />
               <div>
                 <label className="mb-2 block text-sm font-medium text-ink-700">Email</label>
                 <div className="travel-input flex items-center gap-3">
@@ -96,7 +106,7 @@ export default function Login() {
                   <input
                     {...register('email')}
                     type="email"
-                    autoComplete="section-user username"
+                    autoComplete="off"
                     className="min-w-0 flex-1 bg-transparent focus:outline-none"
                   />
                 </div>
@@ -110,7 +120,7 @@ export default function Login() {
                   <input
                     {...register('password')}
                     type={showPassword ? 'text' : 'password'}
-                    autoComplete="section-user current-password"
+                    autoComplete="new-password"
                     className="min-w-0 flex-1 bg-transparent focus:outline-none"
                   />
                   <button type="button" onClick={() => setShowPassword((current) => !current)} className="text-ink-600">
@@ -121,7 +131,7 @@ export default function Login() {
               </div>
 
               <Button type="submit" size="lg" fullWidth isLoading={isSubmitting}>
-                Enter dashboard
+                Sign In
               </Button>
             </form>
 

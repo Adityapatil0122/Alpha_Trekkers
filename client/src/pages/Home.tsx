@@ -4,11 +4,11 @@ import { AnimatePresence, motion, useInView } from 'framer-motion';
 import {
   ArrowRight,
   ArrowLeft,
+  Bus,
   CalendarBlank,
   CaretRight,
   Globe,
   Handshake,
-  MapPinLine,
   Mountains,
   Star,
   Trophy,
@@ -72,42 +72,48 @@ const destinationCards = [
     name: 'Rajgad',
     tours: '6 tours',
     image: '/destinations/rajgad.png',
-    cardClass: 'lg:h-[24rem] xl:h-[25rem]',
+    cardClass: 'lg:mt-8',
+    imageWrapClass: 'h-[16rem] sm:h-[18rem] lg:h-[15rem] xl:h-[16rem]',
     imageClass: 'object-center',
   },
   {
     name: 'Harishchandragad',
     tours: '4 tours',
     image: '/destinations/harishchandragad.png',
-    cardClass: 'lg:mt-8 lg:h-[18rem] xl:h-[19rem]',
+    cardClass: 'lg:mt-14',
+    imageWrapClass: 'h-[18rem] sm:h-[20rem] lg:h-[18rem] xl:h-[19rem]',
     imageClass: 'object-center',
   },
   {
     name: 'Torna Fort',
     tours: '5 tours',
     image: '/destinations/torna.png',
-    cardClass: 'lg:h-[17rem] xl:h-[18rem]',
+    cardClass: 'lg:mt-8',
+    imageWrapClass: 'h-[16rem] sm:h-[18rem] lg:h-[15rem] xl:h-[16rem]',
     imageClass: 'object-center',
   },
   {
     name: 'Kalsubai',
     tours: '3 tours',
     image: '/destinations/kalsubai.png',
-    cardClass: 'lg:-mt-2 lg:h-[19rem] xl:h-[20rem]',
+    cardClass: 'lg:mt-14',
+    imageWrapClass: 'h-[18rem] sm:h-[20rem] lg:h-[18rem] xl:h-[19rem]',
     imageClass: 'object-center',
   },
   {
     name: 'Lohagad',
     tours: '4 tours',
     image: '/destinations/lohagad.png',
-    cardClass: 'lg:mt-10 lg:h-[21rem] xl:h-[22rem]',
+    cardClass: 'lg:mt-8',
+    imageWrapClass: 'h-[16rem] sm:h-[18rem] lg:h-[15rem] xl:h-[16rem]',
     imageClass: 'object-center',
   },
   {
     name: 'Rajmachi',
     tours: '3 tours',
     image: '/destinations/rajmachi.png',
-    cardClass: 'lg:mt-2 lg:h-[19rem] xl:h-[20rem]',
+    cardClass: 'lg:mt-14',
+    imageWrapClass: 'h-[18rem] sm:h-[20rem] lg:h-[18rem] xl:h-[19rem]',
     imageClass: 'object-center',
   },
 ];
@@ -164,19 +170,84 @@ const blogPosts = [
 ];
 
 const FEATURED_PAGE_SIZE = 4;
+const HERO_AUTOPLAY_DELAY = 6500;
 
-const featuredSlideVariants = {
+const heroImageVariants = {
+  enter: (direction: number) => ({
+    opacity: 0.65,
+    scale: 1.12,
+    x: direction > 0 ? '18%' : '-18%',
+  }),
+  center: {
+    opacity: 1,
+    scale: 1,
+    x: '0%',
+    transition: {
+      duration: 1.15,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+  exit: (direction: number) => ({
+    opacity: 0.45,
+    scale: 1.04,
+    x: direction > 0 ? '-14%' : '14%',
+    transition: {
+      duration: 1.05,
+      ease: [0.4, 0, 0.2, 1],
+    },
+  }),
+};
+
+const heroContentVariants = {
   enter: (direction: number) => ({
     opacity: 0,
-    x: direction > 0 ? 72 : -72,
+    x: direction > 0 ? 88 : -88,
   }),
   center: {
     opacity: 1,
     x: 0,
+    transition: {
+      duration: 0.72,
+      ease: [0.22, 1, 0.36, 1],
+      staggerChildren: 0.12,
+      delayChildren: 0.14,
+    },
   },
   exit: (direction: number) => ({
     opacity: 0,
-    x: direction > 0 ? -72 : 72,
+    x: direction > 0 ? -68 : 68,
+    transition: {
+      duration: 0.42,
+      ease: [0.4, 0, 1, 1],
+      staggerChildren: 0.05,
+      staggerDirection: -1,
+    },
+  }),
+};
+
+const heroContentItemVariants = {
+  enter: (direction: number) => ({
+    opacity: 0,
+    x: direction > 0 ? 40 : -40,
+    y: 14,
+  }),
+  center: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    transition: {
+      duration: 0.62,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+  exit: (direction: number) => ({
+    opacity: 0,
+    x: direction > 0 ? -28 : 28,
+    y: -10,
+    transition: {
+      duration: 0.3,
+      ease: [0.4, 0, 1, 1],
+    },
   }),
 };
 
@@ -248,7 +319,7 @@ export default function Home() {
   const [featuredTrips, setFeaturedTrips] = useState<Trip[]>([]);
   const [activeCategory, setActiveCategory] = useState<(typeof trekCategories)[number]>('All');
   const [featuredStart, setFeaturedStart] = useState(0);
-  const [featuredDirection, setFeaturedDirection] = useState(1);
+  const [heroDirection, setHeroDirection] = useState(1);
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const counterRef = useRef<HTMLDivElement>(null);
@@ -261,13 +332,14 @@ export default function Home() {
       .catch(() => setFeaturedTrips([]));
   }, []);
 
-  // Auto-rotate hero slides
   useEffect(() => {
-    const timer = setInterval(() => {
+    const timer = window.setTimeout(() => {
+      setHeroDirection(1);
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 6000);
-    return () => clearInterval(timer);
-  }, []);
+    }, HERO_AUTOPLAY_DELAY);
+
+    return () => window.clearTimeout(timer);
+  }, [currentSlide]);
 
   const filteredTrips = useMemo(() => {
     if (activeCategory === 'All') return featuredTrips.slice(0, 8);
@@ -281,16 +353,18 @@ export default function Home() {
 
   useEffect(() => {
     setFeaturedStart(0);
-    setFeaturedDirection(1);
   }, [activeCategory]);
 
   const featuredSource = useMemo(() => {
     return filteredTrips.length > 0 ? filteredTrips : featuredTrips.slice(0, 8);
   }, [featuredTrips, filteredTrips]);
 
-  const visibleFeaturedTrips = useMemo(() => {
-    return featuredSource.slice(featuredStart, featuredStart + FEATURED_PAGE_SIZE);
-  }, [featuredSource, featuredStart]);
+  const featuredPages = useMemo(() => {
+    return Array.from(
+      { length: Math.max(1, Math.ceil(featuredSource.length / FEATURED_PAGE_SIZE)) },
+      (_, index) => featuredSource.slice(index * FEATURED_PAGE_SIZE, index * FEATURED_PAGE_SIZE + FEATURED_PAGE_SIZE),
+    );
+  }, [featuredSource]);
 
   const featuredPageCount = Math.max(
     1,
@@ -301,14 +375,12 @@ export default function Home() {
 
   const nextFeaturedPage = () => {
     const total = featuredSource.length;
-    setFeaturedDirection(1);
     const nextStart = featuredStart + FEATURED_PAGE_SIZE >= total ? 0 : featuredStart + FEATURED_PAGE_SIZE;
     setFeaturedStart(nextStart);
   };
 
   const prevFeaturedPage = () => {
     const total = featuredSource.length;
-    setFeaturedDirection(-1);
     const prevStart = featuredStart - FEATURED_PAGE_SIZE < 0
       ? Math.max(total - ((total % FEATURED_PAGE_SIZE) || FEATURED_PAGE_SIZE), 0)
       : featuredStart - FEATURED_PAGE_SIZE;
@@ -316,98 +388,117 @@ export default function Home() {
   };
 
   const jumpToFeaturedPage = (pageIndex: number) => {
-    setFeaturedDirection(pageIndex >= featuredPage ? 1 : -1);
     setFeaturedStart(pageIndex * FEATURED_PAGE_SIZE);
   };
 
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+  const changeHeroSlide = (nextIndex: number, direction: number) => {
+    setHeroDirection(direction);
+    setCurrentSlide((nextIndex + heroSlides.length) % heroSlides.length);
+  };
+
+  const getHeroJumpDirection = (nextIndex: number) => {
+    if (currentSlide === heroSlides.length - 1 && nextIndex === 0) return 1;
+    if (currentSlide === 0 && nextIndex === heroSlides.length - 1) return -1;
+    return nextIndex > currentSlide ? 1 : -1;
+  };
+
+  const nextSlide = () => changeHeroSlide(currentSlide + 1, 1);
+  const prevSlide = () => changeHeroSlide(currentSlide - 1, -1);
+  const activeHeroSlide = heroSlides[currentSlide];
 
   return (
     <>
       {/* ─── HERO SECTION with Carousel ─── */}
       <section className="relative h-[90vh] min-h-[600px] overflow-hidden">
-        {heroSlides.map((slide, index) => (
-          <div
-            key={index}
-            className={`absolute inset-0 transition-opacity duration-1000 ${
-              index === currentSlide ? 'opacity-100' : 'opacity-0'
-            }`}
-          >
-            <div
-              className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${slide.image})` }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-dark-900/80 via-dark-900/50 to-transparent" />
-          </div>
-        ))}
+        <div className="absolute inset-0">
+          <AnimatePresence custom={heroDirection} initial={false}>
+            <motion.div
+              key={activeHeroSlide.image}
+              custom={heroDirection}
+              variants={heroImageVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              className="absolute inset-0"
+            >
+              <div
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                style={{ backgroundImage: `url(${activeHeroSlide.image})` }}
+              />
+            </motion.div>
+          </AnimatePresence>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.18),transparent_34%),linear-gradient(90deg,rgba(4,10,22,0.8)_0%,rgba(4,10,22,0.56)_36%,rgba(4,10,22,0.12)_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,10,22,0.1)_0%,rgba(4,10,22,0.16)_55%,rgba(4,10,22,0.38)_100%)]" />
+        </div>
 
         <div className="relative z-10 flex h-full items-center">
           <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="hero-copy max-w-3xl">
-              <motion.p
-                key={`tagline-${currentSlide}`}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="playful-text !text-primary-400 text-2xl sm:text-3xl"
-              >
-                {heroSlides[currentSlide].tagline}
-              </motion.p>
+            <div className="hero-copy max-w-3xl overflow-hidden">
+              <AnimatePresence custom={heroDirection} initial={false} mode="wait">
+                <motion.div
+                  key={currentSlide}
+                  custom={heroDirection}
+                  variants={heroContentVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  className="min-h-[24rem] sm:min-h-[27rem] lg:min-h-[29rem]"
+                >
+                  <motion.p
+                    variants={heroContentItemVariants}
+                    className="playful-text text-2xl !text-primary-300 sm:text-3xl"
+                  >
+                    {activeHeroSlide.tagline}
+                  </motion.p>
 
-              <motion.h1
-                key={`title-${currentSlide}`}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-                className="mt-4 text-5xl font-extrabold leading-tight text-white sm:text-6xl lg:text-7xl"
-                style={{ whiteSpace: 'pre-line' }}
-              >
-                {heroSlides[currentSlide].title}{' '}
-                <span className="text-primary-400">{heroSlides[currentSlide].highlight}</span>
-              </motion.h1>
+                  <motion.h1
+                    variants={heroContentItemVariants}
+                    className="mt-4 text-5xl font-extrabold leading-[0.96] tracking-[-0.04em] text-white sm:text-6xl lg:text-7xl"
+                    style={{ whiteSpace: 'pre-line' }}
+                  >
+                    {activeHeroSlide.title}{' '}
+                    <span className="text-primary-400">{activeHeroSlide.highlight}</span>
+                  </motion.h1>
 
-              <motion.p
-                key={`desc-${currentSlide}`}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="mt-6 max-w-xl text-lg leading-8 text-dark-300"
-              >
-                {heroSlides[currentSlide].description}
-              </motion.p>
+                  <motion.p
+                    variants={heroContentItemVariants}
+                    className="mt-6 max-w-xl text-lg leading-8 text-white/78"
+                  >
+                    {activeHeroSlide.description}
+                  </motion.p>
 
-              <motion.div
-                key={`cta-${currentSlide}`}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                className="mt-8 flex flex-wrap items-center gap-4"
-              >
-                <Link to="/trips">
-                  <button className="rounded-lg bg-primary-500 px-8 py-4 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-primary-600 hover:shadow-lg">
-                    Let's Get Started
-                  </button>
-                </Link>
-                <Link to="/about" className="flex items-center gap-2 text-sm font-semibold text-white transition hover:text-primary-400">
-                  Who we are
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary-400 text-primary-400">
-                    <CaretRight className="h-3.5 w-3.5" weight="bold" />
-                  </span>
-                </Link>
-              </motion.div>
+                  <motion.div
+                    variants={heroContentItemVariants}
+                    className="mt-8 flex flex-wrap items-center gap-4"
+                  >
+                    <Link to="/trips">
+                      <button className="rounded-lg bg-primary-500 px-8 py-4 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-primary-600 hover:shadow-lg">
+                        Let's Get Started
+                      </button>
+                    </Link>
+                    <Link to="/about" className="flex items-center gap-2 text-sm font-semibold text-white transition hover:text-primary-400">
+                      Who we are
+                      <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary-400 text-primary-400">
+                        <CaretRight className="h-3.5 w-3.5" weight="bold" />
+                      </span>
+                    </Link>
+                  </motion.div>
+                </motion.div>
+              </AnimatePresence>
             </div>
           </div>
         </div>
 
         {/* Slide nav arrows */}
         <button
+          type="button"
           onClick={prevSlide}
           className="absolute left-4 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-primary-500 text-white transition hover:bg-primary-600 sm:left-8"
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
         <button
+          type="button"
           onClick={nextSlide}
           className="absolute right-4 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-primary-500 text-white transition hover:bg-primary-600 sm:right-8"
         >
@@ -419,7 +510,11 @@ export default function Home() {
           {heroSlides.map((_, index) => (
             <button
               key={index}
-              onClick={() => setCurrentSlide(index)}
+              type="button"
+              onClick={() => {
+                if (index === currentSlide) return;
+                changeHeroSlide(index, getHeroJumpDirection(index));
+              }}
               className={`h-3 rounded-full transition-all ${
                 index === currentSlide ? 'w-8 bg-primary-500' : 'w-3 bg-white/50'
               }`}
@@ -449,20 +544,30 @@ export default function Home() {
       </section>
 
       {/* ─── ABOUT / INTRO SECTION ─── */}
-      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-        <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+      <section className="mx-auto max-w-7xl px-4 pb-2 pt-4 sm:px-6 sm:pb-4 sm:pt-6 lg:px-8 lg:pb-6 lg:pt-8">
+        <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="relative"
+            className="relative home-about-visual lg:-ml-8 xl:-ml-10"
           >
+            <div className="home-about-route pointer-events-none absolute inset-0 hidden lg:block">
+              <svg viewBox="0 0 760 820" className="home-about-route__paths h-full w-full">
+                <path d="M136 74 C172 74, 204 94, 218 124 C236 164, 220 212, 188 234 C160 252, 126 248, 106 228 C88 210, 92 182, 112 168 C130 156, 156 160, 170 178 C190 204, 182 244, 154 280 C120 324, 94 370, 74 420 C62 450, 52 480, 42 514" />
+                <circle cx="136" cy="74" r="5" />
+                <circle cx="42" cy="514" r="5" />
+              </svg>
+              <div className="home-about-route__icon home-about-route__icon--bus">
+                <Bus className="h-7 w-7" weight="fill" />
+              </div>
+            </div>
             <img
               src="/destinations/Exploring Maharashtra's ancient hilltop forts.png"
               alt="Exploring Maharashtra's ancient hilltop forts"
-              className="mx-auto w-full max-w-[48rem] object-contain drop-shadow-[0_24px_45px_rgba(0,0,0,0.18)]"
-              style={{ height: '720px' }}
+              className="mx-auto w-full max-w-[52rem] object-contain drop-shadow-[0_28px_52px_rgba(0,0,0,0.2)]"
+              style={{ height: '780px' }}
             />
             <div className="absolute -bottom-6 -right-6 hidden rounded-2xl bg-white p-4 shadow-xl lg:block">
               <p className="playful-text text-2xl text-primary-500">Enjoy Travel</p>
@@ -560,22 +665,33 @@ export default function Home() {
             </button>
 
             <div className="overflow-hidden rounded-[2rem]">
-              <AnimatePresence custom={featuredDirection} initial={false} mode="wait">
-                <motion.div
-                  key={`${activeCategory}-${featuredPage}`}
-                  custom={featuredDirection}
-                  variants={featuredSlideVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                  className="grid gap-6 md:grid-cols-2 xl:grid-cols-4"
-                >
-                  {visibleFeaturedTrips.map((trip) => (
-                    <TripCard key={trip.id} trip={trip} />
-                  ))}
-                </motion.div>
-              </AnimatePresence>
+              <motion.div
+                animate={{ x: `-${featuredPage * 100}%` }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 108,
+                  damping: 24,
+                  mass: 0.95,
+                }}
+                className="flex"
+              >
+                {featuredPages.map((pageTrips, pageIndex) => (
+                  <div
+                    key={`${activeCategory}-${pageIndex}`}
+                    className="grid w-full shrink-0 gap-6 md:grid-cols-2 xl:grid-cols-4"
+                  >
+                    {pageTrips.map((trip, tripIndex) => (
+                      <TripCard
+                        key={trip.id}
+                        trip={trip}
+                        variant="featuredCompact"
+                        revealOnScroll
+                        revealIndex={tripIndex}
+                      />
+                    ))}
+                  </div>
+                ))}
+              </motion.div>
             </div>
           </div>
 
@@ -638,11 +754,11 @@ export default function Home() {
 
           <div className="relative left-1/2 mt-0 w-screen -translate-x-1/2 overflow-hidden bg-[#0f0e09] pb-28 pt-32 sm:pb-32 sm:pt-36 lg:pb-36 lg:pt-32">
             <img
-              src="/destinations/torna.png"
-              alt="Camp background"
-              className="absolute inset-0 h-full w-full object-cover opacity-30"
+              src="/destinations/Devkund Waterfall in lush surroundings.png"
+              alt="Devkund Waterfall background"
+              className="absolute inset-0 h-full w-full object-cover opacity-40"
             />
-            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(15,14,9,0.92),rgba(15,14,9,0.55)),linear-gradient(180deg,rgba(15,14,9,0.1),rgba(15,14,9,0.45))]" />
+            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(15,14,9,0.7),rgba(15,14,9,0.34)),linear-gradient(180deg,rgba(15,14,9,0.06),rgba(15,14,9,0.26))]" />
 
             <div className="relative mx-auto max-w-7xl">
               <div className="relative grid auto-rows-fr grid-cols-2 gap-6 px-6 pt-10 sm:px-8 sm:pt-12 lg:grid-cols-4 lg:px-10 lg:pt-14 xl:px-16">
@@ -667,16 +783,16 @@ export default function Home() {
       {/* ─── DESTINATIONS SECTION — Staggered Grid ─── */}
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="text-center">
-          <p className="text-sm font-semibold uppercase tracking-wider text-primary-500">
+          <p className="playful-text text-3xl text-primary-500 sm:text-[2.4rem]">
             Top Destinations
           </p>
-          <h2 className="mt-3 text-4xl font-bold text-dark-900 sm:text-5xl">
+          <h2 className="mt-4 text-4xl font-bold text-dark-900 sm:text-5xl">
             Checkout Beautiful Places Around{' '}
             <span className="playful-text text-primary-500">Maharashtra</span>
           </h2>
         </div>
 
-        <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-7">
+        <div className="mx-auto mt-14 grid max-w-[84rem] grid-cols-2 gap-x-5 gap-y-10 sm:grid-cols-3 md:gap-x-6 lg:grid-cols-6 lg:items-start lg:gap-x-5 lg:gap-y-0 xl:gap-x-6">
           {destinationCards.map((dest, idx) => (
             <motion.div
               key={dest.name}
@@ -685,30 +801,23 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ duration: 0.55, delay: idx * 0.08 }}
               whileHover={{ y: -8 }}
-              className={dest.cardClass}
+              className={`mx-auto w-full max-w-[15rem] ${dest.cardClass}`}
             >
-              <Link
-                to="/trips"
-                className="group relative block h-[18rem] overflow-hidden rounded-[1.75rem] sm:h-[20rem] lg:h-full"
-              >
-                <img
-                  src={dest.image}
-                  alt={dest.name}
-                  className={`h-full w-full ${dest.imageClass} scale-[1.01] object-cover transition-transform duration-700 ease-out group-hover:scale-110`}
-                />
-                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,17,31,0.06)_0%,rgba(10,17,31,0.14)_34%,rgba(10,17,31,0.76)_100%)]" />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent opacity-85 transition duration-500 group-hover:opacity-100" />
-                <div className="absolute right-4 top-4 rounded-xl bg-primary-500 px-4 py-2 text-sm font-bold text-white shadow-[0_10px_24px_rgba(76,175,80,0.28)]">
-                  {dest.tours}
+              <Link to="/trips" className="group block text-center">
+                <div className={`overflow-hidden shadow-[0_18px_38px_rgba(15,23,42,0.1)] ${dest.imageWrapClass}`}>
+                  <img
+                    src={dest.image}
+                    alt={dest.name}
+                    className={`h-full w-full ${dest.imageClass} object-cover transition-transform duration-700 ease-out group-hover:scale-110`}
+                  />
                 </div>
-                <div className="absolute inset-x-0 bottom-0 p-6 sm:p-7">
-                  <p className="text-[1.9rem] font-bold leading-tight tracking-[-0.03em] text-white drop-shadow-[0_8px_30px_rgba(0,0,0,0.35)]">
+                <div className="mt-5">
+                  <p className="text-[1.15rem] font-bold leading-tight text-dark-900 sm:text-[1.35rem]">
                     {dest.name}
                   </p>
-                  <div className="mt-2 flex items-center gap-2 text-base text-white/85">
-                    <MapPinLine className="h-4 w-4 shrink-0" weight="bold" />
-                    Maharashtra, India
-                  </div>
+                  <p className="mt-2 text-xl font-medium text-primary-500 sm:text-2xl">
+                    ({dest.tours.replace(' tours', ' Tour').replace(' tour', ' Tour')})
+                  </p>
                 </div>
               </Link>
             </motion.div>

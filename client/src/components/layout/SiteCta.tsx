@@ -9,7 +9,8 @@ export default function SiteCta() {
           alt="Adventure camp in the hills"
           className="absolute inset-0 h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-dark-900/88 via-dark-900/58 to-dark-900/26" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(15,23,42,0.9),rgba(15,23,42,0.72),rgba(15,23,42,0.38))]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.26),rgba(15,23,42,0.12),rgba(15,23,42,0.42))]" />
 
         <div className="relative z-10 mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
           <div className="grid gap-10 lg:grid-cols-[1fr_420px] lg:items-center">
