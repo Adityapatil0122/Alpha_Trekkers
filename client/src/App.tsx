@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ProtectedRoute from '@/components/ui/ProtectedRoute';
@@ -30,8 +30,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/trips" element={<Trips />} />
           <Route path="/trips/:slug" element={<TripDetail />} />
-          <Route path="/weekend-trips" element={<Trips />} />
-          <Route path="/weekday-trips" element={<Trips />} />
+          <Route path="/weekend-trips" element={<Navigate to="/trips" replace />} />
+          <Route path="/weekday-trips" element={<Navigate to="/trips" replace />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />

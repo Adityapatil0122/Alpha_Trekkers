@@ -27,6 +27,10 @@ export const MAHARASHTRA_MONSOON_IMAGES = {
     aboutTorna: commonsFile('View While Climbing Torna Fort.jpg'),
     aboutKalsubai: commonsFile('View from Kalsubai peak.jpg'),
     aboutRajmachi: commonsFile('Hikers climbing one of the forts at Rajmachi.jpg'),
+    aboutHarihar: commonsFile('Harihar Fort Steep Stairs.jpg'),
+    aboutDevkund: commonsFile('Maharashtra, Devkund.jpg'),
+    aboutAndharban: commonsFile('AndharBan View.jpg'),
+    aboutThoseghar: commonsFile('Thoseghar Falls.jpg'),
   },
   trips: {
     rajgad: [
@@ -64,6 +68,51 @@ export const MAHARASHTRA_MONSOON_IMAGES = {
       commonsFile('Hikers climbing one of the forts at Rajmachi.jpg'),
       commonsFile('Mountain waterfalls.jpg'),
       commonsFile('Rajmachi Fort.JPG'),
+    ],
+    harihar: [
+      commonsFile('Hariharfort.jpg'),
+      commonsFile('Harihar - Harihar Fort (11253817395).jpg'),
+      commonsFile('Harihar Fort Steep Stairs.jpg'),
+      commonsFile('Harihar - View from Harihar (11253931813).jpg'),
+    ],
+    devkund: [
+      commonsFile('Devkund Waterfall.JPG'),
+      commonsFile('Devkund waterfalls.jpg'),
+      commonsFile('Maharashtra, Devkund.jpg'),
+      '/destinations/Devkund Waterfall in lush surroundings.png',
+    ],
+    andharban: [
+      commonsFile('AndharBan.jpg'),
+      commonsFile('AndharBan View.jpg'),
+      commonsFile('Andharban Jungle Waterfall Pune.jpg'),
+      commonsFile('Andharban Jungle Pune Waterfall View.jpg'),
+    ],
+    thoseghar: [
+      commonsFile('Thoseghar Falls.jpg'),
+      commonsFile('ThosegharFall1.jpg'),
+      commonsFile('Thoseghar Waterfalls - Satara, Pune.jpg'),
+      commonsFile('Monsoon Waterfall.jpg'),
+    ],
+  },
+  waterfalls: {
+    devkund: [
+      commonsFile('Devkund waterfalls.jpg'),
+      commonsFile('Maharashtra, Devkund.jpg'),
+      commonsFile('Devkund Waterfall.JPG'),
+    ],
+    thoseghar: [
+      commonsFile('Thoseghar Falls.jpg'),
+      commonsFile('ThosegharFall1.jpg'),
+      commonsFile('Thoseghar Waterfalls - Satara, Pune.jpg'),
+    ],
+    kumbhe: [
+      commonsFile('Kumbhe Waterfall View Point.jpg'),
+      commonsFile('Kumbhe Waterfall.jpg'),
+    ],
+    andharban: [
+      commonsFile('Andharban Jungle Waterfall Pune.jpg'),
+      commonsFile('Andharban Jungle Pune Waterfall View.jpg'),
+      commonsFile('AndharBan View.jpg'),
     ],
   },
   seedHeroImages: [

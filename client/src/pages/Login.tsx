@@ -65,83 +65,82 @@ export default function Login() {
   };
 
   return (
-    <section className="travel-dark relative mb-12 min-h-screen overflow-hidden pt-28 sm:mb-14 lg:mb-16">
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${MAHARASHTRA_MONSOON_IMAGES.heroes.login})` }}
+    <section className="relative min-h-screen overflow-hidden">
+      <img
+        src={MAHARASHTRA_MONSOON_IMAGES.heroes.login}
+        alt="Alpha Trekkers sign in"
+        className="absolute inset-0 h-full w-full object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-dark-900/80 via-dark-900/50 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-br from-dark-900/48 via-dark-900/24 to-dark-900/42" />
 
-      <div className="relative mx-auto flex max-w-7xl items-center px-4 py-16 sm:px-6 lg:px-8">
-        <div className="grid w-full gap-10 lg:grid-cols-[0.95fr_0.75fr] lg:items-center">
-          <div className="hero-copy max-w-2xl text-white">
-            <p className="playful-text mt-3 text-2xl !text-primary-400">~ welcome back, explorer ~</p>
-            <h1 className="mt-5 font-heading text-5xl leading-[0.95] !text-white sm:text-6xl">
-              Continue from discovery to booking without losing the travel mood.
-            </h1>
-            <p className="mt-5 text-lg leading-8 text-white/82">
-              Sign in to manage bookings, revisit saved departures, and move through the redesigned
-              journey flow.
-            </p>
+      <div className="relative mx-auto flex min-h-screen max-w-6xl items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+        <div className="w-full max-w-md rounded-[2.4rem] border border-white/22 bg-white/18 p-8 shadow-[0_24px_80px_rgba(15,23,42,0.28)] backdrop-blur-2xl sm:p-10">
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10">
+              <Mountains className="h-8 w-8 text-forest-500" weight="duotone" />
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-white/82">Account access</p>
+              <h1 className="font-heading text-4xl !text-white">Sign In</h1>
+            </div>
           </div>
 
-          <div className="travel-glass rounded-[2.4rem] p-8 sm:p-10">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-forest-500/10">
-                <Mountains className="h-7 w-7 text-forest-500" weight="duotone" />
+          <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5" autoComplete="off">
+            <input type="text" name="fake_username" autoComplete="username" className="hidden" tabIndex={-1} />
+            <input type="password" name="fake_password" autoComplete="current-password" className="hidden" tabIndex={-1} />
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-white">Email</label>
+              <div className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-white backdrop-blur-md">
+                <EnvelopeSimple className="h-5 w-5 text-forest-500" />
+                <input
+                  {...register('email')}
+                  type="email"
+                  autoComplete="off"
+                  className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-white/65 focus:outline-none"
+                  placeholder="Enter your email"
+                />
               </div>
-              <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-forest-500">Account access</p>
-                <h2 className="font-heading text-4xl text-ink-900">Sign in</h2>
-              </div>
+              {errors.email ? (
+                <p className="mt-2 text-xs text-white/80">{errors.email.message}</p>
+              ) : null}
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5" autoComplete="off">
-              <input type="text" name="fake_username" autoComplete="username" className="hidden" tabIndex={-1} />
-              <input type="password" name="fake_password" autoComplete="current-password" className="hidden" tabIndex={-1} />
-              <div>
-                <label className="mb-2 block text-sm font-medium text-ink-700">Email</label>
-                <div className="travel-input flex items-center gap-3">
-                  <EnvelopeSimple className="h-5 w-5 text-forest-500" />
-                  <input
-                    {...register('email')}
-                    type="email"
-                    autoComplete="off"
-                    className="min-w-0 flex-1 bg-transparent focus:outline-none"
-                  />
-                </div>
-                {errors.email ? <p className="mt-2 text-xs text-coral-600">{errors.email.message}</p> : null}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-white">Password</label>
+              <div className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-white backdrop-blur-md">
+                <Lock className="h-5 w-5 text-forest-500" />
+                <input
+                  {...register('password')}
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-white/65 focus:outline-none"
+                  placeholder="Enter your password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((current) => !current)}
+                  className="text-white/80"
+                >
+                  {showPassword ? <EyeSlash className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
               </div>
+              {errors.password ? (
+                <p className="mt-2 text-xs text-white/80">{errors.password.message}</p>
+              ) : null}
+            </div>
 
-              <div>
-                <label className="mb-2 block text-sm font-medium text-ink-700">Password</label>
-                <div className="travel-input flex items-center gap-3">
-                  <Lock className="h-5 w-5 text-forest-500" />
-                  <input
-                    {...register('password')}
-                    type={showPassword ? 'text' : 'password'}
-                    autoComplete="new-password"
-                    className="min-w-0 flex-1 bg-transparent focus:outline-none"
-                  />
-                  <button type="button" onClick={() => setShowPassword((current) => !current)} className="text-ink-600">
-                    {showPassword ? <EyeSlash className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                  </button>
-                </div>
-                {errors.password ? <p className="mt-2 text-xs text-coral-600">{errors.password.message}</p> : null}
-              </div>
+            <Button type="submit" size="lg" fullWidth isLoading={isSubmitting}>
+              Sign In
+            </Button>
+          </form>
 
-              <Button type="submit" size="lg" fullWidth isLoading={isSubmitting}>
-                Sign In
-              </Button>
-            </form>
-
-            <p className="mt-6 text-sm text-ink-700/72">
-              New to Alpha Trekkers?{' '}
-              <Link to="/register" className="font-medium text-forest-500 hover:text-forest-500">
-                Create an account
-              </Link>
-            </p>
-          </div>
+          <p className="mt-6 text-sm text-white/80">
+            New to Alpha Trekkers?{' '}
+            <Link to="/register" className="font-medium text-forest-500 hover:text-forest-400">
+              Create an account
+            </Link>
+          </p>
         </div>
       </div>
     </section>

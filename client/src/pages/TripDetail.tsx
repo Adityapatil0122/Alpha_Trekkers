@@ -23,19 +23,37 @@ import type {
 } from '@alpha-trekkers/shared';
 import { DIFFICULTIES } from '@alpha-trekkers/shared';
 import api from '@/lib/axios';
+import { getStaticFortTrip } from '@/content/fortDirectory';
+import {
+  TRIP_LOCATION_GUIDES,
+  WATERFALL_SPOTLIGHTS,
+  buildFallbackLocationGuide,
+  buildMapEmbedUrl,
+  buildMapLink,
+  getTripRouteLabel,
+} from '@/content/locationGuide';
 import { useAuthStore } from '@/stores/authStore';
 import Button from '@/components/ui/Button';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import TripCard from '@/components/ui/TripCard';
 
 const difficultyTone: Record<Difficulty, string> = {
-  EASY: 'bg-sea-500/12 text-sea-600',
-  MODERATE: 'bg-gold-500/12 text-gold-600',
-  DIFFICULT: 'bg-coral-500/12 text-coral-600',
-  EXTREME: 'bg-ink-900/12 text-ink-900',
+  EASY: 'border border-white/12 bg-sea-500/28 text-white',
+  MODERATE: 'border border-white/12 bg-forest-500/30 text-white',
+  DIFFICULT: 'border border-white/12 bg-coral-500/28 text-white',
+  EXTREME: 'border border-white/12 bg-white/12 text-white',
 };
 
-type TabKey = 'overview' | 'itinerary' | 'inclusions' | 'reviews';
+type TabKey = 'overview' | 'gallery' | 'itinerary' | 'map' | 'essentials' | 'reviews';
+
+function formatDuration(durationHours: number) {
+  if (durationHours >= 24) {
+    const days = Math.round(durationHours / 24);
+    return `${days} day${days > 1 ? 's' : ''}`;
+  }
+
+  return `${durationHours} hour${durationHours > 1 ? 's' : ''}`;
+}
 
 export default function TripDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -51,6 +69,7 @@ export default function TripDetail() {
   useEffect(() => {
     if (!slug) return;
     setLoading(true);
+    const staticFort = getStaticFortTrip(slug);
 
     api
       .get<ApiResponse<{ trip: Trip }>>(`/trips/${slug}`)
@@ -76,31 +95,75 @@ export default function TripDetail() {
             .slice(0, 3) ?? [],
         );
       })
-      .catch(() => navigate('/trips'))
+      .catch(() => {
+        if (staticFort) {
+          setTrip(staticFort);
+          setReviews([]);
+          setRelatedTrips([]);
+          return;
+        }
+
+        navigate('/trips');
+      })
       .finally(() => setLoading(false));
   }, [slug, navigate]);
 
-  if (loading) return <LoadingSpinner fullPage text="Loading journey..." />;
-  if (!trip) return null;
-
   const images =
-    trip.images.length > 0
+    trip?.images.length
       ? trip.images
-        : [
+      : [
           {
             id: 'fallback',
             url: MAHARASHTRA_MONSOON_IMAGES.fallback.tripDetail,
-            altText: trip.title,
+            altText: trip?.title || 'Trip detail',
             isPrimary: true,
             sortOrder: 0,
           },
         ];
 
+  if (loading) return <LoadingSpinner fullPage text="Loading journey..." />;
+  if (!trip) return null;
+
+  const guide = TRIP_LOCATION_GUIDES[trip.slug] ?? buildFallbackLocationGuide(trip);
   const price = trip.discountPrice ?? trip.basePrice;
+  const descriptionSections = trip.description.split(/\n\s*\n/).filter(Boolean);
+  const mapEmbedUrl = buildMapEmbedUrl(trip);
+  const mapLink = buildMapLink(trip);
+  const locationName = trip.fortName || trip.title;
+  const infoLabel = trip.fortName ? 'Fort' : 'Route';
+  const waterfallCards = guide.waterfallIds
+    .map((id) => WATERFALL_SPOTLIGHTS[id])
+    .filter(Boolean);
+  const upcomingDates = trip.schedules
+    ?.filter((schedule) => schedule.status === 'OPEN')
+    .slice(0, 6)
+    .map((schedule) =>
+      new Date(schedule.date).toLocaleDateString('en-IN', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      }),
+    ) ?? [];
+
+  const galleryItems = Array.from(
+    new Map(
+      [
+        ...images.map((image) => ({
+          src: image.url,
+          alt: image.altText || trip.title,
+          caption: image.altText || trip.title,
+        })),
+        ...guide.gallery,
+      ].map((item) => [item.src, item]),
+    ).values(),
+  );
+
   const tabs: { key: TabKey; label: string }[] = [
     { key: 'overview', label: 'Overview' },
+    { key: 'gallery', label: 'Photo Gallery' },
     { key: 'itinerary', label: 'Itinerary' },
-    { key: 'inclusions', label: 'Inclusions' },
+    { key: 'map', label: 'Map' },
+    { key: 'essentials', label: 'Essentials' },
     { key: 'reviews', label: `Reviews (${reviews.length})` },
   ];
 
@@ -109,34 +172,54 @@ export default function TripDetail() {
       <section className="travel-dark relative overflow-hidden pt-28">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${MAHARASHTRA_MONSOON_IMAGES.heroes.tripDetail})` }}
+          style={{ backgroundImage: `url(${images[0]?.url || MAHARASHTRA_MONSOON_IMAGES.heroes.tripDetail})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-dark-900/80 via-dark-900/50 to-transparent" />
-        <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-[4.5rem] sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2 text-sm text-sand-100/70">
-            <Link to="/" className="hover:text-white">Home</Link>
+        <div className="absolute inset-0 bg-gradient-to-r from-dark-900/88 via-dark-900/62 to-dark-900/28" />
+        <div className="relative mx-auto max-w-7xl px-4 pb-20 pt-[4.5rem] sm:px-6 lg:px-8">
+          <div className="flex items-center gap-2 text-sm text-white/82">
+            <Link to="/" className="text-white/82 hover:text-white">Home</Link>
             <CaretRight className="h-3 w-3" />
-            <Link to="/trips" className="hover:text-white">Tours</Link>
+            <Link to="/trips" className="text-white/82 hover:text-white">
+              {trip.category === 'WEEKEND' ? 'Weekend Trips' : trip.category === 'WEEKDAY' ? 'Weekdays Trips' : 'Tours'}
+            </Link>
             <CaretRight className="h-3 w-3" />
             <span className="text-white">{trip.title}</span>
           </div>
 
-          <div className="mt-7 max-w-3xl">
+          <div className="mt-7 max-w-4xl">
             <div className="flex flex-wrap items-center gap-3">
               <span className={`rounded-full px-4 py-1.5 text-sm font-semibold ${difficultyTone[trip.difficulty]}`}>
                 {DIFFICULTIES[trip.difficulty].label}
               </span>
-              <span className="rounded-full bg-white/10 px-4 py-1.5 text-sm text-sand-100">
+              <span className="rounded-full border border-white/12 bg-white/10 px-4 py-1.5 text-sm text-white">
                 {trip.category.replace('_', ' ')}
               </span>
-              <span className="rounded-full bg-white/10 px-4 py-1.5 text-sm text-sand-100">
+              <span className="rounded-full border border-white/12 bg-white/10 px-4 py-1.5 text-sm text-white">
                 {trip.region}
               </span>
+              <span className="rounded-full border border-white/12 bg-forest-500/30 px-4 py-1.5 text-sm font-medium text-white">
+                {getTripRouteLabel(trip.category)}
+              </span>
             </div>
-            <h1 className="mt-6 font-heading text-5xl leading-[0.95] text-white sm:text-6xl">
+            <p className="mt-6 text-xs uppercase tracking-[0.2em] text-white/92">{guide.eyebrow}</p>
+            <h1 className="mt-3 font-heading text-5xl leading-[0.95] !text-white drop-shadow-[0_10px_30px_rgba(0,0,0,0.45)] sm:text-6xl">
               {trip.title}
             </h1>
-            <p className="mt-5 text-lg leading-8 text-sand-100/76">{trip.shortDescription}</p>
+            <p className="mt-5 max-w-3xl text-lg leading-8 text-white/88">{trip.shortDescription}</p>
+            <div className="mt-6 flex flex-wrap gap-6 text-sm text-white">
+              <span className="inline-flex items-center gap-2">
+                <Clock className="h-4 w-4 text-white" />
+                {formatDuration(trip.durationHours)}
+              </span>
+              <span className="inline-flex items-center gap-2">
+                <MapPinLine className="h-4 w-4 text-white" />
+                {trip.startLocation}
+              </span>
+              <span className="inline-flex items-center gap-2">
+                <UsersThree className="h-4 w-4 text-white" />
+                Up to {trip.maxGroupSize} people
+              </span>
+            </div>
           </div>
         </div>
       </section>
@@ -169,17 +252,18 @@ export default function TripDetail() {
               </div>
             ) : null}
 
-            <div className="mt-8 grid gap-4 sm:grid-cols-4">
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
               {[
-                { icon: Clock, label: 'Duration', value: `${trip.durationHours} hours` },
-                { icon: Mountains, label: 'Elevation', value: `${trip.elevationM}m` },
+                { icon: Clock, label: 'Duration', value: formatDuration(trip.durationHours) },
+                { icon: Mountains, label: 'Altitude', value: `${trip.maxAltitudeM} m` },
                 { icon: UsersThree, label: 'Group size', value: `Up to ${trip.maxGroupSize}` },
-                { icon: MapPinLine, label: 'Start', value: trip.startLocation },
+                { icon: MapPinLine, label: 'Start point', value: trip.startLocation },
+                { icon: Clock, label: 'Best for', value: getTripRouteLabel(trip.category) },
               ].map((item) => (
-                <div key={item.label} className="travel-panel rounded-[1.6rem] p-5">
-                  <item.icon className="h-6 w-6 text-forest-500" weight="duotone" />
-                  <p className="mt-4 text-xs uppercase tracking-[0.16em] text-ink-600/70">{item.label}</p>
-                  <p className="mt-2 font-heading text-2xl text-ink-900">{item.value}</p>
+                <div key={item.label} className="travel-panel rounded-[1.6rem] p-4">
+                  <item.icon className="h-5 w-5 text-forest-500" weight="duotone" />
+                  <p className="mt-3 text-[0.7rem] uppercase tracking-[0.18em] text-ink-600/70">{item.label}</p>
+                  <p className="mt-2 font-heading text-[1.75rem] leading-tight text-ink-900">{item.value}</p>
                 </div>
               ))}
             </div>
@@ -211,25 +295,191 @@ export default function TripDetail() {
               className="travel-panel mt-6 rounded-[2rem] p-8"
             >
               {activeTab === 'overview' ? (
-                <div className="space-y-8">
+                <div className="space-y-10">
                   <div>
-                    <p className="section-script">About this journey</p>
-                    <h2 className="mt-2 font-heading text-4xl text-ink-900">About this journey</h2>
-                    <p className="mt-4 whitespace-pre-line text-base leading-8 text-ink-700/74">
-                      {trip.description}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="section-script">Highlights</p>
-                    <h3 className="mt-2 font-heading text-3xl text-ink-900">Highlights</h3>
-                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                      {trip.highlights.map((item) => (
-                        <div key={item} className="rounded-[1.5rem] bg-sand-100 px-5 py-4 text-sm text-ink-800">
-                          {item}
-                        </div>
+                    <p className="section-script">About this location</p>
+                    <h2 className="mt-2 font-heading text-4xl text-ink-900">Overview</h2>
+                    <div className="mt-5 space-y-4 text-base leading-8 text-ink-700/76">
+                      {guide.intro.map((paragraph) => (
+                        <p key={paragraph}>{paragraph}</p>
                       ))}
                     </div>
                   </div>
+
+                  <div>
+                    <h3 className="font-heading text-3xl text-ink-900">{locationName} trek information:</h3>
+                    <ul className="mt-5 space-y-3 text-base leading-8 text-ink-700/78">
+                      <li><strong className="text-ink-900">{infoLabel} elevation:</strong> {trip.maxAltitudeM} m</li>
+                      <li><strong className="text-ink-900">Trek difficulty:</strong> {DIFFICULTIES[trip.difficulty].label}</li>
+                      <li><strong className="text-ink-900">Trek duration:</strong> {formatDuration(trip.durationHours)}</li>
+                      <li><strong className="text-ink-900">Group size:</strong> Up to {trip.maxGroupSize} trekkers</li>
+                      <li><strong className="text-ink-900">Location address:</strong> {trip.startLocation}</li>
+                      {guide.quickFacts.slice(0, 3).map((fact) => (
+                        <li key={fact.label}>
+                          <strong className="text-ink-900">{fact.label}:</strong> {fact.value}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="font-heading text-3xl text-ink-900">Why visit this location:</h3>
+                    <div className="mt-5 space-y-4 text-base leading-8 text-ink-700/76">
+                      {descriptionSections.map((section) => (
+                        <p key={section}>{section}</p>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="font-heading text-3xl text-ink-900">Things to do at {locationName}:</h3>
+                    <ul className="mt-5 space-y-3 text-base leading-8 text-ink-700/78">
+                      {trip.highlights.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="border-t border-ink-900/8 pt-8">
+                    <h3 className="font-heading text-3xl text-ink-900">Batches:</h3>
+                    <p className="mt-4 text-base leading-8 text-ink-700/76">
+                      {upcomingDates.length > 0 ? upcomingDates.join(', ') : 'Available on request. Contact us for upcoming departures.'}
+                    </p>
+                  </div>
+
+                  <div className="border-t border-ink-900/8 pt-8">
+                    <h3 className="font-heading text-3xl text-ink-900">Event fees:</h3>
+                    <ul className="mt-5 space-y-3 text-base leading-8 text-ink-700/78">
+                      <li><strong className="text-ink-900">Starting price:</strong> INR {price.toLocaleString('en-IN')}</li>
+                      <li><strong className="text-ink-900">Per traveler:</strong> before add-ons and optional extras</li>
+                    </ul>
+                  </div>
+
+                  <div className="border-t border-ink-900/8 pt-8">
+                    <h3 className="font-heading text-3xl text-ink-900">Nearby Maharashtra waterfall picks:</h3>
+                    <ul className="mt-5 space-y-3 text-base leading-8 text-ink-700/78">
+                      {waterfallCards.map((waterfall) => (
+                        <li key={waterfall.id}>
+                          <a
+                            href={waterfall.mapUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="font-medium text-forest-500 hover:underline"
+                          >
+                            {waterfall.name}
+                          </a>
+                          {`: ${waterfall.summary}`}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              ) : null}
+
+              {activeTab === 'gallery' ? (
+                <div>
+                  <p className="section-script">Photo gallery</p>
+                  <h2 className="mt-2 font-heading text-4xl text-ink-900">Photo gallery</h2>
+                  <div className="mt-6 grid gap-5 md:grid-cols-2">
+                    {galleryItems.map((item, index) => (
+                      <figure key={`${item.src}-${index}`} className="overflow-hidden rounded-[1.9rem] bg-sand-50">
+                        <img src={item.src} alt={item.alt} className="h-72 w-full object-cover" />
+                        <figcaption className="px-5 py-4 text-sm leading-7 text-ink-700/74">
+                          {item.caption}
+                        </figcaption>
+                      </figure>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              {activeTab === 'itinerary' ? (
+                <div>
+                  <p className="section-script">Day flow</p>
+                  <h2 className="mt-2 font-heading text-4xl text-ink-900">Itinerary</h2>
+                  <div className="mt-6 space-y-5">
+                    {trip.itinerary.map((step, index) => (
+                      <div key={`${step.time}-${index}`} className="rounded-[1.7rem] border border-ink-900/8 bg-sand-50 p-5">
+                        <p className="text-xs uppercase tracking-[0.2em] text-forest-500">{step.time}</p>
+                        <h3 className="mt-2 font-heading text-3xl text-ink-900">{step.title}</h3>
+                        <p className="mt-2 text-sm leading-7 text-ink-700/72">{step.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              {activeTab === 'map' ? (
+                <div>
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                      <p className="section-script">Pickup point</p>
+                      <h2 className="mt-2 font-heading text-4xl text-ink-900">Location map</h2>
+                      <p className="mt-3 max-w-2xl text-sm leading-7 text-ink-700/72">
+                        Navigate directly to the trip region and open the live map for meeting access.
+                      </p>
+                    </div>
+                    {mapLink ? (
+                      <a
+                        href={mapLink}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 rounded-full bg-forest-500 px-5 py-3 text-sm font-medium text-white"
+                      >
+                        View on map
+                        <ArrowRight className="h-4 w-4" />
+                      </a>
+                    ) : null}
+                  </div>
+
+                  <div className="mt-6 rounded-[1.8rem] border border-ink-900/8 bg-sand-50 p-4">
+                    {mapEmbedUrl ? (
+                      <iframe
+                        title={`${trip.title} map`}
+                        src={mapEmbedUrl}
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        allowFullScreen
+                        className="h-[28rem] w-full rounded-[1.3rem] border-0"
+                      />
+                    ) : (
+                      <div className="flex h-[20rem] items-center justify-center rounded-[1.3rem] bg-white text-center text-sm text-ink-700/72">
+                        Map coordinates are not available for this location yet.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : null}
+
+              {activeTab === 'essentials' ? (
+                <div className="space-y-8">
+                  <div className="grid gap-8 sm:grid-cols-2">
+                    <div>
+                      <p className="section-script">Included</p>
+                      <h2 className="mt-2 font-heading text-4xl text-ink-900">Inclusions</h2>
+                      <div className="mt-5 space-y-3">
+                        {trip.inclusions.map((item) => (
+                          <div key={item} className="flex items-start gap-3 rounded-[1.4rem] bg-sand-100 px-5 py-4 text-sm text-ink-800">
+                            <CheckCircle className="mt-0.5 h-4 w-4 text-forest-500" weight="fill" />
+                            {item}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="section-script">Not included</p>
+                      <h2 className="mt-2 font-heading text-4xl text-ink-900">Exclusions</h2>
+                      <div className="mt-5 space-y-3">
+                        {trip.exclusions.map((item) => (
+                          <div key={item} className="flex items-start gap-3 rounded-[1.4rem] bg-sand-100 px-5 py-4 text-sm text-ink-800">
+                            <XCircle className="mt-0.5 h-4 w-4 text-coral-500" weight="fill" />
+                            {item}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
                   <div>
                     <p className="section-script">Things to carry</p>
                     <h3 className="mt-2 font-heading text-3xl text-ink-900">Things to carry</h3>
@@ -245,55 +495,10 @@ export default function TripDetail() {
                 </div>
               ) : null}
 
-              {activeTab === 'itinerary' ? (
-                <div>
-                  <p className="section-script">Day flow</p>
-                  <h2 className="mt-2 font-heading text-4xl text-ink-900">Day flow</h2>
-                  <div className="mt-6 space-y-5">
-                    {trip.itinerary.map((step, index) => (
-                      <div key={`${step.time}-${index}`} className="rounded-[1.7rem] border border-ink-900/8 bg-sand-50 p-5">
-                        <p className="text-xs uppercase tracking-[0.2em] text-forest-500">{step.time}</p>
-                        <h3 className="mt-2 font-heading text-3xl text-ink-900">{step.title}</h3>
-                        <p className="mt-2 text-sm leading-7 text-ink-700/72">{step.description}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-
-              {activeTab === 'inclusions' ? (
-                <div className="grid gap-8 sm:grid-cols-2">
-                  <div>
-                    <p className="section-script">Included</p>
-                    <h2 className="mt-2 font-heading text-4xl text-ink-900">Included</h2>
-                    <div className="mt-5 space-y-3">
-                      {trip.inclusions.map((item) => (
-                        <div key={item} className="flex items-start gap-3 rounded-[1.4rem] bg-sand-100 px-5 py-4 text-sm text-ink-800">
-                          <CheckCircle className="mt-0.5 h-4 w-4 text-forest-500" weight="fill" />
-                          {item}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="section-script">Not included</p>
-                    <h2 className="mt-2 font-heading text-4xl text-ink-900">Not included</h2>
-                    <div className="mt-5 space-y-3">
-                      {trip.exclusions.map((item) => (
-                        <div key={item} className="flex items-start gap-3 rounded-[1.4rem] bg-sand-100 px-5 py-4 text-sm text-ink-800">
-                          <XCircle className="mt-0.5 h-4 w-4 text-coral-500" weight="fill" />
-                          {item}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              ) : null}
-
               {activeTab === 'reviews' ? (
                 <div>
                   <p className="section-script">Traveler feedback</p>
-                  <h2 className="mt-2 font-heading text-4xl text-ink-900">Traveler feedback</h2>
+                  <h2 className="mt-2 font-heading text-4xl text-ink-900">Reviews</h2>
                   <div className="mt-6 space-y-4">
                     {reviews.length > 0 ? (
                       reviews.map((review) => (
@@ -330,26 +535,46 @@ export default function TripDetail() {
 
           <aside>
             <div className="sticky top-[7.5rem] space-y-6">
-              <div className="travel-panel rounded-[2rem] overflow-hidden">
-                <div className="travel-dark p-8 text-white">
-                  <p className="text-xs uppercase tracking-[0.18em] text-gold-400">Starting from</p>
-                  <h2 className="mt-3 font-heading text-5xl">INR {price.toLocaleString('en-IN')}</h2>
-                  <p className="mt-2 text-sm text-sand-100/74">Per traveler, before add-ons</p>
+              <div className="travel-panel overflow-hidden rounded-[2rem]">
+                <div className="bg-forest-500/10 px-8 py-7 text-ink-900">
+                  <p className="text-xs uppercase tracking-[0.18em] text-forest-600">Starting from</p>
+                  <h2 className="mt-3 font-heading text-5xl text-forest-600">INR {price.toLocaleString('en-IN')}</h2>
+                  <p className="mt-2 text-sm text-ink-700/72">Per traveler, before add-ons</p>
                 </div>
-                <div className="space-y-4 p-6 text-sm text-ink-700">
-                  <div className="flex items-center justify-between">
-                    <span>Meeting point</span>
-                    <span className="font-medium text-ink-900">{trip.meetingPoint}</span>
+                <div className="p-6">
+                  <div className="flex flex-col gap-2.5">
+                  <Link to={trip.schedules?.[0] ? (isAuthenticated ? `/booking/${trip.id}/${trip.schedules[0].id}` : '/login') : '/contact'}>
+                    <Button fullWidth size="sm">
+                      {trip.schedules?.[0] ? 'Book Now' : 'Plan This Trek'}
+                    </Button>
+                  </Link>
+                  <Link to="/contact">
+                    <Button fullWidth size="sm" variant="secondary">
+                      Enquire Now
+                    </Button>
+                  </Link>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span>Meeting time</span>
-                    <span className="font-medium text-ink-900">{trip.meetingTime}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>Min age</span>
-                    <span className="font-medium text-ink-900">{trip.minAge}+</span>
+                  <div className="space-y-2 pt-2 text-sm text-ink-700">
+                    <p className="flex items-center justify-between gap-4">
+                      <span>Meeting point</span>
+                      <span className="text-right font-medium text-ink-900">{trip.meetingPoint}</span>
+                    </p>
+                    <p className="flex items-center justify-between gap-4">
+                      <span>Meeting time</span>
+                      <span className="text-right font-medium text-ink-900">{trip.meetingTime}</span>
+                    </p>
+                    <p className="flex items-center justify-between gap-4">
+                      <span>Min age</span>
+                      <span className="text-right font-medium text-ink-900">{trip.minAge}+</span>
+                    </p>
                   </div>
                 </div>
+              </div>
+
+              <div className="travel-panel rounded-[2rem] p-6">
+                <p className="section-script">Route fit</p>
+                <h3 className="mt-2 font-heading text-3xl text-ink-900">{guide.routeFit}</h3>
+                <p className="mt-4 text-sm leading-7 text-ink-700/72">{guide.routeFitDescription}</p>
               </div>
 
               <div className="travel-panel rounded-[2rem] p-6">
@@ -390,6 +615,27 @@ export default function TripDetail() {
                   ) : (
                     <p className="text-sm leading-7 text-ink-700/72">No upcoming departures right now.</p>
                   )}
+                </div>
+              </div>
+
+              <div className="travel-panel rounded-[2rem] p-6">
+                <p className="section-script">Waterfall shortlist</p>
+                <h3 className="mt-2 font-heading text-3xl text-ink-900">Maharashtra picks</h3>
+                <div className="mt-5 space-y-5">
+                  {waterfallCards.slice(0, 3).map((waterfall) => (
+                    <div key={waterfall.id} className="border-b border-ink-900/8 pb-4 last:border-b-0 last:pb-0">
+                      <p className="text-xs uppercase tracking-[0.16em] text-forest-500">{waterfall.location}</p>
+                      <a
+                        href={waterfall.mapUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-1 block font-medium text-ink-900 hover:text-forest-500"
+                      >
+                        {waterfall.name}
+                      </a>
+                      <p className="mt-1 text-sm leading-6 text-ink-700/72">{waterfall.bestFor}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
