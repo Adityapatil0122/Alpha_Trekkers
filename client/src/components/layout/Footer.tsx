@@ -28,15 +28,6 @@ const companyLinks = [
   { to: '/contact', label: 'Travel Support' },
 ];
 
-const trailGallery = [
-  { src: '/destinations/rajgad.png', alt: 'Rajgad fort at sunrise' },
-  { src: '/destinations/harishchandragad.png', alt: 'Harishchandragad valley trail' },
-  { src: '/destinations/torna.png', alt: 'Torna ridgeline in monsoon' },
-  { src: '/destinations/kalsubai.png', alt: 'Kalsubai summit landscape' },
-  { src: '/destinations/lohagad.png', alt: 'Lohagad green fort face' },
-  { src: '/destinations/rajmachi.png', alt: 'Rajmachi trek viewpoint' },
-];
-
 export default function Footer() {
   return (
     <footer className="relative overflow-hidden bg-black text-sand-100">
@@ -152,26 +143,6 @@ export default function Footer() {
                 <PaperPlaneTilt className="h-4 w-4" weight="fill" />
               </button>
             </form>
-            <div className="mt-6">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-gold-400">
-                Trail Gallery
-              </p>
-              <div className="mt-4 grid grid-cols-3 gap-2.5">
-                {trailGallery.map((image, index) => (
-                  <a
-                    key={index}
-                    href="#"
-                    className="group overflow-hidden rounded-[0.9rem] border border-white/8"
-                  >
-                    <img
-                      src={image.src}
-                      alt={image.alt}
-                      className="h-16 w-full object-cover transition-all duration-500 group-hover:scale-110 group-hover:opacity-84"
-                    />
-                  </a>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
       </div>
