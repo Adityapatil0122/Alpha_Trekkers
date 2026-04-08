@@ -1,200 +1,221 @@
+import { useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   BellSimpleRinging,
-  CalendarBlank,
   ChartBar,
+  ChatCircleDots,
+  List,
   Mountains,
   SignOut,
   SuitcaseRolling,
-  Sparkle,
+  Users,
+  X,
 } from '@phosphor-icons/react';
-import Button from '@/components/ui/Button';
 import { useAuthStore } from '@/stores/authStore';
 
 const links = [
-  {
-    to: '/admin',
-    label: 'Dashboard',
-    description: 'Platform overview',
-    Icon: ChartBar,
-  },
-  {
-    to: '/admin/trips',
-    label: 'Trips',
-    description: 'Content and departures',
-    Icon: Mountains,
-  },
-  {
-    to: '/admin/bookings',
-    label: 'Bookings',
-    description: 'Reservation control',
-    Icon: SuitcaseRolling,
-  },
+  { to: '/admin',          label: 'Dashboard', desc: 'Analytics and status',   Icon: ChartBar        },
+  { to: '/admin/trips',    label: 'Trips',     desc: 'Table view and editing', Icon: Mountains       },
+  { to: '/admin/bookings', label: 'Bookings',  desc: 'Reservation control',    Icon: SuitcaseRolling },
+  { to: '/admin/messages', label: 'Messages',  desc: 'Inbox and replies',      Icon: ChatCircleDots  },
+  { to: '/admin/users',    label: 'Users',     desc: 'Registered accounts',    Icon: Users           },
 ] as const;
 
-const pageMeta = {
-  '/admin': {
-    title: 'Dashboard Overview',
-    subtitle: 'Monitor platform activity, booking flow, and operational updates.',
-  },
-  '/admin/trips': {
-    title: 'Trip Operations',
-    subtitle: 'Manage trek content, pricing, schedules, and gallery assets from one place.',
-  },
-  '/admin/bookings': {
-    title: 'Booking Operations',
-    subtitle: 'Review reservation requests and keep departures on track.',
-  },
-} as const;
+const pageMeta: Record<string, { label: string; title: string }> = {
+  '/admin':           { label: 'Analytics Dashboard', title: 'Control Center' },
+  '/admin/trips':     { label: 'Trip Directory',       title: 'Trips'         },
+  '/admin/bookings':  { label: 'Reservation Hub',      title: 'Bookings'      },
+  '/admin/messages':  { label: 'Inbox',                title: 'Messages'      },
+  '/admin/users':     { label: 'User Directory',       title: 'Users'         },
+};
 
-function getInitials(firstName?: string, lastName?: string) {
-  return `${firstName?.[0] ?? 'A'}${lastName?.[0] ?? 'T'}`.toUpperCase();
+function getInitials(f?: string, l?: string) {
+  return `${f?.[0] ?? 'A'}${l?.[0] ?? 'T'}`.toUpperCase();
 }
 
 export default function AdminLayout() {
+  const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
 
-  const currentMeta =
-    pageMeta[location.pathname as keyof typeof pageMeta] ?? pageMeta['/admin'];
-
+  const meta = pageMeta[location.pathname] ?? pageMeta['/admin'];
   const activeDate = new Intl.DateTimeFormat('en-IN', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
+    weekday: 'short', day: 'numeric', month: 'short', year: 'numeric',
   }).format(new Date());
 
+  const W = collapsed ? 'w-[68px]' : 'w-60';
+  const sidebarCopyClass = collapsed
+    ? 'max-w-0 -translate-x-2 opacity-0 pointer-events-none'
+    : 'max-w-[160px] translate-x-0 opacity-100';
+  const sidebarSectionClass = collapsed
+    ? 'max-h-0 -translate-y-2 opacity-0 pointer-events-none'
+    : 'max-h-24 translate-y-0 opacity-100';
+  const compactUserClass = collapsed
+    ? 'max-h-20 translate-y-0 opacity-100'
+    : 'max-h-0 translate-y-2 opacity-0 pointer-events-none';
+  const expandedUserClass = collapsed
+    ? 'max-h-0 -translate-y-2 opacity-0 pointer-events-none'
+    : 'max-h-32 translate-y-0 opacity-100';
+
   return (
-    <div className="admin-shell min-h-screen pt-24">
-      <div className="mx-auto flex min-h-screen max-w-[1600px] gap-6 px-4 py-6 sm:px-6 xl:px-8">
-        <aside className="w-full shrink-0 lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)] lg:w-80">
-          <div className="travel-panel flex h-full flex-col overflow-hidden rounded-[2rem] border border-white/70 bg-white/95 p-6 shadow-[0_26px_60px_rgba(15,23,42,0.08)]">
-            <div className="rounded-[1.8rem] bg-gradient-to-br from-forest-500 via-forest-600 to-sea-500 p-5 text-white shadow-[0_22px_50px_rgba(34,120,69,0.22)]">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/80">
-                Admin
-              </p>
-              <h1 className="mt-3 text-3xl font-bold">Control Center</h1>
-              <p className="mt-2 text-sm leading-6 text-white/80">
-                Clean layout, same Alpha Trekkers palette, faster operations.
-              </p>
-            </div>
+    <div className="flex min-h-screen bg-[#f0f4f2]">
 
-            <div className="mt-6 space-y-2">
-              {links.map(({ to, label, description, Icon }) => (
-                <NavLink
-                  key={to}
-                  to={to}
-                  end={to === '/admin'}
-                  className={({ isActive }) =>
-                    `group flex items-start gap-3 rounded-[1.4rem] px-4 py-3.5 transition ${
-                      isActive
-                        ? 'bg-gradient-to-r from-forest-500 to-forest-600 text-white shadow-[0_14px_32px_rgba(34,120,69,0.18)]'
-                        : 'text-ink-700 hover:bg-sand-100'
-                    }`
-                  }
-                >
-                  <span className="mt-0.5 rounded-2xl bg-white/16 p-2 text-current">
-                    <Icon className="h-5 w-5" />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block text-sm font-semibold">{label}</span>
-                    <span className="mt-1 block text-xs leading-5 text-current/72">
-                      {description}
-                    </span>
-                  </span>
-                </NavLink>
-              ))}
-            </div>
+      {/* ── Fixed Sidebar ──────────────────────────────────────────── */}
+      <aside className={`fixed inset-y-0 left-0 z-40 flex flex-col overflow-hidden border-r border-black/[0.07] bg-white shadow-[2px_0_16px_rgba(15,23,42,0.07)] transition-[width,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${W}`}>
 
-            <div className="mt-6 rounded-[1.6rem] border border-forest-500/12 bg-sand-50 p-4">
-              <div className="flex items-center gap-3">
-                <span className="rounded-full bg-forest-500/12 p-2 text-forest-500">
-                  <BellSimpleRinging className="h-5 w-5" />
-                </span>
-                <div>
-                  <p className="text-sm font-semibold text-ink-900">Admin mode</p>
-                  <p className="text-xs text-ink-600">
-                    Protected route with elevated edit access.
-                  </p>
-                </div>
+        {/* Logo row */}
+        <div className="flex h-14 shrink-0 items-center gap-3 border-b border-black/[0.07] px-3">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-forest-500 to-sea-600 shadow-[0_4px_12px_rgba(34,120,69,0.3)]">
+            <Mountains className="h-4 w-4 text-white" weight="fill" />
+          </div>
+          <div className={`overflow-hidden whitespace-nowrap transition-all duration-300 ease-out ${sidebarCopyClass}`}>
+            <p className="text-[9px] font-bold uppercase tracking-[0.24em] text-ink-400 whitespace-nowrap">Alpha Trekkers</p>
+            <p className="text-sm font-extrabold text-ink-900 leading-tight whitespace-nowrap">Admin Panel</p>
+          </div>
+          {!collapsed && (
+            <button
+              type="button"
+              onClick={() => setCollapsed(true)}
+              className="ml-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-black/[0.06] bg-sand-50 text-ink-400 transition-all duration-300 ease-out hover:border-forest-500/20 hover:bg-white hover:text-forest-600"
+              title="Close sidebar"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+
+        {/* Nav */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden py-4 px-2 space-y-0.5">
+          <div className={`overflow-hidden px-2 transition-all duration-300 ease-out ${sidebarSectionClass}`}>
+            <p className="mb-2 text-[9px] font-bold uppercase tracking-[0.24em] text-ink-400">Menu</p>
+          </div>
+          {links.map(({ to, label, desc, Icon }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={to === '/admin'}
+              title={collapsed ? label : undefined}
+              className={({ isActive }) =>
+                `group flex items-center rounded-xl transition-all duration-300 ease-out ${collapsed ? 'justify-center gap-0 px-0 py-2.5' : 'gap-3 px-2.5 py-2.5'} ${
+                  isActive
+                    ? 'bg-gradient-to-r from-forest-500 to-forest-600 text-white shadow-[0_4px_12px_rgba(34,120,69,0.22)]'
+                    : 'text-ink-600 hover:bg-sand-50 hover:text-ink-900'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${isActive ? 'bg-white/20' : 'bg-sand-100 group-hover:bg-white'}`}>
+                    <Icon className="h-4 w-4" />
+                  </span>
+                  <span className={`min-w-0 overflow-hidden whitespace-nowrap transition-all duration-300 ease-out ${sidebarCopyClass}`}>
+                    <span className="block text-sm font-semibold leading-tight whitespace-nowrap">{label}</span>
+                    <span className={`block text-[10px] whitespace-nowrap truncate ${isActive ? 'text-white/65' : 'text-ink-400'}`}>{desc}</span>
+                  </span>
+                </>
+              )}
+            </NavLink>
+          ))}
+        </div>
+
+        {/* Admin badge */}
+        <div className={`mx-2 mb-2 shrink-0 overflow-hidden rounded-xl border border-forest-500/15 bg-sand-50 transition-all duration-300 ease-out ${sidebarSectionClass}`}>
+          <div className="p-2.5">
+            <div className="flex items-center gap-2">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-forest-500/12 text-forest-500">
+                <BellSimpleRinging className="h-3 w-3" />
+              </span>
+              <div className="min-w-0">
+                <p className="text-[11px] font-semibold text-ink-900 whitespace-nowrap">Admin mode</p>
+                <p className="text-[9px] text-ink-500 whitespace-nowrap">Elevated access active.</p>
               </div>
             </div>
+          </div>
+        </div>
 
-            <div className="mt-auto rounded-[1.6rem] border border-ink-900/6 bg-sand-50 p-4">
-              <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-sea-500 text-sm font-semibold text-white">
+        {/* User */}
+        <div className="shrink-0 border-t border-black/[0.07] p-2.5">
+          <div className={`overflow-hidden transition-all duration-300 ease-out ${compactUserClass}`}>
+            <div className="flex flex-col items-center gap-2">
+              <div title={user ? `${user.firstName} ${user.lastName}` : 'Admin'} className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-sea-500 to-forest-500 text-[11px] font-bold text-white">
+                {getInitials(user?.firstName, user?.lastName)}
+              </div>
+              <button type="button" title="Sign out" onClick={() => { logout(); navigate('/admin/login', { replace: true }); }} className="flex h-7 w-7 items-center justify-center rounded-lg text-ink-400 hover:bg-coral-500/10 hover:text-coral-600 transition">
+                <SignOut className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </div>
+          <div className={`overflow-hidden transition-all duration-300 ease-out ${expandedUserClass}`}>
+            <div>
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-sea-500 to-forest-500 text-[11px] font-bold text-white">
                   {getInitials(user?.firstName, user?.lastName)}
                 </div>
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-ink-900">
-                    {user ? `${user.firstName} ${user.lastName}` : 'Admin User'}
-                  </p>
-                  <p className="truncate text-xs text-ink-600">
-                    {user?.email ?? 'admin@alphatrekkers.com'}
-                  </p>
+                  <p className="truncate text-sm font-semibold text-ink-900 leading-tight">{user ? `${user.firstName} ${user.lastName}` : 'Admin'}</p>
+                  <p className="truncate text-[10px] text-ink-500">{user?.email ?? 'admin@alphatrekkers.com'}</p>
                 </div>
               </div>
-
-              <Button
+              <button
                 type="button"
-                variant="secondary"
-                fullWidth
-                className="mt-4"
-                leftIcon={<SignOut className="h-4 w-4" />}
-                onClick={() => {
-                  logout();
-                  navigate('/admin/login', { replace: true });
-                }}
+                onClick={() => { logout(); navigate('/admin/login', { replace: true }); }}
+                className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg border border-black/[0.07] bg-sand-50 py-1.5 text-xs font-medium text-ink-600 hover:bg-coral-500/8 hover:text-coral-600 transition"
               >
-                Sign out
-              </Button>
+                <SignOut className="h-3.5 w-3.5" /> Sign out
+              </button>
             </div>
           </div>
-        </aside>
+        </div>
 
-        <div className="min-w-0 flex-1 space-y-6">
-          <header className="travel-panel rounded-[2rem] border border-white/70 bg-white/92 p-6 shadow-[0_24px_60px_rgba(15,23,42,0.06)]">
-            <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
-              <div>
-                <div className="inline-flex items-center gap-2 rounded-full bg-forest-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-forest-600">
-                  <Sparkle className="h-3.5 w-3.5" weight="fill" />
-                  Admin Workspace
-                </div>
-                <h2 className="mt-3 text-4xl font-bold text-ink-900">{currentMeta.title}</h2>
-                <p className="mt-2 max-w-3xl text-sm leading-7 text-ink-600">
-                  {currentMeta.subtitle}
-                </p>
+      </aside>
+
+      {/* ── Content area ───────────────────────────────────────────── */}
+      <div className={`flex min-h-screen flex-1 flex-col transition-[margin] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${collapsed ? 'ml-[68px]' : 'ml-60'}`}>
+
+        {/* Sticky top header bar */}
+        <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-3 border-b border-black/[0.07] bg-white/96 px-4 backdrop-blur-sm shadow-[0_1px_6px_rgba(15,23,42,0.05)]">
+          {/* Hamburger */}
+          <button
+            type="button"
+            onClick={() => setCollapsed((c) => !c)}
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-ink-500 hover:bg-sand-100 hover:text-ink-900 transition"
+          >
+            <List className="h-4.5 w-4.5" />
+          </button>
+
+          {/* Divider */}
+          <span className="h-5 w-px bg-ink-900/10" />
+
+          {/* Page crumb */}
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="hidden sm:block text-[10px] font-bold uppercase tracking-[0.18em] text-ink-400 whitespace-nowrap">{meta.label}</span>
+            <span className="hidden sm:block text-ink-300 text-xs">/</span>
+            <span className="text-sm font-bold text-ink-900 whitespace-nowrap">{meta.title}</span>
+          </div>
+
+          {/* Right */}
+          <div className="ml-auto flex items-center gap-2.5">
+            <span className="hidden md:inline-flex items-center gap-1.5 rounded-full bg-sand-100 px-3 py-1 text-[11px] font-medium text-ink-500">
+              <span className="h-1.5 w-1.5 rounded-full bg-forest-500" />
+              {activeDate}
+            </span>
+            <div className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-sea-500 to-forest-500 text-[11px] font-bold text-white">
+                {getInitials(user?.firstName, user?.lastName)}
               </div>
-
-              <div className="grid gap-3 sm:grid-cols-2 xl:min-w-[26rem]">
-                <div className="rounded-[1.4rem] border border-ink-900/6 bg-sand-50 px-4 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-ink-500">
-                    Today
-                  </p>
-                  <p className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-ink-900">
-                    <CalendarBlank className="h-4 w-4 text-forest-500" />
-                    {activeDate}
-                  </p>
-                </div>
-                <div className="rounded-[1.4rem] border border-ink-900/6 bg-sand-50 px-4 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-ink-500">
-                    Signed in as
-                  </p>
-                  <p className="mt-2 text-sm font-semibold text-ink-900">
-                    {user?.role ?? 'ADMIN'} account
-                  </p>
-                  <p className="mt-1 text-xs text-ink-600">Theme preserved, layout expanded.</p>
-                </div>
+              <div className="hidden lg:block">
+                <p className="text-sm font-semibold text-ink-900 leading-tight">{user?.firstName ?? 'Admin'}</p>
+                <p className="text-[10px] text-ink-500 leading-tight">{user?.role ?? 'ADMIN'}</p>
               </div>
             </div>
-          </header>
+          </div>
+        </header>
 
-          <main className="min-w-0">
-            <Outlet />
-          </main>
-        </div>
+        {/* Page */}
+        <main className="flex-1 p-5">
+          <Outlet />
+        </main>
       </div>
     </div>
   );

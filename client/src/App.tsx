@@ -18,6 +18,8 @@ const AdminLayout = lazy(() => import('@/pages/admin/AdminLayout'));
 const Dashboard = lazy(() => import('@/pages/admin/Dashboard'));
 const AdminTrips = lazy(() => import('@/pages/admin/AdminTrips'));
 const AdminBookings = lazy(() => import('@/pages/admin/AdminBookings'));
+const AdminMessages = lazy(() => import('@/pages/admin/AdminMessages'));
+const AdminUsers = lazy(() => import('@/pages/admin/AdminUsers'));
 
 function App() {
   return (
@@ -50,6 +52,8 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path="trips" element={<AdminTrips />} />
             <Route path="bookings" element={<AdminBookings />} />
+            <Route path="messages" element={<AdminMessages />} />
+            <Route path="users" element={<AdminUsers />} />
           </Route>
         </Route>
       </Routes>

@@ -5,36 +5,27 @@ import {
   CalendarBlank,
   CaretDown,
   EnvelopeSimple,
-  FacebookLogo,
-  InstagramLogo,
-  LinkedinLogo,
   List,
-  MapPinLine,
   Mountains,
   PhoneCall,
   SignOut,
-  TwitterLogo,
   X,
 } from '@phosphor-icons/react';
 import { useAuthStore } from '@/stores/authStore';
 import Button from '@/components/ui/Button';
 
-const tripMenuLinks = [
-  { to: '/trips', label: 'All Trips' },
+const tripNavLinks = [
   { to: '/weekend-trips', label: 'Weekend Trips' },
-  { to: '/weekday-trips', label: 'Weekday Trips' },
+  { to: '/weekday-trips', label: 'Weekdays Trips' },
 ];
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [tripsMenuOpen, setTripsMenuOpen] = useState(false);
-  const [mobileTripsOpen, setMobileTripsOpen] = useState(false);
   const { isAuthenticated, user, logout } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
-  const isTripsSection = ['/trips', '/weekend-trips', '/weekday-trips'].includes(location.pathname);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 32);
@@ -46,8 +37,6 @@ export default function Navbar() {
   useEffect(() => {
     setMobileOpen(false);
     setDropdownOpen(false);
-    setTripsMenuOpen(false);
-    setMobileTripsOpen(false);
   }, [location.pathname]);
 
   const handleLogout = () => {
@@ -58,37 +47,6 @@ export default function Navbar() {
   return (
     <>
       <div className="fixed inset-x-0 top-0 z-50">
-        {/* Top info bar */}
-        <div className="hidden border-b border-dark-200 bg-dark-900 text-white lg:block">
-          <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2.5 text-sm sm:px-6 lg:px-8">
-            <div className="flex items-center gap-6">
-              <a href="mailto:hello@alphatrekkers.com" className="flex items-center gap-2 text-dark-300 hover:text-white">
-                <EnvelopeSimple className="h-4 w-4 text-primary-500" />
-                hello@alphatrekkers.com
-              </a>
-              <a href="tel:+919876543210" className="flex items-center gap-2 text-dark-300 hover:text-white">
-                <PhoneCall className="h-4 w-4 text-primary-500" />
-                +91 98765 43210
-              </a>
-              <span className="flex items-center gap-2 text-dark-300">
-                <MapPinLine className="h-4 w-4 text-primary-500" />
-                Pune, Maharashtra
-              </span>
-            </div>
-            <div className="flex items-center gap-3">
-              {[FacebookLogo, TwitterLogo, InstagramLogo, LinkedinLogo].map((Icon, i) => (
-                <a
-                  key={i}
-                  href="#"
-                  className="flex h-8 w-8 items-center justify-center rounded-full text-dark-400 transition hover:bg-white/10 hover:text-white"
-                >
-                  <Icon className="h-4 w-4" weight="fill" />
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
-
         {/* Main navigation */}
         <motion.header
           initial={{ y: -18, opacity: 0 }}
@@ -131,50 +89,19 @@ export default function Navbar() {
                 Home
               </NavLink>
 
-              <div
-                className="relative"
-                onMouseEnter={() => setTripsMenuOpen(true)}
-                onMouseLeave={() => setTripsMenuOpen(false)}
-              >
-                <button
-                  type="button"
-                  onClick={() => setTripsMenuOpen((open) => !open)}
+              {tripNavLinks.map((link) => (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
                   className={`inline-flex items-center gap-1.5 px-4 py-2 text-[0.9rem] font-medium transition ${
-                    isTripsSection
+                    location.pathname === link.to
                       ? 'text-primary-500'
                       : 'text-dark-700 hover:text-primary-500'
                   }`}
                 >
-                  Tours
-                  <CaretDown className={`h-3.5 w-3.5 transition-transform ${tripsMenuOpen ? 'rotate-180' : ''}`} />
-                </button>
-
-                <AnimatePresence>
-                  {tripsMenuOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 8 }}
-                      className="absolute left-0 mt-1 w-56 rounded-lg border border-dark-200 bg-white p-2 shadow-xl"
-                    >
-                      {tripMenuLinks.map((link) => {
-                        const active = location.pathname === link.to;
-                        return (
-                          <Link
-                            key={link.to}
-                            to={link.to}
-                            className={`block rounded-lg px-4 py-2.5 text-sm font-medium transition ${
-                              active ? 'bg-primary-500 text-white' : 'text-dark-700 hover:bg-primary-50 hover:text-primary-500'
-                            }`}
-                          >
-                            {link.label}
-                          </Link>
-                        );
-                      })}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+                  {link.label}
+                </NavLink>
+              ))}
 
               <NavLink
                 to="/about"
@@ -318,45 +245,19 @@ export default function Navbar() {
                   Home
                 </NavLink>
 
-                <div className="rounded-lg border border-dark-200 p-1">
-                  <button
-                    type="button"
-                    onClick={() => setMobileTripsOpen((open) => !open)}
-                    className={`flex w-full items-center justify-between rounded-lg px-4 py-3 text-sm font-medium ${
-                      isTripsSection ? 'bg-primary-500 text-white' : 'text-dark-700 hover:bg-primary-50'
-                    }`}
+                {tripNavLinks.map((link) => (
+                  <NavLink
+                    key={link.to}
+                    to={link.to}
+                    className={({ isActive }) =>
+                      `block rounded-lg px-4 py-3 text-sm font-medium ${
+                        isActive ? 'bg-primary-500 text-white' : 'text-dark-700 hover:bg-primary-50'
+                      }`
+                    }
                   >
-                    <span>Tours</span>
-                    <CaretDown className={`h-4 w-4 transition-transform ${mobileTripsOpen ? 'rotate-180' : ''}`} />
-                  </button>
-
-                  <AnimatePresence initial={false}>
-                    {mobileTripsOpen && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="overflow-hidden"
-                      >
-                        <div className="mt-1 space-y-1 px-2 pb-2">
-                          {tripMenuLinks.map((link) => (
-                            <Link
-                              key={link.to}
-                              to={link.to}
-                              className={`block rounded-lg px-4 py-2.5 text-sm ${
-                                location.pathname === link.to
-                                  ? 'bg-primary-500 text-white'
-                                  : 'text-dark-700 hover:bg-primary-50'
-                              }`}
-                            >
-                              {link.label}
-                            </Link>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
+                    {link.label}
+                  </NavLink>
+                ))}
 
                 <NavLink
                   to="/about"
