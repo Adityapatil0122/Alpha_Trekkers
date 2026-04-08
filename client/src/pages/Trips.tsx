@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { Link, useLocation, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   ArrowRight,
@@ -50,12 +50,6 @@ function mapSortParams(sortBy: string): Pick<TripFilters, 'sortBy'> & {
       return { sortBy: 'createdAt', sortOrder: 'desc' };
   }
 }
-
-const tripRouteTabs = [
-  { to: '/trips', label: 'All Trips' },
-  { to: '/weekend-trips', label: 'Weekend Trips' },
-  { to: '/weekday-trips', label: 'Weekday Trips' },
-];
 
 function getEarliestSchedule(trip: Trip) {
   return trip.schedules?.[0];
@@ -195,13 +189,8 @@ function FilterPanel({
 
 export default function Trips() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const location = useLocation();
   const routeCategory: TripCategory | undefined =
-    location.pathname === '/weekend-trips'
-      ? 'WEEKEND'
-      : location.pathname === '/weekday-trips'
-        ? 'WEEKDAY'
-        : (searchParams.get('category') as TripCategory) || undefined;
+    (searchParams.get('category') as TripCategory) || undefined;
 
   const [trips, setTrips] = useState<Trip[]>([]);
   const [pagination, setPagination] = useState({ page: 1, limit: 12, total: 0, pages: 1 });
@@ -294,9 +283,9 @@ export default function Trips() {
 
   const pageCopy =
     routeCategory === 'WEEKEND'
-      ? 'Weekend departures with live schedules, faster booking, and high-conversion getaways.'
+      ? 'Weekend departures built for bigger fort circuits, longer climbs, and routes that deserve a full day outdoors.'
       : routeCategory === 'WEEKDAY'
-        ? 'Midweek departures with lighter crowds, better pacing, and ready-to-book schedules.'
+        ? 'Midweek departures built for compact escapes, waterfall resets, and same-day return plans.'
         : 'Browse scheduled fort departures, seasonal journeys, and last-chance trips that are ready to book now.';
 
   return (
@@ -316,25 +305,6 @@ export default function Trips() {
           </h1>
           <p className="playful-text text-2xl text-gold-400 mt-2">~ find your perfect monsoon trek ~</p>
           <p className="mt-4 max-w-2xl text-lg leading-8 text-sand-100/76">{pageCopy}</p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            {tripRouteTabs.map((tab) => {
-              const active = location.pathname === tab.to;
-
-              return (
-                <Link
-                  key={tab.to}
-                  to={tab.to}
-                  className={`rounded-full px-5 py-3 text-sm font-medium transition ${
-                    active
-                      ? 'bg-white text-ink-900'
-                      : 'border border-white/14 bg-white/8 text-sand-100 hover:bg-white/14'
-                  }`}
-                >
-                  {tab.label}
-                </Link>
-              );
-            })}
-          </div>
         </div>
       </section>
 
