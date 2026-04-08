@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=Caveat:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=Caveat:wght@400;500;600;700&family=Coiny&display=swap");
 @import "tailwindcss";
 
 @theme {
@@ -343,8 +343,8 @@ a, button, input, select, textarea {
 }
 
 .mountain-divider__ridge { transition: fill 180ms ease; }
-.mountain-divider__ridge--back { fill: rgba(15, 23, 42, 0.94); }
-.mountain-divider__ridge--mid { fill: rgba(92, 184, 92, 0.75); }
+.mountain-divider__ridge--back { fill: rgba(61, 109, 72, 0.42); }
+.mountain-divider__ridge--mid { fill: rgba(92, 184, 92, 0.68); }
 .mountain-divider__ridge--front { fill: #ffffff; }
 
 /* CTA banner - vibrant green */
