@@ -160,11 +160,11 @@ export default function MyBookings() {
             <p className="section-script">Start your trail diary</p>
             <h2 className="mt-2 font-heading text-5xl text-ink-900">No bookings yet</h2>
             <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-ink-700/72">
-              Start with the redesigned tour archive and book your first fort experience.
+              Start with the one-day trips page or reach out when you want help shaping the next getaway.
             </p>
             <div className="mt-6">
               <Link to="/trips">
-                <Button rightIcon={<ArrowRight className="h-4 w-4" />}>Explore tours</Button>
+                <Button rightIcon={<ArrowRight className="h-4 w-4" />}>Explore day trips</Button>
               </Link>
             </div>
           </div>

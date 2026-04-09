@@ -16,6 +16,8 @@ import api from '@/lib/axios';
 import { useAuthStore } from '@/stores/authStore';
 import Button from '@/components/ui/Button';
 
+const siteLogo = '/destinations/alogo.jpg';
+
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -98,9 +100,11 @@ export default function Navbar() {
         >
           <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
             <Link to="/" className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-500 text-white">
-                <Mountains className="h-6 w-6" weight="bold" />
-              </div>
+              <img
+                src={siteLogo}
+                alt="Alpha Trekkers logo"
+                className="h-12 w-12 rounded-full object-cover"
+              />
               <div>
                 <p className="text-xl font-bold text-dark-900">
                   Alpha <span className="text-primary-500">Trekkers</span>
@@ -172,10 +176,10 @@ export default function Navbar() {
                             ))}
                           </div>
                           <Link
-                            to={`/trips?category=${activeTrekCategory}`}
+                            to="/trips"
                             className="mt-5 block rounded-full border border-dark-200 bg-white px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-[0.14em] text-dark-700 transition hover:border-primary-500 hover:text-primary-500"
                           >
-                            Browse All
+                            See One-Day Trips
                           </Link>
                         </div>
 
@@ -497,10 +501,10 @@ export default function Navbar() {
                           </div>
 
                           <Link
-                            to={`/trips?category=${mobileTrekCategory}`}
+                            to="/trips"
                             className="mt-4 block rounded-xl border border-dark-200 px-3 py-3 text-center text-sm font-medium text-dark-700"
                           >
-                            Browse all {mobileCategoryLabel.toLowerCase()} treks
+                            See one-day trips
                           </Link>
                         </div>
                       </motion.div>

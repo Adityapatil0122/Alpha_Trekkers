@@ -12,28 +12,22 @@ import {
   YoutubeLogo,
 } from '@phosphor-icons/react';
 
-const quickLinks = [
-  { to: '/', label: 'Home' },
-  { to: '/trips', label: 'Treks' },
-  { to: '/corporate-treks', label: 'Corporate Treks' },
-  { to: '/about', label: 'About' },
-  { to: '/contact', label: 'Contact' },
-  { to: '/trips', label: 'Book Now' },
-  ];
+const siteLogo = '/destinations/alogo.jpg';
+
 const destinations = [
-  { label: 'Rajgad', to: '/weekend-trips' },
-  { label: 'Lohagad', to: '/weekend-trips' },
-  { label: 'Harishchandragad', to: '/weekend-trips' },
-  { label: 'Torna', to: '/weekend-trips' },
-  { label: 'Kalsubai', to: '/weekday-trips' },
-  { label: 'Rajmachi', to: '/weekday-trips' },
+  { label: 'Mahabaleshwar', to: '/trips#mahabaleshwar' },
+  { label: 'Alibaug', to: '/trips#alibaug' },
+  { label: 'Lonavala & Khandala', to: '/trips#lonavala-khandala' },
+  { label: 'Bhimashankar', to: '/trips#bhimashankar' },
+  { label: 'Tamhini Ghat', to: '/trips#tamhini-ghat' },
+  { label: 'Matheran', to: '/trips#matheran' },
 ];
 
 const companyLinks = [
   { to: '/about', label: 'Who We Are' },
-  { to: '/weekend-trips', label: 'Weekend Trips' },
-  { to: '/weekday-trips', label: 'Weekday Trips' },
-  { to: '/weekend-trips', label: 'Weekend Plans' },
+  { to: '/trips', label: 'One-Day Trips' },
+  { to: '/trips#kolad-river-rafting', label: 'Adventure Picks' },
+  { to: '/trips#wai', label: 'Spiritual Escapes' },
   { to: '/contact', label: 'Travel Support' },
 ];
 
@@ -178,9 +172,11 @@ export default function Footer() {
           <div className="grid gap-10 border-b border-white/10 pb-12 lg:grid-cols-[1.25fr_0.9fr_0.9fr_1fr]">
             <div className="pr-6">
               <div className="flex items-start gap-3">
-                <div className="mt-1 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10">
-                  <Mountains className="h-7 w-7 text-gold-400" weight="duotone" />
-                </div>
+                <img
+                  src={siteLogo}
+                  alt="Alpha Trekkers logo"
+                  className="mt-1 h-14 w-auto object-contain"
+                />
                 <div>
                   <p className="text-xs uppercase tracking-[0.24em] text-gold-400">Alpha Trekkers</p>
                   <p className="max-w-sm font-heading text-3xl font-semibold leading-tight">

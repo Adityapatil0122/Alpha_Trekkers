@@ -1,613 +1,257 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
+import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import {
   ArrowRight,
-  CalendarBlank,
-  FunnelSimple,
-  MagnifyingGlass,
-  MapPinLine,
-  SlidersHorizontal,
-  SortAscending,
-  Star,
   UsersThree,
-  X,
+  Star,
 } from '@phosphor-icons/react';
-import { MAHARASHTRA_MONSOON_IMAGES } from '@alpha-trekkers/shared';
-import type {
-  Difficulty,
-  PaginatedResponse,
-  Trip,
-  TripCategory,
-  TripFilters,
-} from '@alpha-trekkers/shared';
-import { CATEGORIES, DIFFICULTIES, REGIONS } from '@alpha-trekkers/shared';
-import api from '@/lib/axios';
-import Button from '@/components/ui/Button';
-import LoadingSpinner from '@/components/ui/LoadingSpinner';
-import TripCard from '@/components/ui/TripCard';
+import {
+  ONE_DAY_TRIP_FILTERS,
+  oneDayTrips,
+  type OneDayTrip,
+  type OneDayTripType,
+} from '@/content/oneDayTrips';
 
-const sortOptions = [
-  { value: 'popular', label: 'Most Popular' },
-  { value: 'rating', label: 'Top Rated' },
-  { value: 'newest', label: 'Newest Departures' },
-  { value: 'price_asc', label: 'Price Low to High' },
-  { value: 'price_desc', label: 'Price High to Low' },
+type TripFilter = 'All' | OneDayTripType;
+
+const tripsHeroBackground = '/destinations/rajmachi.png';
+
+const typeCopy: Record<OneDayTripType, string> = {
+  'Hill Station': 'cool-weather escapes',
+  Beach: 'coastal breaks',
+  Spiritual: 'temple-led routes',
+  Nature: 'scenic ghat loops',
+  Adventure: 'action-first outings',
+};
+
+const tourBenefits = [
+  {
+    title: 'Quick Route Clarity',
+    copy: 'Dates, group size, and starting price are visible right away, so choosing a trip stays fast and stress-free.',
+  },
+  {
+    title: 'Picked For Pune Starts',
+    copy: 'These routes are chosen for real early-morning departures, scenic value, and smoother same-day planning.',
+  },
+  {
+    title: 'Booking Support That Helps',
+    copy: 'Every card goes straight to our team, making it easier to confirm availability, pickup points, and final pricing.',
+  },
 ];
 
-function mapSortParams(sortBy: string): Pick<TripFilters, 'sortBy'> & {
-  sortOrder?: 'asc' | 'desc';
-} {
-  switch (sortBy) {
-    case 'price_asc':
-      return { sortBy: 'basePrice', sortOrder: 'asc' };
-    case 'price_desc':
-      return { sortBy: 'basePrice', sortOrder: 'desc' };
-    case 'rating':
-    case 'popular':
-      return { sortBy: 'avgRating', sortOrder: 'desc' };
-    default:
-      return { sortBy: 'createdAt', sortOrder: 'desc' };
-  }
-}
-
-function getEarliestSchedule(trip: Trip) {
-  return trip.schedules?.[0];
-}
-
-function formatScheduleDate(date: string, includeWeekday = true) {
-  return new Date(date).toLocaleDateString('en-IN', {
-    weekday: includeWeekday ? 'short' : undefined,
-    day: 'numeric',
-    month: 'short',
+function getBookingHref(trip: OneDayTrip) {
+  const params = new URLSearchParams({
+    trip: trip.slug,
+    source: 'one-day-trips',
   });
+
+  return `/contact?${params.toString()}`;
 }
 
-function getDepartureLabel(date: string) {
-  const now = new Date();
-  const target = new Date(date);
-  const diffTime = target.getTime() - now.getTime();
-  const diffDays = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
-
-  if (diffDays === 0) return 'Leaving today';
-  if (diffDays === 1) return 'Leaving tomorrow';
-  if (diffDays <= 4) return `Leaving in ${diffDays} days`;
-  return 'Scheduled now';
-}
-
-function FilterPanel({
-  search,
-  setSearch,
-  category,
-  setCategory,
-  difficulty,
-  setDifficulty,
-  region,
-  setRegion,
-  clearFilters,
-  routeCategory,
+function TripCard({
+  trip,
+  index,
 }: {
-  search: string;
-  setSearch: (value: string) => void;
-  category: TripCategory | '';
-  setCategory: (value: TripCategory | '') => void;
-  difficulty: Difficulty | '';
-  setDifficulty: (value: Difficulty | '') => void;
-  region: string;
-  setRegion: (value: string) => void;
-  clearFilters: () => void;
-  routeCategory?: TripCategory;
+  trip: OneDayTrip;
+  index: number;
 }) {
   return (
-    <div className="travel-panel rounded-[2rem] p-6">
-      <div className="flex items-center gap-3">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-forest-500/10">
-          <SlidersHorizontal className="h-5 w-5 text-forest-500" />
-        </div>
-        <div>
-          <p className="section-script">Trail filters</p>
-          <h3 className="font-heading text-3xl text-ink-900">Find your route</h3>
+    <motion.article
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.18 }}
+      transition={{
+        duration: 0.42,
+        delay: Math.min(index, 5) * 0.04,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+      whileHover={{ y: -6 }}
+      className="flex h-full flex-col overflow-hidden rounded-[2.2rem] border border-[#dbe4de] bg-white shadow-[0_18px_48px_rgba(15,23,42,0.07)]"
+    >
+      <div className="relative h-[13.5rem] overflow-hidden">
+        <img
+          src={trip.imageUrl}
+          alt={trip.title}
+          className="h-full w-full object-cover"
+        />
+        <div className="absolute left-4 top-4 flex items-center gap-2">
+          <span className="rounded-[0.8rem] bg-[#57b94f] px-3.5 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-white shadow-[0_12px_24px_rgba(87,185,79,0.24)]">
+            {trip.dateLabel}
+          </span>
         </div>
       </div>
 
-      <div className="mt-6 space-y-5">
-        <label className="block">
-          <span className="mb-2 block text-sm font-medium text-ink-700">Search</span>
-          <div className="travel-input flex items-center gap-3">
-            <MagnifyingGlass className="h-5 w-5 text-forest-500" />
-            <input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              className="min-w-0 flex-1 bg-transparent text-sm focus:outline-none"
-            />
-          </div>
-        </label>
+      <div className="flex flex-1 flex-col px-7 pb-6 pt-5">
+        <h2 className="min-h-[3.9rem] font-heading text-[1.7rem] leading-[1.08] text-[#0f2540]">
+          {trip.title}
+        </h2>
 
-        {!routeCategory ? (
-          <label className="block">
-            <span className="mb-2 block text-sm font-medium text-ink-700">Category</span>
-            <select
-              value={category}
-              onChange={(event) => setCategory(event.target.value as TripCategory | '')}
-              className="travel-input"
-            >
-              <option value="">All Categories</option>
-              {Object.entries(CATEGORIES).map(([key, value]) => (
-                <option key={key} value={key}>
-                  {value.label}
-                </option>
-              ))}
-            </select>
-          </label>
-        ) : null}
-
-        <div>
-          <span className="mb-3 block text-sm font-medium text-ink-700">Difficulty</span>
-          <div className="grid gap-2">
-            {Object.entries(DIFFICULTIES).map(([key, value]) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => setDifficulty(difficulty === key ? '' : (key as Difficulty))}
-                className={`rounded-2xl px-4 py-3 text-left text-sm ${
-                  difficulty === key
-                    ? 'bg-forest-500 text-white'
-                    : 'bg-sand-100 text-ink-700 hover:bg-sand-200'
-                }`}
-              >
-                {value.label}
-              </button>
+        <div className="mt-4 flex items-center gap-2 text-sm text-slate-600">
+          <div className="flex items-center gap-1 text-amber-400">
+            {Array.from({ length: 5 }).map((_, starIndex) => (
+              <Star
+                key={`${trip.slug}-star-${starIndex}`}
+                className="h-4 w-4"
+                weight="fill"
+              />
             ))}
+          </div>
+          <span className="text-slate-700">(1 Review)</span>
+        </div>
+
+        <div className="mt-5 flex flex-wrap items-center gap-6 text-[0.95rem] text-slate-500">
+          <div className="flex items-center gap-2">
+            <UsersThree className="h-5 w-5 text-lime-500" weight="fill" />
+            <span>{trip.groupSizeLabel}</span>
           </div>
         </div>
 
-        <label className="block">
-          <span className="mb-2 block text-sm font-medium text-ink-700">Region</span>
-          <select
-            value={region}
-            onChange={(event) => setRegion(event.target.value)}
-            className="travel-input"
+        <div className="mt-auto border-t border-slate-200 pt-5">
+          <div className="flex flex-wrap items-end gap-2">
+            <p className="text-[1.05rem] text-slate-500">From</p>
+            <p className="font-heading text-[2.15rem] leading-none text-lime-600">
+              {trip.priceLabel}
+            </p>
+            <p className="pb-1 text-sm text-slate-400 line-through">{trip.comparePriceLabel}</p>
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <Link
+            to={getBookingHref(trip)}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#5dbb59] px-5 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-[#51ae4d]"
           >
-            <option value="">All Regions</option>
-            {REGIONS.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
-        </label>
+            Book Now
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
       </div>
-
-      <div className="mt-6">
-        <Button variant="secondary" fullWidth onClick={clearFilters}>
-          Reset filters
-        </Button>
-      </div>
-    </div>
+    </motion.article>
   );
 }
 
 export default function Trips() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const routeCategory: TripCategory | undefined =
-    (searchParams.get('category') as TripCategory) || undefined;
+  const [activeFilter, setActiveFilter] = useState<TripFilter>('All');
 
-  const [trips, setTrips] = useState<Trip[]>([]);
-  const [pagination, setPagination] = useState({ page: 1, limit: 12, total: 0, pages: 1 });
-  const [loading, setLoading] = useState(true);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const filteredTrips = useMemo(() => {
+    if (activeFilter === 'All') return oneDayTrips;
+    return oneDayTrips.filter((trip) => trip.typeLabel === activeFilter);
+  }, [activeFilter]);
 
-  const [search, setSearch] = useState(searchParams.get('search') || '');
-  const [category, setCategory] = useState<TripCategory | ''>(routeCategory || '');
-  const [difficulty, setDifficulty] = useState<Difficulty | ''>((searchParams.get('difficulty') as Difficulty) || '');
-  const [region, setRegion] = useState(searchParams.get('region') || '');
-  const [sortBy, setSortBy] = useState(searchParams.get('sortBy') || 'popular');
-  const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
-
-  const fetchTrips = useCallback(async () => {
-    setLoading(true);
-    try {
-      const { sortBy: apiSortBy, sortOrder } = mapSortParams(sortBy);
-      const params: TripFilters = { page, limit: 12, sortBy: apiSortBy };
-      if (sortOrder) params.sortOrder = sortOrder;
-      if (search) params.search = search;
-      if (category) params.category = category;
-      if (difficulty) params.difficulty = difficulty;
-      if (region) params.region = region;
-
-      const response = await api.get<PaginatedResponse<{ trips: Trip[] }>>('/trips', { params });
-      setTrips(response.data.data.trips);
-      setPagination(response.data.pagination);
-    } catch {
-      setTrips([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [page, sortBy, search, category, difficulty, region]);
-
-  useEffect(() => {
-    void fetchTrips();
-  }, [fetchTrips]);
-
-  useEffect(() => {
-    const params: Record<string, string> = {};
-    if (search) params.search = search;
-    if (category && !routeCategory) params.category = category;
-    if (difficulty) params.difficulty = difficulty;
-    if (region) params.region = region;
-    if (sortBy !== 'popular') params.sortBy = sortBy;
-    if (page > 1) params.page = String(page);
-    setSearchParams(params, { replace: true });
-  }, [search, category, difficulty, region, sortBy, page, routeCategory, setSearchParams]);
-
-  useEffect(() => {
-    if (routeCategory) setCategory(routeCategory);
-  }, [routeCategory]);
-
-  const clearFilters = () => {
-    setSearch('');
-    setCategory(routeCategory || '');
-    setDifficulty('');
-    setRegion('');
-    setSortBy('popular');
-    setPage(1);
-  };
-
-  const scheduledTrips = useMemo(
-    () =>
-      [...trips]
-        .filter((trip) => Boolean(getEarliestSchedule(trip)))
-        .sort((left, right) => {
-          const leftSchedule = getEarliestSchedule(left);
-          const rightSchedule = getEarliestSchedule(right);
-          if (!leftSchedule || !rightSchedule) return 0;
-
-          const byDate = new Date(leftSchedule.date).getTime() - new Date(rightSchedule.date).getTime();
-          if (byDate !== 0) return byDate;
-
-          return leftSchedule.availableSpots - rightSchedule.availableSpots;
-        }),
-    [trips],
-  );
-
-  const scheduledHighlights = scheduledTrips.slice(0, 3);
-  const lastChanceTrip = scheduledTrips[0] ?? null;
-  const lastChanceSchedule = lastChanceTrip ? getEarliestSchedule(lastChanceTrip) : undefined;
-
-  const pageTitle =
-    routeCategory === 'WEEKEND'
-      ? 'Weekend Trips'
-      : routeCategory === 'WEEKDAY'
-        ? 'Weekday Trips'
-        : 'Trips';
-
-  const pageCopy =
-    routeCategory === 'WEEKEND'
-      ? 'Weekend departures built for bigger fort circuits, longer climbs, and routes that deserve a full day outdoors.'
-      : routeCategory === 'WEEKDAY'
-        ? 'Midweek departures built for compact escapes, waterfall resets, and same-day return plans.'
-        : 'Browse scheduled fort departures, seasonal journeys, and last-chance trips that are ready to book now.';
+  const eyebrowCopy =
+    activeFilter === 'All'
+      ? 'Pick a route and book the right one-day escape.'
+      : `${filteredTrips.length} ${typeCopy[activeFilter]} ready to compare.`;
 
   return (
     <>
-      <section className="travel-dark relative overflow-hidden pt-28">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${MAHARASHTRA_MONSOON_IMAGES.heroes.trips})` }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-dark-900/80 via-dark-900/50 to-transparent" />
-        <div className="relative mx-auto max-w-7xl px-4 pb-[4.5rem] pt-20 sm:px-6 lg:px-8">
-          <span className="section-label !bg-white/10 !text-sand-100 before:!bg-gold-400">
-            Trip collection
-          </span>
-          <h1 className="mt-6 max-w-3xl font-heading text-5xl leading-[0.95] text-white sm:text-6xl">
-            {pageTitle}
-          </h1>
-          <p className="playful-text text-2xl text-gold-400 mt-2">~ find your perfect monsoon trek ~</p>
-          <p className="mt-4 max-w-2xl text-lg leading-8 text-sand-100/76">{pageCopy}</p>
+      <section className="relative overflow-hidden bg-[#07131f] pt-24 text-white">
+        <div className="absolute inset-0 overflow-hidden">
+          <img
+            src={tripsHeroBackground}
+            alt=""
+            aria-hidden="true"
+            className="h-full w-full scale-[1.04] object-cover object-center saturate-[1.05]"
+          />
+        </div>
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,23,18,0.64)_0%,rgba(9,28,22,0.46)_36%,rgba(8,26,23,0.22)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(19,71,47,0.18)_0%,rgba(8,28,23,0.08)_34%,rgba(5,17,23,0.38)_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_16%_18%,rgba(149,233,157,0.18),transparent_22%),radial-gradient(circle_at_82%_16%,rgba(216,241,150,0.1),transparent_18%)]" />
+
+        <div className="relative mx-auto max-w-7xl px-4 pb-20 pt-20 sm:px-6 lg:px-8 lg:pb-24">
+          <div className="max-w-4xl">
+            <span className="inline-flex items-center rounded-full border border-white/14 bg-white/10 px-5 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-sand-100 backdrop-blur-md">
+              Curated day trips
+            </span>
+
+            <h1 className="mt-7 max-w-3xl font-heading text-5xl leading-[0.92] !text-white drop-shadow-[0_12px_34px_rgba(0,0,0,0.38)] sm:text-6xl lg:text-[4.6rem]">
+              Scenic escapes around Pune worth planning next.
+            </h1>
+
+            <p className="mt-6 max-w-2xl text-base leading-8 text-sand-100/82 sm:text-lg">
+              Clean, destination-led getaways for quick resets, scenic drives, temple mornings, hill air,
+              rafting bursts, and coastal breaks. Pick a mood, compare the route, and book the one that fits.
+            </p>
+          </div>
         </div>
       </section>
 
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        {scheduledTrips.length > 0 ? (
-          <div className="mb-10 grid gap-6 lg:grid-cols-[1.06fr_0.94fr]">
-            <div className="travel-dark relative overflow-hidden rounded-[2.4rem] p-8 sm:p-10">
-              {lastChanceTrip?.images[0]?.url ? (
-                <img
-                  src={lastChanceTrip.images[0].url}
-                  alt={lastChanceTrip.images[0].altText || lastChanceTrip.title}
-                  className="absolute inset-0 h-full w-full object-cover"
-                />
-              ) : null}
-              <div className="absolute inset-0 bg-gradient-to-r from-dark-900/80 via-dark-900/50 to-transparent" />
-              <div className="absolute right-0 top-0 h-48 w-48 rounded-full bg-forest-500/16 blur-3xl" />
-              <div className="absolute bottom-0 left-0 h-40 w-40 rounded-full bg-gold-500/14 blur-3xl" />
-              <div className="relative">
-                <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-gold-400">
-                  <Star className="h-4 w-4" weight="fill" />
-                  Last Chance Trip
-                </div>
-                {lastChanceTrip && lastChanceSchedule ? (
-                  <>
-                    <p className="mt-6 text-sm uppercase tracking-[0.18em] text-sand-200/68">
-                      {getDepartureLabel(lastChanceSchedule.date)}
-                    </p>
-                    <h2 className="mt-3 max-w-2xl font-heading text-5xl leading-tight text-white">
-                      {lastChanceTrip.title}
-                    </h2>
-                    <p className="mt-4 max-w-2xl text-base leading-8 text-sand-100/74">
-                      {lastChanceTrip.shortDescription}
-                    </p>
+      <section className="relative bg-[linear-gradient(180deg,#f7fbf8_0%,#ffffff_28%,#f7faf8_100%)] py-14 sm:py-16">
+        <div className="absolute left-0 top-10 h-56 w-56 rounded-full bg-[#dff0de] blur-3xl" />
+        <div className="absolute bottom-0 right-0 h-64 w-64 rounded-full bg-[#f5ecd0] blur-3xl" />
 
-                    <div className="mt-7 grid gap-3 sm:grid-cols-3">
-                      <div className="rounded-[1.4rem] border border-white/12 bg-white/8 p-4">
-                        <p className="text-xs uppercase tracking-[0.18em] text-gold-400">Scheduled</p>
-                        <p className="mt-2 text-base font-medium text-white">
-                          {formatScheduleDate(lastChanceSchedule.date)}
-                        </p>
-                      </div>
-                      <div className="rounded-[1.4rem] border border-white/12 bg-white/8 p-4">
-                        <p className="text-xs uppercase tracking-[0.18em] text-gold-400">Region</p>
-                        <p className="mt-2 text-base font-medium text-white">{lastChanceTrip.region}</p>
-                      </div>
-                      <div className="rounded-[1.4rem] border border-white/12 bg-white/8 p-4">
-                        <p className="text-xs uppercase tracking-[0.18em] text-gold-400">Open Spots</p>
-                        <p className="mt-2 text-base font-medium text-white">
-                          {lastChanceSchedule.availableSpots} seats left
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                      <div>
-                        <p className="text-sm text-sand-200/58">Starting from</p>
-                        <p className="font-heading text-4xl text-white">
-                          INR {(lastChanceTrip.discountPrice ?? lastChanceTrip.basePrice).toLocaleString('en-IN')}
-                        </p>
-                      </div>
-                      <Link to={`/trips/${lastChanceTrip.slug}`}>
-                        <Button
-                          variant="accent"
-                          size="lg"
-                          rightIcon={<ArrowRight className="h-5 w-5" />}
-                        >
-                          Book this trip
-                        </Button>
-                      </Link>
-                    </div>
-                  </>
-                ) : null}
-              </div>
-            </div>
-
-            <div className="grid gap-4">
-              <div className="travel-panel rounded-[2rem] p-6">
-                <p className="section-script">Scheduled trips</p>
-                <h2 className="mt-3 font-heading text-4xl text-ink-900">Next departures open now</h2>
-                <p className="mt-3 text-sm leading-7 text-ink-700/70">
-                  These upcoming trips already have live schedules and are ready for immediate booking.
-                </p>
-              </div>
-
-              {scheduledHighlights.map((trip) => {
-                const nextSchedule = getEarliestSchedule(trip);
-                if (!nextSchedule) return null;
-
-                return (
-                  <Link
-                    key={trip.id}
-                    to={`/trips/${trip.slug}`}
-                    className="travel-panel group rounded-[1.8rem] p-5 transition hover:translate-y-[-4px]"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.18em] text-forest-500">
-                          {getDepartureLabel(nextSchedule.date)}
-                        </p>
-                        <h3 className="mt-2 font-heading text-3xl text-ink-900">{trip.title}</h3>
-                      </div>
-                      <span className="rounded-full bg-gold-500/12 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-gold-600">
-                        {trip.category.replace('_', ' ')}
-                      </span>
-                    </div>
-
-                    <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                      <span className="flex items-center gap-2 rounded-2xl bg-sand-100 px-3 py-3 text-sm text-ink-700">
-                        <CalendarBlank className="h-4 w-4 text-forest-500" />
-                        {formatScheduleDate(nextSchedule.date)}
-                      </span>
-                      <span className="flex items-center gap-2 rounded-2xl bg-sand-100 px-3 py-3 text-sm text-ink-700">
-                        <MapPinLine className="h-4 w-4 text-forest-500" />
-                        {trip.region}
-                      </span>
-                      <span className="flex items-center gap-2 rounded-2xl bg-sand-100 px-3 py-3 text-sm text-ink-700">
-                        <UsersThree className="h-4 w-4 text-forest-500" />
-                        {nextSchedule.availableSpots} open
-                      </span>
-                    </div>
-
-                    <div className="mt-5 flex items-center justify-between border-t border-ink-900/8 pt-4">
-                      <div>
-                        <p className="text-sm text-ink-600/58">Starts from</p>
-                        <p className="font-heading text-3xl text-ink-900">
-                          INR {(trip.discountPrice ?? trip.basePrice).toLocaleString('en-IN')}
-                        </p>
-                      </div>
-                      <span className="text-sm font-medium text-forest-500 group-hover:text-forest-500">
-                        View trip
-                      </span>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        ) : null}
-
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="section-script">Collection snapshot</p>
-            <h2 className="font-heading text-3xl text-ink-900">
-              {pagination.total} journeys available
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-4xl text-center">
+            <p className="section-script">Why choose us</p>
+            <h2 className="mt-3 text-4xl font-bold text-dark-900 sm:text-5xl">
+              What Makes <span className="playful-text text-primary-500">Alpha Trekkers</span> Better For Quick Escapes
             </h2>
+            <p className="mt-5 text-base leading-8 text-ink-700/72 sm:text-lg">
+              Clean routes, easy comparison, and simple booking support for hill air, beach breaks,
+              spiritual mornings, and short adventure plans around Pune.
+            </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setSidebarOpen(true)}
-              className="rounded-full bg-sand-100 px-4 py-3 text-sm font-medium text-ink-800 lg:hidden"
-            >
-              <span className="inline-flex items-center gap-2">
-                <FunnelSimple className="h-4 w-4" />
-                Filters
-              </span>
-            </button>
-            <div className="travel-panel flex items-center gap-3 rounded-full px-4 py-3">
-              <SortAscending className="h-4 w-4 text-forest-500" />
-              <select
-                value={sortBy}
-                onChange={(event) => {
-                  setSortBy(event.target.value);
-                  setPage(1);
-                }}
-                className="bg-transparent text-sm text-ink-800 focus:outline-none"
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {tourBenefits.map((benefit, benefitIndex) => (
+              <motion.div
+                key={benefit.title}
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.25 }}
+                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                whileHover={{ y: -6 }}
+                className="rounded-[2rem] border border-[#dbe4de] bg-white p-7 shadow-[0_18px_48px_rgba(15,23,42,0.06)]"
               >
-                {sortOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary-50 text-sm font-semibold text-primary-600">
+                  0{benefitIndex + 1}
+                </div>
+                <h3 className="mt-5 text-[1.35rem] font-semibold text-dark-900">
+                  {benefit.title}
+                </h3>
+                <p className="mt-3 text-sm leading-7 text-dark-500">
+                  {benefit.copy}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="mt-14 flex flex-col items-start gap-5 border-t border-[#dbe4de] pt-10">
+            <div>
+              <p className="text-sm leading-7 text-ink-700/72">{eyebrowCopy}</p>
+              <h3 className="mt-1 text-2xl font-semibold text-dark-900 sm:text-[2rem]">
+                Trips to compare
+              </h3>
+            </div>
+
+            <div className="-mx-4 w-[calc(100%+2rem)] overflow-x-auto px-4 pb-1">
+              <div className="flex min-w-max gap-2.5">
+                {ONE_DAY_TRIP_FILTERS.map((filter) => (
+                  <button
+                    key={filter}
+                    type="button"
+                    onClick={() => setActiveFilter(filter)}
+                    className={`rounded-full border px-5 py-3 text-sm font-semibold transition ${
+                      activeFilter === filter
+                        ? 'border-forest-500 bg-forest-500 text-white shadow-[0_18px_42px_rgba(58,138,74,0.22)]'
+                        : 'border-[#d8e4dc] bg-white text-slate-700 hover:border-forest-300 hover:text-forest-600'
+                    }`}
+                  >
+                    {filter}
+                  </button>
                 ))}
-              </select>
+              </div>
             </div>
           </div>
+
+          <div className="mt-8 grid gap-7 md:grid-cols-2 xl:grid-cols-4">
+            {filteredTrips.map((trip, index) => (
+              <TripCard key={trip.slug} trip={trip} index={index} />
+            ))}
+          </div>
         </div>
-
-        <div className="flex items-start gap-8">
-          <aside className="hidden w-80 shrink-0 lg:block">
-            <FilterPanel
-              search={search}
-              setSearch={(value) => {
-                setSearch(value);
-                setPage(1);
-              }}
-              category={category}
-              setCategory={(value) => {
-                setCategory(value);
-                setPage(1);
-              }}
-              difficulty={difficulty}
-              setDifficulty={(value) => {
-                setDifficulty(value);
-                setPage(1);
-              }}
-              region={region}
-              setRegion={(value) => {
-                setRegion(value);
-                setPage(1);
-              }}
-              clearFilters={clearFilters}
-              routeCategory={routeCategory}
-            />
-          </aside>
-
-          <AnimatePresence>
-            {sidebarOpen && (
-              <>
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="fixed inset-0 z-40 bg-ink-950/45 backdrop-blur-sm lg:hidden"
-                  onClick={() => setSidebarOpen(false)}
-                />
-                <motion.div
-                  initial={{ x: '-100%' }}
-                  animate={{ x: 0 }}
-                  exit={{ x: '-100%' }}
-                  className="fixed left-0 top-0 z-50 h-full w-80 max-w-[88vw] overflow-y-auto bg-sand-50 p-5 lg:hidden"
-                >
-                  <div className="mb-4 flex items-center justify-between">
-                    <h3 className="font-heading text-3xl text-ink-900">Filters</h3>
-                    <button type="button" onClick={() => setSidebarOpen(false)} className="rounded-full bg-sand-100 p-2">
-                      <X className="h-5 w-5" />
-                    </button>
-                  </div>
-                  <FilterPanel
-                    search={search}
-                    setSearch={(value) => {
-                      setSearch(value);
-                      setPage(1);
-                    }}
-                    category={category}
-                    setCategory={(value) => {
-                      setCategory(value);
-                      setPage(1);
-                    }}
-                    difficulty={difficulty}
-                    setDifficulty={(value) => {
-                      setDifficulty(value);
-                      setPage(1);
-                    }}
-                    region={region}
-                    setRegion={(value) => {
-                      setRegion(value);
-                      setPage(1);
-                    }}
-                    clearFilters={clearFilters}
-                    routeCategory={routeCategory}
-                  />
-                </motion.div>
-              </>
-            )}
-          </AnimatePresence>
-
-          <main className="min-w-0 flex-1">
-            {loading ? (
-              <LoadingSpinner text="Loading tours..." />
-            ) : trips.length > 0 ? (
-              <>
-                <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                  {trips.map((trip) => (
-                    <TripCard key={trip.id} trip={trip} />
-                  ))}
-                </div>
-                {pagination.pages > 1 ? (
-                  <div className="mt-10 flex flex-wrap justify-center gap-2">
-                    {Array.from({ length: pagination.pages }, (_, index) => index + 1).map((pageNumber) => (
-                      <button
-                        key={pageNumber}
-                        type="button"
-                        onClick={() => setPage(pageNumber)}
-                        className={`h-11 w-11 rounded-full text-sm font-medium ${
-                          pageNumber === page
-                            ? 'bg-forest-500 text-white'
-                            : 'bg-white text-ink-800 shadow-[0_10px_30px_rgba(8,17,28,0.06)]'
-                        }`}
-                      >
-                        {pageNumber}
-                      </button>
-                    ))}
-                  </div>
-                ) : null}
-              </>
-            ) : (
-              <div className="travel-panel rounded-[2rem] px-8 py-16 text-center">
-                <p className="section-script">Adjust your route</p>
-                <h3 className="mt-2 font-heading text-4xl text-ink-900">No matching departures</h3>
-                <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-ink-700/72">
-                  Try broadening the filters or reset the journey criteria to browse the full collection.
-                </p>
-                <div className="mt-6">
-                  <Button variant="secondary" onClick={clearFilters}>
-                    Reset and browse all
-                  </Button>
-                </div>
-              </div>
-            )}
-          </main>
-        </div>
-      </div>
+      </section>
     </>
   );
 }
