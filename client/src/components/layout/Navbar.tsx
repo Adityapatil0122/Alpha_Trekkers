@@ -240,6 +240,32 @@ export default function Navbar() {
               </div>
 
               <NavLink
+                to="/trips"
+                className={({ isActive }) =>
+                  `px-4 py-2 text-[0.9rem] font-medium transition ${
+                    isActive
+                      ? 'text-primary-500'
+                      : 'text-dark-700 hover:text-primary-500'
+                  }`
+                }
+              >
+                Tours
+              </NavLink>
+
+              <NavLink
+                to="/corporate-treks"
+                className={({ isActive }) =>
+                  `px-4 py-2 text-[0.9rem] font-medium transition ${
+                    isActive
+                      ? 'text-primary-500'
+                      : 'text-dark-700 hover:text-primary-500'
+                  }`
+                }
+              >
+                Corporate Treks
+              </NavLink>
+
+              <NavLink
                 to="/about"
                 className={({ isActive }) =>
                   `px-4 py-2 text-[0.9rem] font-medium transition ${
@@ -481,6 +507,28 @@ export default function Navbar() {
                     ) : null}
                   </AnimatePresence>
                 </div>
+
+                <NavLink
+                  to="/trips"
+                  className={({ isActive }) =>
+                    `block rounded-lg px-4 py-3 text-sm font-medium ${
+                      isActive ? 'bg-primary-500 text-white' : 'text-dark-700 hover:bg-primary-50'
+                    }`
+                  }
+                >
+                  Tours
+                </NavLink>
+
+                <NavLink
+                  to="/corporate-treks"
+                  className={({ isActive }) =>
+                    `block rounded-lg px-4 py-3 text-sm font-medium ${
+                      isActive ? 'bg-primary-500 text-white' : 'text-dark-700 hover:bg-primary-50'
+                    }`
+                  }
+                >
+                  Corporate Treks
+                </NavLink>
 
                 <NavLink
                   to="/about"

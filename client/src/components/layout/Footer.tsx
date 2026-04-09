@@ -11,6 +11,13 @@ import {
   YoutubeLogo,
 } from '@phosphor-icons/react';
 
+const quickLinks = [
+  { to: '/', label: 'Home' },
+  { to: '/trips', label: 'Treks' },
+  { to: '/corporate-treks', label: 'Corporate Treks' },
+  { to: '/about', label: 'About' },
+  { to: '/contact', label: 'Contact' },
+  { to: '/trips', label: 'Book Now' },
 const destinations = [
   { label: 'Rajgad', to: '/weekend-trips' },
   { label: 'Lohagad', to: '/weekend-trips' },
