@@ -11,6 +11,7 @@ const Login = lazy(() => import('@/pages/Login'));
 const Register = lazy(() => import('@/pages/Register'));
 const About = lazy(() => import('@/pages/About'));
 const Contact = lazy(() => import('@/pages/Contact'));
+const CorporateTreks = lazy(() => import('@/pages/CorporateTreks'));
 const BookingPage = lazy(() => import('@/pages/BookingPage'));
 const MyBookings = lazy(() => import('@/pages/MyBookings'));
 const AdminLogin = lazy(() => import('@/pages/admin/AdminLogin'));
@@ -34,6 +35,7 @@ function App() {
           <Route path="/weekday-trips" element={<Navigate to="/trips" replace />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/corporate-treks" element={<CorporateTreks />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 

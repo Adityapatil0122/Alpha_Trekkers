@@ -14,6 +14,7 @@ import { WEEKDAY_LOCATION_GROUPS, WEEKEND_FORT_GROUPS } from '@/content/fortDire
 const quickLinks = [
   { to: '/', label: 'Home' },
   { to: '/trips', label: 'Treks' },
+  { to: '/corporate-treks', label: 'Corporate Treks' },
   { to: '/about', label: 'About' },
   { to: '/contact', label: 'Contact' },
   { to: '/trips', label: 'Book Now' },
