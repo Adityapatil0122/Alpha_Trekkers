@@ -545,7 +545,7 @@ export default function TripDetail() {
                   <div className="flex flex-col gap-2.5">
                   <Link to={trip.schedules?.[0] ? (isAuthenticated ? `/booking/${trip.id}/${trip.schedules[0].id}` : '/login') : '/contact'}>
                     <Button fullWidth size="sm">
-                      {trip.schedules?.[0] ? 'Book Now' : 'Plan This Trek'}
+                      Book Now
                     </Button>
                   </Link>
                   <Link to="/contact">

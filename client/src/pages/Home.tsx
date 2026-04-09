@@ -171,6 +171,7 @@ const blogPosts = [
 
 const FEATURED_PAGE_SIZE = 4;
 const HERO_AUTOPLAY_DELAY = 6500;
+const siteLogo = '/destinations/alogo.jpg';
 
 const heroImageVariants = {
   enter: (direction: number) => ({
@@ -661,9 +662,11 @@ export default function Home() {
                 </button>
               </Link>
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-primary-500 text-sm font-bold text-white">
-                  AT
-                </div>
+                <img
+                  src={siteLogo}
+                  alt="Alpha Trekkers logo"
+                  className="h-12 w-auto object-contain"
+                />
                 <div>
                   <p className="font-bold text-dark-900">Alpha Trekkers</p>
                   <p className="text-sm text-primary-500">Founded 2019</p>
@@ -758,7 +761,7 @@ export default function Home() {
           <div className="mt-10 text-center">
             <Link to="/trips">
               <button className="rounded-lg bg-primary-500 px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-primary-600">
-                View All Tours
+                Explore One-Day Trips
               </button>
             </Link>
           </div>

@@ -1,11 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Clock, EnvelopeSimple, MapPinLine, PaperPlaneTilt, PhoneCall } from '@phosphor-icons/react';
 import toast from 'react-hot-toast';
+import { useSearchParams } from 'react-router-dom';
 import api from '@/lib/axios';
 import Button from '@/components/ui/Button';
+import {
+  buildOneDayTripInquiryMessage,
+  buildOneDayTripInquirySubject,
+  findOneDayTripBySlug,
+} from '@/content/oneDayTrips';
 
 const schema = z.object({
   name: z.string().min(2, 'Name is required'),
@@ -61,18 +67,52 @@ const inputClassName =
 
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
+  const [searchParams] = useSearchParams();
+  const tripSlug = searchParams.get('trip');
+  const source = searchParams.get('source');
+  const selectedTrip = useMemo(
+    () => (source === 'one-day-trips' ? findOneDayTripBySlug(tripSlug) : undefined),
+    [source, tripSlug],
+  );
+  const prefilledSubject = selectedTrip ? buildOneDayTripInquirySubject(selectedTrip) : '';
+  const prefilledMessage = selectedTrip ? buildOneDayTripInquiryMessage(selectedTrip) : '';
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<FormData>({ resolver: zodResolver(schema) });
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      name: '',
+      email: '',
+      phone: '',
+      subject: prefilledSubject,
+      message: prefilledMessage,
+    },
+  });
+
+  useEffect(() => {
+    reset({
+      name: '',
+      email: '',
+      phone: '',
+      subject: prefilledSubject,
+      message: prefilledMessage,
+    });
+  }, [prefilledMessage, prefilledSubject, reset]);
 
   const onSubmit = async (data: FormData) => {
     try {
       await api.post('/contact', data);
       setSubmitted(true);
-      reset();
+      reset({
+        name: '',
+        email: '',
+        phone: '',
+        subject: prefilledSubject,
+        message: prefilledMessage,
+      });
       toast.success('Message sent. We will reach out shortly.');
     } catch {
       toast.error('Unable to send your message right now.');
@@ -185,6 +225,17 @@ export default function Contact() {
                   Share your plan, even if it is rough. We can help with routes, timings, group comfort, and the best
                   monsoon-friendly options.
                 </p>
+
+                {selectedTrip ? (
+                  <div className="mt-6 inline-flex flex-wrap items-center gap-3 rounded-[1.1rem] border border-forest-500/16 bg-forest-500/8 px-4 py-3 text-sm text-forest-700">
+                    <span className="rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-forest-600 shadow-sm">
+                      Booking context
+                    </span>
+                    <span>
+                      One-day trip selected: <strong>{selectedTrip.title}</strong>
+                    </span>
+                  </div>
+                ) : null}
 
                 <form onSubmit={handleSubmit(onSubmit)} className="mt-9 space-y-5">
                   <div className="grid gap-5 sm:grid-cols-2">

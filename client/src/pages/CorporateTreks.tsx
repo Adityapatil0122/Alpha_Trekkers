@@ -427,11 +427,11 @@ export default function CorporateTreks() {
         <div className="travel-panel flex flex-col gap-6 rounded-[2rem] p-8 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="section-script">Need public departures instead?</p>
-            <h2 className="mt-2 font-heading text-4xl text-ink-900">Explore regular tours and weekend treks</h2>
+            <h2 className="mt-2 font-heading text-4xl text-ink-900">Explore one-day trips and quick getaways</h2>
           </div>
           <div className="flex flex-wrap gap-4">
             <Link to="/trips">
-              <Button>Browse Tours</Button>
+              <Button>Browse Day Trips</Button>
             </Link>
             <Link to="/contact">
               <Button variant="secondary">Contact Team</Button>

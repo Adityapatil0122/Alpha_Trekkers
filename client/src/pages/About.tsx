@@ -7,7 +7,6 @@ import {
   Handshake,
   Mountains,
   ShieldCheck,
-  Star,
   TreeEvergreen,
   Users,
 } from '@phosphor-icons/react';
@@ -72,12 +71,6 @@ const storyStats = [
   { value: '2019', label: 'Operations Started' },
   { value: '12K+', label: 'Trekkers Hosted' },
   { value: 'Local-first', label: 'Maharashtra Focus' },
-];
-
-const teamMembers = [
-  { name: 'Trek Leader', role: 'Head Guide', avatar: 'TL' },
-  { name: 'Route Planner', role: 'Operations', avatar: 'RP' },
-  { name: 'Safety Officer', role: 'Emergency Lead', avatar: 'SO' },
 ];
 
 const container = {
