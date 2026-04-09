@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
+  ArrowRight,
   ChatCircle,
   EnvelopeSimple,
   InstagramLogo,
@@ -18,6 +19,7 @@ const quickLinks = [
   { to: '/about', label: 'About' },
   { to: '/contact', label: 'Contact' },
   { to: '/trips', label: 'Book Now' },
+  ];
 const destinations = [
   { label: 'Rajgad', to: '/weekend-trips' },
   { label: 'Lohagad', to: '/weekend-trips' },
