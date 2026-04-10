@@ -6,7 +6,6 @@ import {
   CaretDown,
   EnvelopeSimple,
   List,
-  Mountains,
   PhoneCall,
   SignOut,
   X,
@@ -29,15 +28,33 @@ export default function Navbar() {
   const [expandedMobileMenu, setExpandedMobileMenu] = useState<'treks' | null>(null);
   const [mobileTrekCategory, setMobileTrekCategory] = useState<'WEEKEND' | 'WEEKDAY'>('WEEKEND');
   const treksMenuRef = useRef<HTMLDivElement | null>(null);
+  const scrollFrameRef = useRef<number | null>(null);
   const { isAuthenticated, user, logout } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 32);
-    onScroll();
+    const updateScrolled = () => {
+      scrollFrameRef.current = null;
+      setScrolled((current) => {
+        const next = window.scrollY > 32;
+        return current === next ? current : next;
+      });
+    };
+
+    const onScroll = () => {
+      if (scrollFrameRef.current !== null) return;
+      scrollFrameRef.current = window.requestAnimationFrame(updateScrolled);
+    };
+
+    updateScrolled();
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    return () => {
+      if (scrollFrameRef.current !== null) {
+        window.cancelAnimationFrame(scrollFrameRef.current);
+      }
+      window.removeEventListener('scroll', onScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -99,17 +116,17 @@ export default function Navbar() {
           }`}
         >
           <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-            <Link to="/" className="flex items-center gap-3">
+            <Link to="/" className="flex min-w-0 items-center gap-2.5 sm:gap-3">
               <img
                 src={siteLogo}
                 alt="Alpha Trekkers logo"
-                className="h-12 w-12 rounded-full object-cover"
+                className="h-10 w-10 rounded-full object-cover sm:h-12 sm:w-12"
               />
-              <div>
-                <p className="text-xl font-bold text-dark-900">
+              <div className="min-w-0">
+                <p className="truncate text-lg font-bold leading-none text-dark-900 sm:text-xl">
                   Alpha <span className="text-primary-500">Trekkers</span>
                 </p>
-                <p className="text-[0.65rem] font-medium uppercase tracking-wider text-dark-400">
+                <p className="hidden text-[0.65rem] font-medium uppercase tracking-wider text-dark-400 sm:block">
                   Adventure & Travel
                 </p>
               </div>
@@ -359,7 +376,7 @@ export default function Navbar() {
             <button
               type="button"
               onClick={() => setMobileOpen((open) => !open)}
-              className="rounded-lg border border-dark-200 p-2.5 text-dark-700 xl:hidden"
+              className="rounded-lg border border-dark-200 p-2 text-dark-700 sm:p-2.5 xl:hidden"
               aria-label="Toggle menu"
             >
               {mobileOpen ? <X className="h-5 w-5" /> : <List className="h-5 w-5" />}

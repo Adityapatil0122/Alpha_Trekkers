@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ChatCircleDots,
   CheckCircle,
@@ -67,7 +67,7 @@ export default function AdminMessages() {
   const [selected, setSelected] = useState<ContactMessage | null>(null);
   const [markingRead, setMarkingRead] = useState(false);
 
-  const loadMessages = async (pg = page) => {
+  const loadMessages = useCallback(async (pg = page) => {
     setLoading(true);
     try {
       const params: Record<string, unknown> = { page: pg, limit: 15 };
@@ -83,10 +83,10 @@ export default function AdminMessages() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filterRead, page]);
 
-  useEffect(() => { setPage(1); void loadMessages(1); }, [filterRead]);
-  useEffect(() => { void loadMessages(page); }, [page]);
+  useEffect(() => { setPage(1); void loadMessages(1); }, [filterRead, loadMessages]);
+  useEffect(() => { void loadMessages(page); }, [loadMessages, page]);
 
   const markRead = async (id: string) => {
     setMarkingRead(true);
@@ -214,7 +214,7 @@ export default function AdminMessages() {
         </div>
 
         {totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-ink-900/6 px-6 py-4">
+          <div className="flex flex-col gap-3 border-t border-ink-900/6 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-ink-500">Page {page} of {totalPages}</p>
             <div className="flex gap-2">
               <Button type="button" size="sm" variant="secondary" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>Previous</Button>

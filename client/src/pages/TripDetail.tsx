@@ -134,17 +134,6 @@ export default function TripDetail() {
   const waterfallCards = guide.waterfallIds
     .map((id) => WATERFALL_SPOTLIGHTS[id])
     .filter(Boolean);
-  const upcomingDates = trip.schedules
-    ?.filter((schedule) => schedule.status === 'OPEN')
-    .slice(0, 6)
-    .map((schedule) =>
-      new Date(schedule.date).toLocaleDateString('en-IN', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-      }),
-    ) ?? [];
-
   const galleryItems = Array.from(
     new Map(
       [
@@ -174,9 +163,9 @@ export default function TripDetail() {
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${images[0]?.url || MAHARASHTRA_MONSOON_IMAGES.heroes.tripDetail})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-dark-900/88 via-dark-900/62 to-dark-900/28" />
+        <div className="absolute inset-0 bg-gradient-to-r from-dark-900/74 via-dark-900/48 to-dark-900/20" />
         <div className="relative mx-auto max-w-7xl px-4 pb-20 pt-[4.5rem] sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2 text-sm text-white/82">
+          <div className="flex flex-wrap items-center gap-2 text-sm text-white/82">
             <Link to="/" className="text-white/82 hover:text-white">Home</Link>
             <CaretRight className="h-3 w-3" />
             <Link to="/trips" className="text-white/82 hover:text-white">
@@ -202,10 +191,10 @@ export default function TripDetail() {
               </span>
             </div>
             <p className="mt-6 text-xs uppercase tracking-[0.2em] text-white/92">{guide.eyebrow}</p>
-            <h1 className="mt-3 font-heading text-5xl leading-[0.95] !text-white drop-shadow-[0_10px_30px_rgba(0,0,0,0.45)] sm:text-6xl">
+            <h1 className="mt-3 font-heading text-4xl leading-[0.95] !text-white drop-shadow-[0_10px_30px_rgba(0,0,0,0.45)] sm:text-5xl lg:text-6xl">
               {trip.title}
             </h1>
-            <p className="mt-5 max-w-3xl text-lg leading-8 text-white/88">{trip.shortDescription}</p>
+            <p className="mt-5 max-w-3xl text-base leading-7 text-white/88 sm:text-lg sm:leading-8">{trip.shortDescription}</p>
             <div className="mt-6 flex flex-wrap gap-6 text-sm text-white">
               <span className="inline-flex items-center gap-2">
                 <Clock className="h-4 w-4 text-white" />
@@ -225,18 +214,18 @@ export default function TripDetail() {
       </section>
 
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid gap-10 lg:grid-cols-[1fr_360px]">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_360px]">
           <div>
             <div className="overflow-hidden rounded-[2.4rem]">
               <img
                 src={images[activeImage]?.url}
                 alt={images[activeImage]?.altText || trip.title}
-                className="h-[26rem] w-full object-cover sm:h-[32rem]"
+                className="h-[18rem] w-full object-cover sm:h-[26rem] lg:h-[32rem]"
               />
             </div>
 
             {images.length > 1 ? (
-              <div className="mt-4 grid grid-cols-4 gap-3">
+              <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {images.slice(0, 4).map((image, index) => (
                   <button
                     key={image.id}
@@ -252,18 +241,24 @@ export default function TripDetail() {
               </div>
             ) : null}
 
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+            <div className="mt-8 grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
               {[
-                { icon: Clock, label: 'Duration', value: formatDuration(trip.durationHours) },
-                { icon: Mountains, label: 'Altitude', value: `${trip.maxAltitudeM} m` },
-                { icon: UsersThree, label: 'Group size', value: `Up to ${trip.maxGroupSize}` },
-                { icon: MapPinLine, label: 'Start point', value: trip.startLocation },
-                { icon: Clock, label: 'Best for', value: getTripRouteLabel(trip.category) },
+                { icon: Clock, label: 'Duration', value: formatDuration(trip.durationHours), valueClassName: 'text-[1.05rem] sm:text-[1.15rem]' },
+                { icon: Mountains, label: 'Altitude', value: `${trip.maxAltitudeM} m`, valueClassName: 'text-[1.05rem] sm:text-[1.15rem]' },
+                { icon: UsersThree, label: 'Group size', value: `Up to ${trip.maxGroupSize}`, valueClassName: 'text-[1.05rem] sm:text-[1.15rem]' },
+                { icon: MapPinLine, label: 'Start point', value: trip.startLocation, valueClassName: 'text-[0.98rem] sm:text-[1.05rem]' },
+                { icon: Clock, label: 'Best for', value: getTripRouteLabel(trip.category), valueClassName: 'text-[0.98rem] sm:text-[1.05rem]' },
               ].map((item) => (
-                <div key={item.label} className="travel-panel rounded-[1.6rem] p-4">
-                  <item.icon className="h-5 w-5 text-forest-500" weight="duotone" />
-                  <p className="mt-3 text-[0.7rem] uppercase tracking-[0.18em] text-ink-600/70">{item.label}</p>
-                  <p className="mt-2 font-heading text-[1.75rem] leading-tight text-ink-900">{item.value}</p>
+                <div key={item.label} className="travel-panel self-start rounded-[1.15rem] px-3.5 py-3">
+                  <div className="flex items-center gap-2">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-forest-500/8">
+                      <item.icon className="h-4 w-4 text-forest-500" weight="duotone" />
+                    </span>
+                    <p className="text-[0.62rem] uppercase tracking-[0.14em] text-ink-600/70">{item.label}</p>
+                  </div>
+                  <p className={`mt-2.5 font-heading leading-[1.1] text-ink-900 ${item.valueClassName}`}>
+                    {item.value}
+                  </p>
                 </div>
               ))}
             </div>
@@ -296,7 +291,7 @@ export default function TripDetail() {
             >
               {activeTab === 'overview' ? (
                 <div className="space-y-10">
-                  <div>
+                  <div className="border-t border-ink-900/8 pt-8 first:border-t-0 first:pt-0">
                     <p className="section-script">About this location</p>
                     <h2 className="mt-2 font-heading text-4xl text-ink-900">Overview</h2>
                     <div className="mt-5 space-y-4 text-base leading-8 text-ink-700/76">
@@ -306,7 +301,7 @@ export default function TripDetail() {
                     </div>
                   </div>
 
-                  <div>
+                  <div className="border-t border-ink-900/8 pt-8">
                     <h3 className="font-heading text-3xl text-ink-900">{locationName} trek information:</h3>
                     <ul className="mt-5 space-y-3 text-base leading-8 text-ink-700/78">
                       <li><strong className="text-ink-900">{infoLabel} elevation:</strong> {trip.maxAltitudeM} m</li>
@@ -322,29 +317,13 @@ export default function TripDetail() {
                     </ul>
                   </div>
 
-                  <div>
+                  <div className="border-t border-ink-900/8 pt-8">
                     <h3 className="font-heading text-3xl text-ink-900">Why visit this location:</h3>
                     <div className="mt-5 space-y-4 text-base leading-8 text-ink-700/76">
                       {descriptionSections.map((section) => (
                         <p key={section}>{section}</p>
                       ))}
                     </div>
-                  </div>
-
-                  <div>
-                    <h3 className="font-heading text-3xl text-ink-900">Things to do at {locationName}:</h3>
-                    <ul className="mt-5 space-y-3 text-base leading-8 text-ink-700/78">
-                      {trip.highlights.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="border-t border-ink-900/8 pt-8">
-                    <h3 className="font-heading text-3xl text-ink-900">Batches:</h3>
-                    <p className="mt-4 text-base leading-8 text-ink-700/76">
-                      {upcomingDates.length > 0 ? upcomingDates.join(', ') : 'Available on request. Contact us for upcoming departures.'}
-                    </p>
                   </div>
 
                   <div className="border-t border-ink-900/8 pt-8">
@@ -536,9 +515,9 @@ export default function TripDetail() {
           <aside>
             <div className="sticky top-[7.5rem] space-y-6">
               <div className="travel-panel overflow-hidden rounded-[2rem]">
-                <div className="bg-forest-500/10 px-8 py-7 text-ink-900">
+                <div className="bg-forest-500/10 px-6 py-7 text-ink-900 sm:px-8">
                   <p className="text-xs uppercase tracking-[0.18em] text-forest-600">Starting from</p>
-                  <h2 className="mt-3 font-heading text-5xl text-forest-600">INR {price.toLocaleString('en-IN')}</h2>
+                  <h2 className="mt-3 font-heading text-4xl text-forest-600 sm:text-5xl">INR {price.toLocaleString('en-IN')}</h2>
                   <p className="mt-2 text-sm text-ink-700/72">Per traveler, before add-ons</p>
                 </div>
                 <div className="p-6">
@@ -555,15 +534,15 @@ export default function TripDetail() {
                   </Link>
                   </div>
                   <div className="space-y-2 pt-2 text-sm text-ink-700">
-                    <p className="flex items-center justify-between gap-4">
+                    <p className="flex items-start justify-between gap-4">
                       <span>Meeting point</span>
                       <span className="text-right font-medium text-ink-900">{trip.meetingPoint}</span>
                     </p>
-                    <p className="flex items-center justify-between gap-4">
+                    <p className="flex items-start justify-between gap-4">
                       <span>Meeting time</span>
                       <span className="text-right font-medium text-ink-900">{trip.meetingTime}</span>
                     </p>
-                    <p className="flex items-center justify-between gap-4">
+                    <p className="flex items-start justify-between gap-4">
                       <span>Min age</span>
                       <span className="text-right font-medium text-ink-900">{trip.minAge}+</span>
                     </p>
@@ -573,12 +552,12 @@ export default function TripDetail() {
 
               <div className="travel-panel rounded-[2rem] p-6">
                 <p className="section-script">Route fit</p>
-                <h3 className="mt-2 font-heading text-3xl text-ink-900">{guide.routeFit}</h3>
+                <h3 className="mt-2 font-heading text-2xl text-ink-900 sm:text-3xl">{guide.routeFit}</h3>
                 <p className="mt-4 text-sm leading-7 text-ink-700/72">{guide.routeFitDescription}</p>
               </div>
 
               <div className="travel-panel rounded-[2rem] p-6">
-                <h3 className="font-heading text-3xl text-ink-900">Available dates</h3>
+                <h3 className="font-heading text-2xl text-ink-900 sm:text-3xl">Available dates</h3>
                 <div className="mt-5 space-y-3">
                   {trip.schedules && trip.schedules.length > 0 ? (
                     trip.schedules

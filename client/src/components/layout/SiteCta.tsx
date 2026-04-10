@@ -1,22 +1,24 @@
 import { ArrowRight } from '@phosphor-icons/react';
 
+const siteCtaImage = `/destinations/${encodeURIComponent('Exploring ancient forts in the sunshine.png')}`;
+
 export default function SiteCta() {
   return (
-    <section className="bg-white px-6 pb-8 sm:px-10 sm:pb-10 lg:px-16 lg:pb-12 xl:px-20">
-      <div className="relative overflow-hidden rounded-[2rem] bg-dark-900 py-14 lg:py-16">
+    <section className="bg-white px-4 pb-8 sm:px-10 sm:pb-10 lg:px-16 lg:pb-12 xl:px-20">
+      <div className="relative overflow-hidden rounded-[2rem] bg-dark-900 py-8 lg:py-9">
         <img
           src="/destinations/rajgad.png"
           alt="Adventure camp in the hills"
           className="absolute inset-0 h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(15,23,42,0.9),rgba(15,23,42,0.72),rgba(15,23,42,0.38))]" />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.26),rgba(15,23,42,0.12),rgba(15,23,42,0.42))]" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,12,24,0.9),rgba(8,12,24,0.76),rgba(8,12,24,0.48))]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,12,24,0.42),rgba(8,12,24,0.2),rgba(8,12,24,0.58))]" />
 
-        <div className="relative z-10 mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
-          <div className="grid gap-10 lg:grid-cols-[1fr_420px] lg:items-center">
+        <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
+          <div className="grid gap-6 lg:grid-cols-[1fr_420px] lg:items-center">
             <div className="max-w-3xl">
               <p className="playful-text text-xl text-primary-400">Explore the world</p>
-              <h2 className="mt-3 text-3xl font-extrabold leading-tight !text-white sm:text-4xl lg:text-[2.75rem]">
+              <h2 className="mt-3 text-[1.75rem] font-extrabold leading-tight !text-white sm:text-[2.2rem] lg:text-[2.5rem]">
                 Ready To Travel With Real Adventure &amp; Enjoy Natural
               </h2>
               <a
@@ -30,50 +32,14 @@ export default function SiteCta() {
               </a>
             </div>
 
-            <div className="relative hidden min-h-[18rem] lg:block">
-              <div className="absolute left-10 top-0 h-24 w-24 overflow-hidden rounded-full border-2 border-white/50 shadow-xl">
-                <img
-                  src="/destinations/torna.png"
-                  alt="Camp view"
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              <div className="absolute right-8 top-0 h-28 w-28 overflow-hidden rounded-full border-2 border-white/50 shadow-xl">
-                <img
-                  src="/destinations/lohagad.png"
-                  alt="Fort summit"
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              <div className="absolute left-1/2 top-10 h-[13rem] w-[10.5rem] -translate-x-1/2 overflow-hidden rounded-[1.75rem] border border-white/40 shadow-2xl">
-                <img
-                  src="/destinations/rajmachi.png"
-                  alt="Hiker in the valley"
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              <div className="absolute bottom-4 right-6 h-24 w-24 overflow-hidden rounded-[1.4rem] border border-white/30 shadow-xl">
-                <img
-                  src="/destinations/kalsubai.png"
-                  alt="Tent at sunrise"
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              <div className="pointer-events-none absolute left-[54%] top-3 h-32 w-44 -translate-x-1/2 opacity-80">
-                <svg viewBox="0 0 180 130" className="h-full w-full">
-                  <path
-                    d="M16 118 C24 68, 72 28, 112 46 C136 58, 126 88, 138 100 C150 112, 162 100, 166 74"
-                    fill="none"
-                    stroke="rgba(255,255,255,0.62)"
-                    strokeWidth="2"
-                    strokeDasharray="5 6"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </div>
-              <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 text-white">
-                ✈
-              </div>
+            <div className="relative mx-auto w-full max-w-[26rem] lg:mx-0">
+              <div className="absolute inset-x-8 top-1/2 h-40 -translate-y-1/2 rounded-full bg-white/12 blur-3xl" />
+              <img
+                src={siteCtaImage}
+                alt="Explorer standing beside an ancient fort"
+                className="relative z-10 w-full object-contain drop-shadow-[0_22px_44px_rgba(0,0,0,0.28)]"
+              />
+              <div className="pointer-events-none absolute inset-x-[31%] bottom-[9.5%] z-20 h-[16%] rounded-[999px] bg-[#f2efea]" />
             </div>
           </div>
         </div>

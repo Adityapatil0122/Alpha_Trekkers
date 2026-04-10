@@ -5,7 +5,6 @@ import {
   ArrowRight,
   ArrowLeft,
   Bus,
-  CalendarBlank,
   CaretRight,
   Globe,
   Handshake,
@@ -58,8 +57,6 @@ const aboutFeatures = [
   },
 ];
 
-const trekCategories = ['All', 'Weekend', 'Monsoon', 'Night Trek', 'Fort Circuit'] as const;
-
 const counterStats = [
   { end: 5489, label: 'Happy Traveller', suffix: '', icon: Mountains },
   { end: 100, label: 'Total Positive Reviews', suffix: '%', decimals: 0, icon: Star },
@@ -71,7 +68,7 @@ const destinationCards = [
   {
     name: 'Rajgad',
     tours: '6 tours',
-    image: '/destinations/rajgad.png',
+    image: '/destinations/Rajgad Fort atop misty mountains.png',
     cardClass: 'lg:mt-8',
     imageWrapClass: 'h-[16rem] sm:h-[18rem] lg:h-[15rem] xl:h-[16rem]',
     imageClass: 'object-center',
@@ -111,7 +108,7 @@ const destinationCards = [
   {
     name: 'Rajmachi',
     tours: '3 tours',
-    image: '/destinations/rajmachi.png',
+    image: '/destinations/Rajmachi Fort from above.png',
     cardClass: 'lg:mt-14',
     imageWrapClass: 'h-[18rem] sm:h-[20rem] lg:h-[18rem] xl:h-[19rem]',
     imageClass: 'object-center',
@@ -125,6 +122,7 @@ const testimonials = [
     quote: 'The whole journey felt more like a boutique expedition than a standard trek booking. Amazing experience from start to end.',
     stars: 5,
     avatar: 'AK',
+    image: '/destinations/rp1.png',
   },
   {
     name: 'Nikhil Patil',
@@ -132,6 +130,7 @@ const testimonials = [
     quote: 'The routes, timing, and pacing were perfect. We got amazing views, incredible stories, and zero chaos throughout.',
     stars: 5,
     avatar: 'NP',
+    image: '/destinations/rp2.png',
   },
   {
     name: 'Ritu Salunkhe',
@@ -139,6 +138,7 @@ const testimonials = [
     quote: 'I came in nervous and left planning my next three trips. The confidence-building was real and the guides were fantastic.',
     stars: 5,
     avatar: 'RS',
+    image: '/destinations/rp3.png',
   },
 ];
 
@@ -148,7 +148,7 @@ const blogPosts = [
     category: 'Safety',
     date: '15 Mar 2026',
     comments: 5,
-    image: MAHARASHTRA_MONSOON_IMAGES.sections.monsoonTrails,
+    image: '/destinations/Trekking towards the waterfall in the rain.png',
     excerpt: 'Essential safety tips for trekking during Maharashtra\'s monsoon season, from gear to route planning.',
   },
   {
@@ -156,7 +156,7 @@ const blogPosts = [
     category: 'Trekking',
     date: '02 Apr 2026',
     comments: 3,
-    image: MAHARASHTRA_MONSOON_IMAGES.sections.chooseUsRange,
+    image: '/destinations/Lohagad Fort panorama in Maharashtra.png',
     excerpt: 'Discover the most beginner-friendly fort treks within 3 hours of Pune, complete with route tips and seasonal advice.',
   },
   {
@@ -164,7 +164,7 @@ const blogPosts = [
     category: 'Adventure',
     date: '28 Feb 2026',
     comments: 2,
-    image: MAHARASHTRA_MONSOON_IMAGES.trips.rajmachi[0],
+    image: '/destinations/Night hike through the Sahyadris.png',
     excerpt: 'Why night treks offer a completely different perspective on the Western Ghats and how to prepare.',
   },
 ];
@@ -301,9 +301,14 @@ const featuredCardVariants = {
 function useCountUp(end: number, duration = 2200, decimals = 0, active = false) {
   const [count, setCount] = useState(0);
   const frameRef = useRef<number | null>(null);
+  const lastValueRef = useRef(0);
 
   useEffect(() => {
-    if (!active) return;
+    if (!active) {
+      lastValueRef.current = 0;
+      setCount(0);
+      return;
+    }
     const startTime = performance.now();
 
     function tick(now: number) {
@@ -311,7 +316,13 @@ function useCountUp(end: number, duration = 2200, decimals = 0, active = false) 
       const progress = Math.min(elapsed / duration, 1);
       const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
       const current = end * eased;
-      setCount(Number(current.toFixed(decimals)));
+      const nextValue = Number(current.toFixed(decimals));
+
+      if (nextValue !== lastValueRef.current || progress === 1) {
+        lastValueRef.current = nextValue;
+        setCount(nextValue);
+      }
+
       if (progress < 1) {
         frameRef.current = requestAnimationFrame(tick);
       }
@@ -361,7 +372,6 @@ function CounterCard({
 
 export default function Home() {
   const [featuredTrips, setFeaturedTrips] = useState<Trip[]>([]);
-  const [activeCategory, setActiveCategory] = useState<(typeof trekCategories)[number]>('All');
   const [featuredStart, setFeaturedStart] = useState(0);
   const [featuredDirection, setFeaturedDirection] = useState(1);
   const [heroDirection, setHeroDirection] = useState(1);
@@ -386,24 +396,9 @@ export default function Home() {
     return () => window.clearTimeout(timer);
   }, [currentSlide]);
 
-  const filteredTrips = useMemo(() => {
-    if (activeCategory === 'All') return featuredTrips.slice(0, 8);
-    return featuredTrips
-      .filter((t) => {
-        const cat = activeCategory.toUpperCase().replace(' ', '_');
-        return t.category === cat || t.title.toLowerCase().includes(activeCategory.toLowerCase());
-      })
-      .slice(0, 8);
-  }, [featuredTrips, activeCategory]);
-
-  useEffect(() => {
-    setFeaturedStart(0);
-    setFeaturedDirection(1);
-  }, [activeCategory]);
-
   const featuredSource = useMemo(() => {
-    return filteredTrips.length > 0 ? filteredTrips : featuredTrips.slice(0, 8);
-  }, [featuredTrips, filteredTrips]);
+    return featuredTrips.slice(0, 8);
+  }, [featuredTrips]);
 
   const featuredPages = useMemo(() => {
     return Array.from(
@@ -459,7 +454,7 @@ export default function Home() {
   return (
     <>
       {/* ─── HERO SECTION with Carousel ─── */}
-      <section className="relative h-[90vh] min-h-[600px] overflow-hidden">
+      <section className="relative min-h-[32rem] overflow-hidden sm:min-h-[38rem] lg:h-[90vh] lg:min-h-[42rem]">
         <div className="absolute inset-0">
           <AnimatePresence custom={heroDirection} initial={false}>
             <motion.div
@@ -477,11 +472,11 @@ export default function Home() {
               />
             </motion.div>
           </AnimatePresence>
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.18),transparent_34%),linear-gradient(90deg,rgba(4,10,22,0.8)_0%,rgba(4,10,22,0.56)_36%,rgba(4,10,22,0.12)_100%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.18),transparent_34%),linear-gradient(90deg,rgba(4,10,22,0.68)_0%,rgba(4,10,22,0.44)_36%,rgba(4,10,22,0.08)_100%)]" />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,10,22,0.1)_0%,rgba(4,10,22,0.16)_55%,rgba(4,10,22,0.38)_100%)]" />
         </div>
 
-        <div className="relative z-10 flex h-full items-center">
+        <div className="relative z-10 flex h-full items-center py-24 sm:items-start sm:pt-36 sm:pb-20 lg:pt-40">
           <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="hero-copy max-w-3xl overflow-hidden">
               <AnimatePresence custom={heroDirection} initial={false} mode="wait">
@@ -492,18 +487,18 @@ export default function Home() {
                   initial="enter"
                   animate="center"
                   exit="exit"
-                  className="min-h-[24rem] sm:min-h-[27rem] lg:min-h-[29rem]"
+                  className="min-h-[20rem] sm:min-h-[24rem] lg:min-h-[29rem]"
                 >
                   <motion.p
                     variants={heroContentItemVariants}
-                    className="playful-text text-2xl !text-primary-300 sm:text-3xl"
+                    className="playful-text text-xl !text-primary-300 sm:text-3xl"
                   >
                     {activeHeroSlide.tagline}
                   </motion.p>
 
                   <motion.h1
                     variants={heroContentItemVariants}
-                    className="mt-4 text-5xl font-extrabold leading-[0.96] tracking-[-0.04em] text-white sm:text-6xl lg:text-7xl"
+                    className="mt-4 text-4xl font-extrabold leading-[0.96] tracking-[-0.04em] text-white sm:text-5xl lg:text-7xl"
                     style={{ whiteSpace: 'pre-line' }}
                   >
                     {activeHeroSlide.title}{' '}
@@ -512,7 +507,7 @@ export default function Home() {
 
                   <motion.p
                     variants={heroContentItemVariants}
-                    className="mt-6 max-w-xl text-lg leading-8 text-white/78"
+                    className="mt-6 max-w-xl text-base leading-7 text-white/78 sm:text-lg sm:leading-8"
                   >
                     {activeHeroSlide.description}
                   </motion.p>
@@ -521,12 +516,12 @@ export default function Home() {
                     variants={heroContentItemVariants}
                     className="mt-8 flex flex-wrap items-center gap-4"
                   >
-                    <Link to="/trips">
-                      <button className="rounded-lg bg-primary-500 px-8 py-4 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-primary-600 hover:shadow-lg">
+                    <Link to="/trips" className="w-full sm:w-auto">
+                      <button className="w-full rounded-lg bg-primary-500 px-8 py-4 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-primary-600 hover:shadow-lg sm:w-auto">
                         Let's Get Started
                       </button>
                     </Link>
-                    <Link to="/about" className="flex items-center gap-2 text-sm font-semibold text-white transition hover:text-primary-400">
+                    <Link to="/about" className="flex w-full items-center gap-2 text-sm font-semibold text-white transition hover:text-primary-400 sm:w-auto">
                       Who we are
                       <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary-400 text-primary-400">
                         <CaretRight className="h-3.5 w-3.5" weight="bold" />
@@ -543,20 +538,20 @@ export default function Home() {
         <button
           type="button"
           onClick={prevSlide}
-          className="absolute left-4 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-primary-500 text-white transition hover:bg-primary-600 sm:left-8"
+          className="absolute left-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/45 bg-transparent text-white transition hover:bg-white/10 md:flex md:left-8"
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
         <button
           type="button"
           onClick={nextSlide}
-          className="absolute right-4 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-primary-500 text-white transition hover:bg-primary-600 sm:right-8"
+          className="absolute right-4 top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/45 bg-transparent text-white transition hover:bg-white/10 md:flex md:right-8"
         >
           <ArrowRight className="h-5 w-5" />
         </button>
 
         {/* Slide indicators */}
-        <div className="absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 gap-2">
+        <div className="absolute bottom-5 left-1/2 z-20 flex -translate-x-1/2 gap-2 sm:bottom-8">
           {heroSlides.map((_, index) => (
             <button
               key={index}
@@ -573,9 +568,9 @@ export default function Home() {
         </div>
 
         {/* Animated hanging Booking sign */}
-        <div className="absolute right-8 top-24 z-20 hidden lg:block">
+        <div className="absolute right-10 top-16 z-20 hidden lg:block">
           {/* Rope */}
-          <div className="mx-auto h-10 w-[2px] bg-gradient-to-b from-transparent via-amber-400/70 to-amber-400" />
+          <div className="mx-auto h-14 w-[2px] bg-gradient-to-b from-transparent via-amber-400/80 to-amber-400" />
           {/* Sign board */}
           <motion.div
             animate={{ rotate: [0, 3, -3, 2, -2, 0] }}
@@ -583,13 +578,95 @@ export default function Home() {
             style={{ transformOrigin: 'top center' }}
             className="relative"
           >
-            <div className="booking-hang-sign rounded-xl px-8 py-5 text-center shadow-2xl">
-              <p className="playful-text text-3xl text-white drop-shadow-lg">Booking</p>
-              <p className="mt-1 text-[10px] font-medium uppercase tracking-[0.25em] text-white/60">Open Now</p>
+            <div className="booking-hang-sign w-[8.75rem] px-5 py-4 text-center">
+              <p className="playful-text text-[1.75rem] leading-none text-white [text-shadow:0_3px_10px_rgba(0,0,0,0.32)]">
+                Booking
+              </p>
             </div>
             {/* Nail dots */}
-            <div className="absolute -top-1 left-1/2 h-3 w-3 -translate-x-1/2 rounded-full border border-amber-400/60 bg-amber-500 shadow-md" />
+            <div className="absolute -top-1 left-1/2 h-3.5 w-3.5 -translate-x-1/2 rounded-full bg-amber-400 shadow-[0_0_0_2px_rgba(251,191,36,0.22)]" />
           </motion.div>
+        </div>
+      </section>
+
+      {/* ─── FEATURED TOURS with Category Tabs ─── */}
+      <section className="featured-tours-shell relative overflow-hidden bg-[#f4f8f2] pb-16 pt-20 sm:pb-20">
+        <div className="featured-tours-shell__pattern pointer-events-none absolute inset-0" />
+
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <p className="text-sm font-semibold uppercase tracking-wider text-primary-500">
+              Explore the world
+            </p>
+            <h2 className="mt-3 text-4xl font-bold text-dark-900 sm:text-5xl">
+              Amazing Featured Tour{' '}
+              <span className="playful-text text-primary-500">Package</span> The World
+            </h2>
+          </div>
+
+          <div className="relative mt-10">
+            <button
+              onClick={prevFeaturedPage}
+              className="absolute left-0 top-1/2 z-10 hidden h-14 w-14 -translate-x-[135%] -translate-y-1/2 items-center justify-center rounded-full border border-primary-500 bg-white text-primary-500 shadow-[0_14px_35px_rgba(15,23,42,0.08)] transition hover:bg-primary-500 hover:text-white xl:flex"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <button
+              onClick={nextFeaturedPage}
+              className="absolute right-0 top-1/2 z-10 hidden h-14 w-14 translate-x-[135%] -translate-y-1/2 items-center justify-center rounded-full bg-primary-500 text-white shadow-[0_14px_35px_rgba(52,152,75,0.22)] transition hover:bg-primary-600 xl:flex"
+            >
+              <ArrowRight className="h-5 w-5" />
+            </button>
+
+            <div className="overflow-hidden rounded-[2rem]">
+              <AnimatePresence custom={featuredDirection} initial={false} mode="wait">
+                <motion.div
+                  key={featuredPage}
+                  custom={featuredDirection}
+                  variants={featuredPageVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  className="grid w-full gap-6 md:grid-cols-2 xl:grid-cols-4"
+                >
+                  {(featuredPages[featuredPage] ?? []).map((trip, tripIndex) => (
+                    <motion.div
+                      key={trip.id}
+                      variants={featuredCardVariants}
+                    >
+                      <TripCard
+                        trip={trip}
+                        variant="featuredCompact"
+                        revealOnScroll
+                        revealIndex={tripIndex}
+                      />
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
+
+          <div className="mt-8 flex justify-center gap-2">
+            {Array.from({ length: featuredPageCount }).map((_, index) => (
+              <button
+                key={index}
+                type="button"
+                onClick={() => jumpToFeaturedPage(index)}
+                className={`h-3 rounded-full transition-all ${
+                  index === featuredPage ? 'w-8 bg-primary-500' : 'w-3 bg-dark-300'
+                }`}
+              />
+            ))}
+          </div>
+
+          <div className="mt-10 text-center">
+            <Link to="/trips">
+              <button className="rounded-lg bg-primary-500 px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-primary-600">
+                Explore All Treks
+              </button>
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -619,9 +696,6 @@ export default function Home() {
               className="mx-auto w-full max-w-[52rem] object-contain drop-shadow-[0_28px_52px_rgba(0,0,0,0.2)]"
               style={{ height: '780px' }}
             />
-            <div className="absolute -bottom-6 -right-6 hidden rounded-2xl bg-white p-4 shadow-xl lg:block">
-              <p className="playful-text text-2xl text-primary-500">Enjoy Travel</p>
-            </div>
           </motion.div>
 
           <motion.div
@@ -677,112 +751,21 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── FEATURED TOURS with Category Tabs ─── */}
-      <section className="bg-dark-50 pb-32 pt-20 sm:pb-36">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <p className="text-sm font-semibold uppercase tracking-wider text-primary-500">
-              Explore the world
-            </p>
-            <h2 className="mt-3 text-4xl font-bold text-dark-900 sm:text-5xl">
-              Amazing Featured Tour{' '}
-              <span className="playful-text text-primary-500">Package</span> The World
-            </h2>
-          </div>
-
-          <div className="mt-10 flex flex-wrap justify-center gap-3">
-            {trekCategories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`vitour-tab ${activeCategory === cat ? 'active' : ''}`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-
-          <div className="relative mt-10">
-            <button
-              onClick={prevFeaturedPage}
-              className="absolute left-0 top-1/2 z-10 hidden h-14 w-14 -translate-x-[135%] -translate-y-1/2 items-center justify-center rounded-full border border-primary-500 bg-white text-primary-500 shadow-[0_14px_35px_rgba(15,23,42,0.08)] transition hover:bg-primary-500 hover:text-white xl:flex"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </button>
-            <button
-              onClick={nextFeaturedPage}
-              className="absolute right-0 top-1/2 z-10 hidden h-14 w-14 translate-x-[135%] -translate-y-1/2 items-center justify-center rounded-full bg-primary-500 text-white shadow-[0_14px_35px_rgba(52,152,75,0.22)] transition hover:bg-primary-600 xl:flex"
-            >
-              <ArrowRight className="h-5 w-5" />
-            </button>
-
-            <div className="overflow-hidden rounded-[2rem]">
-              <AnimatePresence custom={featuredDirection} initial={false} mode="wait">
-                <motion.div
-                  key={`${activeCategory}-${featuredPage}`}
-                  custom={featuredDirection}
-                  variants={featuredPageVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  className="grid w-full gap-6 md:grid-cols-2 xl:grid-cols-4"
-                >
-                  {(featuredPages[featuredPage] ?? []).map((trip, tripIndex) => (
-                    <motion.div
-                      key={trip.id}
-                      variants={featuredCardVariants}
-                    >
-                      <TripCard
-                        trip={trip}
-                        variant="featuredCompact"
-                        revealOnScroll
-                        revealIndex={tripIndex}
-                      />
-                    </motion.div>
-                  ))}
-                </motion.div>
-              </AnimatePresence>
-            </div>
-          </div>
-
-          <div className="mt-8 flex justify-center gap-2">
-            {Array.from({ length: featuredPageCount }).map((_, index) => (
-              <button
-                key={index}
-                type="button"
-                onClick={() => jumpToFeaturedPage(index)}
-                className={`h-3 rounded-full transition-all ${
-                  index === featuredPage ? 'w-8 bg-primary-500' : 'w-3 bg-dark-300'
-                }`}
-              />
-            ))}
-          </div>
-
-          <div className="mt-10 text-center">
-            <Link to="/trips">
-              <button className="rounded-lg bg-primary-500 px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-primary-600">
-                Explore One-Day Trips
-              </button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* ─── STATS CTA SECTION ─── */}
       <section ref={counterRef} className="relative overflow-visible bg-white px-4 pb-20 pt-0 sm:px-6 lg:px-8">
         <div className="relative mx-auto max-w-7xl">
-          <div className="absolute left-1/2 top-0 z-20 w-full max-w-[1280px] -translate-x-1/2 -translate-y-1/2 px-4 sm:px-6 lg:px-8">
-            <div className="mx-4 overflow-hidden rounded-xl bg-primary-600 px-8 py-5 shadow-[0_24px_70px_rgba(64,162,64,0.25)] sm:mx-6 sm:px-10 sm:py-6 lg:mx-8">
-              <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+          <div className="hidden">
+            <div className="mx-0 overflow-hidden rounded-[1.35rem] bg-primary-600 px-4 py-4 shadow-[0_24px_70px_rgba(64,162,64,0.25)] sm:mx-6 sm:rounded-xl sm:px-10 sm:py-6 lg:mx-8">
+              <div className="relative flex flex-col gap-4 sm:gap-5 lg:flex-row lg:items-center lg:justify-between">
                 <div className="max-w-3xl">
-                  <h2 className="text-[2.2rem] font-bold leading-none text-dark-900 sm:text-[2.6rem]">
+                  <h2 className="text-[1.45rem] font-bold leading-[1.06] text-dark-900 sm:text-[2.6rem] sm:leading-none">
                     Ready To Adventure And Enjoy Natural
                   </h2>
-                  <p className="mt-2 max-w-2xl text-sm text-white/85 sm:text-base">
+                  <p className="mt-2 max-w-2xl text-[0.9rem] leading-6 text-white/85 sm:text-base">
                     Join thousands of happy travelers who have explored Maharashtra&apos;s hidden gems with us.
                   </p>
                 </div>
-                <Link to="/contact" className="relative z-10 inline-flex shrink-0 items-center justify-center rounded-lg bg-white px-9 py-3.5 text-sm font-bold uppercase tracking-[0.08em] text-primary-600 transition hover:bg-white/90">
+                <Link to="/contact" className="relative z-10 inline-flex shrink-0 self-start rounded-lg bg-white px-5 py-2.5 text-[0.72rem] font-bold uppercase tracking-[0.06em] text-primary-600 transition hover:bg-white/90 sm:items-center sm:justify-center sm:px-9 sm:py-3.5 sm:text-sm sm:tracking-[0.08em]">
                   Let&apos;s Get Started
                 </Link>
                 <div className="pointer-events-none absolute right-20 top-1/2 hidden h-36 w-56 -translate-y-1/2 opacity-80 lg:block">
@@ -802,16 +785,16 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="relative left-1/2 mt-0 w-screen -translate-x-1/2 overflow-hidden bg-[#0f0e09] pb-28 pt-32 sm:pb-32 sm:pt-36 lg:pb-36 lg:pt-32">
+          <div className="relative left-1/2 mt-0 w-screen -translate-x-1/2 overflow-hidden bg-[#0f0e09] pb-28 pt-20 sm:pb-32 sm:pt-24 lg:pb-36 lg:pt-24">
             <img
               src="/destinations/Devkund Waterfall in lush surroundings.png"
               alt="Devkund Waterfall background"
               className="absolute inset-0 h-full w-full object-cover opacity-40"
             />
-            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(15,14,9,0.7),rgba(15,14,9,0.34)),linear-gradient(180deg,rgba(15,14,9,0.06),rgba(15,14,9,0.26))]" />
+            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(15,14,9,0.58),rgba(15,14,9,0.26)),linear-gradient(180deg,rgba(15,14,9,0.06),rgba(15,14,9,0.26))]" />
 
             <div className="relative mx-auto max-w-7xl">
-              <div className="relative grid auto-rows-fr grid-cols-2 gap-6 px-6 pt-10 sm:px-8 sm:pt-12 lg:grid-cols-4 lg:px-10 lg:pt-14 xl:px-16">
+              <div className="relative grid auto-rows-fr grid-cols-1 gap-4 px-4 pt-8 sm:grid-cols-2 sm:gap-6 sm:px-8 sm:pt-12 lg:grid-cols-4 lg:px-10 lg:pt-14 xl:px-16">
                 {counterStats.map(({ end, label, suffix, decimals, icon }) => (
                   <motion.div key={label} className="h-full" initial={{ opacity: 0, y: 26 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }}>
                     <CounterCard
@@ -904,9 +887,11 @@ export default function Home() {
                 </div>
                 <p className="leading-7 text-dark-500">"{item.quote}"</p>
                 <div className="mt-6 flex items-center gap-4">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary-500 text-lg font-bold text-white">
-                    {item.avatar}
-                  </div>
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="h-14 w-14 rounded-full object-cover"
+                  />
                   <div>
                     <p className="font-bold text-dark-900">{item.name}</p>
                     <p className="text-sm text-primary-500">{item.role}</p>
@@ -951,13 +936,6 @@ export default function Home() {
                 </div>
               </div>
               <div className="p-6">
-                <div className="mb-3 flex items-center gap-4 text-sm text-dark-400">
-                  <span className="flex items-center gap-1">
-                    <CalendarBlank className="h-3.5 w-3.5" />
-                    {post.date}
-                  </span>
-                  <span>Comments ({post.comments.toString().padStart(2, '0')})</span>
-                </div>
                 <h3 className="text-xl font-bold text-dark-900 transition group-hover:text-primary-500">
                   {post.title}
                 </h3>

@@ -23,18 +23,25 @@ import api from '@/lib/axios';
 import Button from '@/components/ui/Button';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
+const indianPhonePattern = /^[6-9]\d{9}$/;
+const optionalTextField = z
+  .string()
+  .transform((value) => value.trim())
+  .optional();
+
 const participantSchema = z.object({
   fullName: z.string().min(2, 'Full name is required'),
-  age: z.coerce.number().min(1, 'Age required').max(100),
-  phone: z.string().min(10, 'Valid phone required'),
-  emergencyName: z.string().optional(),
-  emergencyPhone: z.string().optional(),
-  medicalNotes: z.string().optional(),
+  age: z.coerce.number().min(5, 'Minimum age is 5').max(100),
+  phone: z.string().regex(indianPhonePattern, 'Valid 10-digit Indian phone required'),
+  emergencyName: optionalTextField.refine((value) => !value || value.length >= 2, 'Emergency contact must be at least 2 characters'),
+  emergencyPhone: optionalTextField.refine((value) => !value || indianPhonePattern.test(value), 'Valid emergency phone required'),
+  medicalNotes: optionalTextField,
 });
 
 const schema = z.object({
-  specialRequests: z.string().optional(),
-  promoCode: z.string().optional(),
+  specialRequests: optionalTextField,
+  promoCode: optionalTextField,
+  paymentMethod: z.enum(['FREE_TEST']),
   participants: z.array(participantSchema).min(1, 'At least one participant required'),
 });
 
@@ -56,6 +63,7 @@ export default function BookingPage() {
   } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
+      paymentMethod: 'FREE_TEST',
       participants: [{ fullName: '', age: 0, phone: '', emergencyName: '', emergencyPhone: '', medicalNotes: '' }],
     },
   });
@@ -80,25 +88,33 @@ export default function BookingPage() {
   const onSubmit = async (data: FormData) => {
     if (!tripId || !scheduleId) return;
 
+    const normalizedParticipants = data.participants.map((participant) => ({
+      fullName: participant.fullName.trim(),
+      age: participant.age,
+      phone: participant.phone.trim(),
+      emergencyName: participant.emergencyName || undefined,
+      emergencyPhone: participant.emergencyPhone || undefined,
+      medicalNotes: participant.medicalNotes || undefined,
+    }));
+
     const payload: CreateBookingRequest = {
       tripId,
       scheduleId,
-      numberOfPeople: data.participants.length,
-      specialRequests: data.specialRequests,
-      promoCode: data.promoCode,
-      participants: data.participants.map((participant) => ({
-        fullName: participant.fullName,
-        age: participant.age,
-        phone: participant.phone,
-        emergencyName: participant.emergencyName,
-        emergencyPhone: participant.emergencyPhone,
-        medicalNotes: participant.medicalNotes,
-      })),
+      numberOfPeople: normalizedParticipants.length,
+      specialRequests: data.specialRequests || undefined,
+      promoCode: data.promoCode || undefined,
+      participants: normalizedParticipants,
     };
 
     try {
-      await api.post('/bookings', payload);
-      toast.success('Booking created successfully');
+      const bookingResponse = await api.post<ApiResponse<{ booking: { id: string } }>>('/bookings', payload);
+      const bookingId = bookingResponse.data.data.booking.id;
+
+      if (data.paymentMethod === 'FREE_TEST') {
+        await api.post(`/bookings/${bookingId}/free-payment`);
+      }
+
+      toast.success('Booking confirmed successfully');
       navigate('/my-bookings');
     } catch (error: unknown) {
       const message =
@@ -119,19 +135,20 @@ export default function BookingPage() {
       <section className="travel-dark relative overflow-hidden pt-28">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${MAHARASHTRA_MONSOON_IMAGES.heroes.booking})` }}
+          style={{ backgroundImage: `url(${MAHARASHTRA_MONSOON_IMAGES.sections.chooseUsRange})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-dark-900/80 via-dark-900/50 to-transparent" />
-        <div className="relative mx-auto max-w-7xl px-4 pb-14 pt-[4.5rem] sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2 text-sm text-sand-100/70">
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(15,23,42,0.72),rgba(15,23,42,0.42),rgba(15,23,42,0.16))]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.18),rgba(15,23,42,0.08),rgba(15,23,42,0.3))]" />
+        <div className="relative mx-auto max-w-7xl px-4 pb-20 pt-[6.5rem] sm:px-6 lg:px-8">
+          <div className="flex flex-wrap items-center gap-2 text-sm text-sand-100/70">
             <Link to="/" className="hover:text-white">Home</Link>
             <CaretRight className="h-3 w-3" />
             <Link to={`/trips/${trip.slug}`} className="hover:text-white">{trip.title}</Link>
             <CaretRight className="h-3 w-3" />
             <span className="text-white">Booking</span>
           </div>
-          <h1 className="mt-6 font-heading text-5xl text-white">Reserve your departure</h1>
-          <p className="playful-text text-xl text-gold-400 mt-2">~ almost there! ~</p>
+          <h1 className="mt-6 font-heading text-4xl !text-white sm:text-5xl lg:text-6xl">Reserve your departure</h1>
+          <p className="mt-3 playful-text text-xl !text-primary-400">~ almost there! ~</p>
           <p className="mt-4 max-w-2xl text-lg leading-8 text-sand-100/76">
             Complete participant details and keep the premium booking flow consistent with the rest of the regenerated site.
           </p>
@@ -139,13 +156,13 @@ export default function BookingPage() {
       </section>
 
       <form onSubmit={handleSubmit(onSubmit)} className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
           <div className="space-y-6">
             <div className="travel-panel rounded-[2rem] p-6 sm:p-8">
-              <div className="mb-6 flex items-center justify-between">
+              <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="section-script">Travelers</p>
-                  <h2 className="font-heading text-4xl text-ink-900">Participant details</h2>
+                  <h2 className="font-heading text-3xl text-ink-900 sm:text-4xl">Participant details</h2>
                 </div>
                 <Button
                   type="button"
@@ -164,7 +181,7 @@ export default function BookingPage() {
                 {fields.map((field, index) => (
                   <div key={field.id} className="rounded-[1.8rem] bg-sand-100 p-5">
                     <div className="mb-4 flex items-center justify-between">
-                      <h3 className="font-heading text-3xl text-ink-900">Traveler {index + 1}</h3>
+                      <h3 className="font-heading text-2xl text-ink-900 sm:text-3xl">Traveler {index + 1}</h3>
                       {fields.length > 1 ? (
                         <button type="button" onClick={() => remove(index)} className="inline-flex items-center gap-2 text-sm font-medium text-coral-600">
                           <Minus className="h-4 w-4" />
@@ -210,7 +227,7 @@ export default function BookingPage() {
 
             <div className="travel-panel rounded-[2rem] p-6 sm:p-8">
               <p className="section-script">Need anything else?</p>
-              <h2 className="mt-2 font-heading text-4xl text-ink-900">Special requests</h2>
+              <h2 className="mt-2 font-heading text-3xl text-ink-900 sm:text-4xl">Special requests</h2>
               <textarea
                 {...register('specialRequests')}
                 rows={4}
@@ -220,8 +237,27 @@ export default function BookingPage() {
 
             <div className="travel-panel rounded-[2rem] p-6 sm:p-8">
               <p className="section-script">Save on the trail</p>
-              <h2 className="mt-2 font-heading text-4xl text-ink-900">Promo code</h2>
+              <h2 className="mt-2 font-heading text-3xl text-ink-900 sm:text-4xl">Promo code</h2>
               <input {...register('promoCode')} className="travel-input mt-5" />
+            </div>
+
+            <div className="travel-panel rounded-[2rem] p-6 sm:p-8">
+              <p className="section-script">Payment</p>
+              <h2 className="mt-2 font-heading text-3xl text-ink-900 sm:text-4xl">Choose a payment method</h2>
+              <label className="mt-5 flex items-start gap-4 rounded-[1.6rem] border border-forest-500/20 bg-forest-500/5 p-5">
+                <input
+                  type="radio"
+                  value="FREE_TEST"
+                  {...register('paymentMethod')}
+                  className="mt-1 h-4 w-4 accent-forest-500"
+                />
+                <span>
+                  <span className="block text-base font-semibold text-ink-900">Instant test payment</span>
+                  <span className="mt-1 block text-sm leading-6 text-ink-700">
+                    Use the built-in free payment fallback for this build. Your booking is confirmed immediately without an external gateway.
+                  </span>
+                </span>
+              </label>
             </div>
           </div>
 
@@ -234,7 +270,7 @@ export default function BookingPage() {
                   className="h-52 w-full object-cover"
                 />
                 <div className="p-6">
-                  <h3 className="font-heading text-4xl text-ink-900">{trip.title}</h3>
+                  <h3 className="font-heading text-3xl text-ink-900 sm:text-4xl">{trip.title}</h3>
                   {schedule ? (
                     <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-sand-100 px-4 py-2 text-sm text-ink-700">
                       <CalendarBlank className="h-4 w-4 text-forest-500" />
@@ -267,7 +303,7 @@ export default function BookingPage() {
               </div>
 
               <Button type="submit" size="lg" fullWidth isLoading={isSubmitting}>
-                Continue to payment
+                Complete booking
               </Button>
             </div>
           </aside>

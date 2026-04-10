@@ -65,82 +65,96 @@ export default function Login() {
   };
 
   return (
-    <section className="relative min-h-screen overflow-hidden">
+    <section className="relative min-h-screen overflow-hidden pt-28">
       <img
         src={MAHARASHTRA_MONSOON_IMAGES.heroes.login}
         alt="Alpha Trekkers sign in"
         className="absolute inset-0 h-full w-full object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-br from-dark-900/48 via-dark-900/24 to-dark-900/42" />
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(15,23,42,0.74),rgba(15,23,42,0.44),rgba(15,23,42,0.16))]" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.26),rgba(15,23,42,0.1),rgba(15,23,42,0.38))]" />
 
-      <div className="relative mx-auto flex min-h-screen max-w-6xl items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-        <div className="w-full max-w-md rounded-[2.4rem] border border-white/22 bg-white/18 p-8 shadow-[0_24px_80px_rgba(15,23,42,0.28)] backdrop-blur-2xl sm:p-10">
-          <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10">
-              <Mountains className="h-8 w-8 text-forest-500" weight="duotone" />
-            </div>
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-white/82">Account access</p>
-              <h1 className="font-heading text-4xl !text-white">Sign In</h1>
-            </div>
+      <div className="relative mx-auto flex min-h-screen max-w-7xl items-center px-4 py-16 sm:px-6 lg:px-8">
+        <div className="grid w-full gap-10 lg:grid-cols-[0.98fr_0.78fr] lg:items-center lg:gap-14">
+          <div className="hero-copy max-w-2xl text-white">
+            <p className="playful-text mt-3 text-2xl !text-primary-400">~ start your adventure ~</p>
+            <h1 className="mt-5 font-heading text-4xl leading-[0.95] !text-white sm:text-5xl lg:text-6xl">
+              Sign in and keep your next trek booking moving without friction.
+            </h1>
+            <p className="mt-5 text-base leading-7 text-white/82 sm:text-lg sm:leading-8">
+              Pick up where you left off, review departures, and manage your bookings with the same
+              cleaner account flow used across the travel experience.
+            </p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5" autoComplete="off">
-            <input type="text" name="fake_username" autoComplete="username" className="hidden" tabIndex={-1} />
-            <input type="password" name="fake_password" autoComplete="current-password" className="hidden" tabIndex={-1} />
-
-            <div>
-              <label className="mb-2 block text-sm font-medium text-white">Email</label>
-              <div className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-white backdrop-blur-md">
-                <EnvelopeSimple className="h-5 w-5 text-forest-500" />
-                <input
-                  {...register('email')}
-                  type="email"
-                  autoComplete="off"
-                  className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-white/65 focus:outline-none"
-                  placeholder="Enter your email"
-                />
+          <div className="w-full max-w-md rounded-[2.4rem] border border-white/22 bg-white/18 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.28)] backdrop-blur-2xl sm:p-10">
+            <div className="flex items-center gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10">
+                <Mountains className="h-8 w-8 text-forest-500" weight="duotone" />
               </div>
-              {errors.email ? (
-                <p className="mt-2 text-xs text-white/80">{errors.email.message}</p>
-              ) : null}
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-white/82">Account access</p>
+                <h2 className="font-heading text-3xl !text-white sm:text-4xl">Sign In</h2>
+              </div>
             </div>
 
-            <div>
-              <label className="mb-2 block text-sm font-medium text-white">Password</label>
-              <div className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-white backdrop-blur-md">
-                <Lock className="h-5 w-5 text-forest-500" />
-                <input
-                  {...register('password')}
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete="new-password"
-                  className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-white/65 focus:outline-none"
-                  placeholder="Enter your password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((current) => !current)}
-                  className="text-white/80"
-                >
-                  {showPassword ? <EyeSlash className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
+            <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5" autoComplete="off">
+              <input type="text" name="fake_username" autoComplete="username" className="hidden" tabIndex={-1} />
+              <input type="password" name="fake_password" autoComplete="current-password" className="hidden" tabIndex={-1} />
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-white">Email</label>
+                <div className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-white backdrop-blur-md">
+                  <EnvelopeSimple className="h-5 w-5 text-forest-500" />
+                  <input
+                    {...register('email')}
+                    type="email"
+                    autoComplete="off"
+                    className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-white/65 focus:outline-none"
+                    placeholder="Enter your email"
+                  />
+                </div>
+                {errors.email ? (
+                  <p className="mt-2 text-xs text-white/80">{errors.email.message}</p>
+                ) : null}
               </div>
-              {errors.password ? (
-                <p className="mt-2 text-xs text-white/80">{errors.password.message}</p>
-              ) : null}
-            </div>
 
-            <Button type="submit" size="lg" fullWidth isLoading={isSubmitting}>
-              Sign In
-            </Button>
-          </form>
+              <div>
+                <label className="mb-2 block text-sm font-medium text-white">Password</label>
+                <div className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-white backdrop-blur-md">
+                  <Lock className="h-5 w-5 text-forest-500" />
+                  <input
+                    {...register('password')}
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
+                    className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-white/65 focus:outline-none"
+                    placeholder="Enter your password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((current) => !current)}
+                    className="text-white/80"
+                  >
+                    {showPassword ? <EyeSlash className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+                {errors.password ? (
+                  <p className="mt-2 text-xs text-white/80">{errors.password.message}</p>
+                ) : null}
+              </div>
 
-          <p className="mt-6 text-sm text-white/80">
-            New to Alpha Trekkers?{' '}
-            <Link to="/register" className="font-medium text-forest-500 hover:text-forest-400">
-              Create an account
-            </Link>
-          </p>
+              <Button type="submit" size="lg" fullWidth isLoading={isSubmitting}>
+                Sign In
+              </Button>
+            </form>
+
+            <p className="mt-6 text-sm text-white/80">
+              New to Alpha Trekkers?{' '}
+              <Link to="/register" className="font-medium text-forest-500 hover:text-forest-400">
+                Create an account
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </section>

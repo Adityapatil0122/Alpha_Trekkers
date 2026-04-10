@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   CalendarDots,
   CloudArrowUp,
@@ -233,7 +233,7 @@ export default function AdminTrips() {
 
   // ── Data loading ──────────────────────────────────────────────────────
 
-  const loadTrips = async () => {
+  const loadTrips = useCallback(async () => {
     setListLoading(true);
     try {
       const res = await api.get<PaginatedResponse<{ trips: AdminTripSummary[] }>>(
@@ -248,7 +248,7 @@ export default function AdminTrips() {
     } finally {
       setListLoading(false);
     }
-  };
+  }, [tripSearch]);
 
   const loadTripDetail = async (tripId: string) => {
     setDetailLoading(true);
@@ -280,7 +280,7 @@ export default function AdminTrips() {
     }
   };
 
-  useEffect(() => { void loadTrips(); }, [tripSearch]);
+  useEffect(() => { void loadTrips(); }, [loadTrips]);
 
   const openTripModal = (tripId: string) => {
     setSelectedTripId(tripId);

@@ -57,13 +57,13 @@ export default function MyBookings() {
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${MAHARASHTRA_MONSOON_IMAGES.heroes.myBookings})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-dark-900/80 via-dark-900/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-dark-900/66 via-dark-900/38 to-transparent" />
         <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-[4.5rem] sm:px-6 lg:px-8">
-          <span className="section-label !bg-white/10 !text-sand-100 before:!bg-gold-400">
-            Traveler dashboard
+          <span className="playful-text text-2xl !text-primary-300 sm:text-3xl">
+            your trail story
           </span>
-          <h1 className="mt-6 font-heading text-5xl text-white sm:text-6xl">My bookings</h1>
-          <p className="playful-text text-xl text-gold-400 mt-2">~ your trail diary ~</p>
+          <h1 className="mt-6 font-heading text-4xl text-white sm:text-5xl lg:text-6xl">My bookings</h1>
+          <p className="playful-text mt-2 text-xl text-primary-300">~ your trail story ~</p>
           <p className="mt-4 max-w-2xl text-lg leading-8 text-sand-100/76">
             Manage confirmations, review pending reservations, and keep track of every departure in the redesigned interface.
           </p>
@@ -106,7 +106,7 @@ export default function MyBookings() {
                       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         <div>
                           <p className="text-xs uppercase tracking-[0.16em] text-forest-500">Booking ID</p>
-                          <h2 className="mt-2 font-heading text-4xl text-ink-900">
+                          <h2 className="mt-2 font-heading text-3xl text-ink-900 sm:text-4xl">
                             {booking.trip?.title || 'Departure reservation'}
                           </h2>
                         </div>
@@ -116,7 +116,7 @@ export default function MyBookings() {
                         </span>
                       </div>
 
-                      <div className="mt-6 grid gap-3 sm:grid-cols-3 text-sm text-ink-700">
+                      <div className="mt-6 grid gap-3 md:grid-cols-3 text-sm text-ink-700">
                         <div className="rounded-[1.4rem] bg-sand-100 px-4 py-3">
                           <p className="inline-flex items-center gap-2"><CalendarBlank className="h-4 w-4 text-forest-500" /> Departure</p>
                           <p className="mt-2 font-medium text-ink-900">
@@ -158,7 +158,7 @@ export default function MyBookings() {
         ) : (
           <div className="travel-panel rounded-[2rem] px-8 py-16 text-center">
             <p className="section-script">Start your trail diary</p>
-            <h2 className="mt-2 font-heading text-5xl text-ink-900">No bookings yet</h2>
+            <h2 className="mt-2 font-heading text-4xl text-ink-900 sm:text-5xl">No bookings yet</h2>
             <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-ink-700/72">
               Start with the one-day trips page or reach out when you want help shaping the next getaway.
             </p>

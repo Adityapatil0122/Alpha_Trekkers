@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   CalendarCheck,
   CheckCircle,
@@ -114,7 +114,7 @@ export default function AdminBookings() {
   const [newStatus, setNewStatus] = useState<BookingStatus>('CONFIRMED');
   const [updatingStatus, setUpdatingStatus] = useState(false);
 
-  const loadBookings = async (pg = page) => {
+  const loadBookings = useCallback(async (pg = page) => {
     setLoading(true);
     try {
       const res = await api.get<PaginatedResponse<{ bookings: BookingRow[] }>>('/admin/bookings', {
@@ -130,15 +130,14 @@ export default function AdminBookings() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filterStatus, page, search]);
 
   useEffect(() => {
     setPage(1);
     void loadBookings(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, filterStatus]);
+  }, [filterStatus, loadBookings, search]);
 
-  useEffect(() => { void loadBookings(page); }, [page]);
+  useEffect(() => { void loadBookings(page); }, [loadBookings, page]);
 
   const openDetail = (booking: BookingRow) => {
     setSelected(booking);
@@ -294,7 +293,7 @@ export default function AdminBookings() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-ink-900/6 px-6 py-4">
+          <div className="flex flex-col gap-3 border-t border-ink-900/6 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-ink-500">Page {page} of {totalPages}</p>
             <div className="flex gap-2">
               <Button type="button" size="sm" variant="secondary" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>Previous</Button>

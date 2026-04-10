@@ -7,6 +7,7 @@ import ProtectedRoute from '@/components/ui/ProtectedRoute';
 const Home = lazy(() => import('@/pages/Home'));
 const Trips = lazy(() => import('@/pages/Trips'));
 const TripDetail = lazy(() => import('@/pages/TripDetail'));
+const OneDayTripDetail = lazy(() => import('@/pages/OneDayTripDetail'));
 const Login = lazy(() => import('@/pages/Login'));
 const Register = lazy(() => import('@/pages/Register'));
 const About = lazy(() => import('@/pages/About'));
@@ -31,6 +32,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/trips" element={<Trips />} />
           <Route path="/trips/:slug" element={<TripDetail />} />
+          <Route path="/tours/:slug" element={<OneDayTripDetail />} />
           <Route path="/weekend-trips" element={<Navigate to="/trips" replace />} />
           <Route path="/weekday-trips" element={<Navigate to="/trips" replace />} />
           <Route path="/about" element={<About />} />
