@@ -90,34 +90,36 @@ export default function Register() {
   };
 
   return (
-    <section className="travel-dark relative mb-12 min-h-screen overflow-hidden pt-28 sm:mb-14 lg:mb-16">
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${MAHARASHTRA_MONSOON_IMAGES.heroes.register})` }}
+    <section className="relative min-h-screen overflow-hidden pt-28">
+      <img
+        src={MAHARASHTRA_MONSOON_IMAGES.heroes.login}
+        alt="Alpha Trekkers registration"
+        className="absolute inset-0 h-full w-full object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-dark-900/80 via-dark-900/50 to-transparent" />
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(15,23,42,0.74),rgba(15,23,42,0.44),rgba(15,23,42,0.16))]" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.26),rgba(15,23,42,0.1),rgba(15,23,42,0.38))]" />
 
       <div className="relative mx-auto flex max-w-7xl items-center px-4 py-16 sm:px-6 lg:px-8">
-        <div className="grid w-full gap-10 lg:grid-cols-[0.95fr_0.8fr] lg:items-center">
+        <div className="grid w-full gap-10 lg:grid-cols-[0.95fr_0.8fr] lg:items-center lg:gap-14">
           <div className="hero-copy max-w-2xl text-white">
             <p className="playful-text mt-3 text-2xl !text-primary-400">~ start your adventure ~</p>
-            <h1 className="mt-5 font-heading text-5xl leading-[0.95] !text-white sm:text-6xl">
+            <h1 className="mt-5 font-heading text-4xl leading-[0.95] !text-white sm:text-5xl lg:text-6xl">
               Create an account and keep the new booking experience connected.
             </h1>
-            <p className="mt-5 text-lg leading-8 text-white/82">
+            <p className="mt-5 text-base leading-7 text-white/82 sm:text-lg sm:leading-8">
               Save your spot, revisit departures, and move from discovery to payment with a cleaner
               travel-template inspired account flow.
             </p>
           </div>
 
-          <div className="travel-glass rounded-[2.4rem] p-8 sm:p-10">
+          <div className="w-full max-w-md rounded-[2.4rem] border border-white/22 bg-white/18 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.28)] backdrop-blur-2xl sm:p-10">
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-forest-500/10">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10">
                 <Mountains className="h-7 w-7 text-forest-500" weight="duotone" />
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-forest-500">Traveler onboarding</p>
-                <h2 className="font-heading text-4xl text-ink-900">Create account</h2>
+                <p className="text-xs uppercase tracking-[0.2em] text-white/82">Traveler onboarding</p>
+                <h2 className="font-heading text-3xl !text-white sm:text-4xl">Create account</h2>
               </div>
             </div>
 
@@ -127,86 +129,92 @@ export default function Register() {
               <input type="password" name="fake_register_password" autoComplete="new-password" className="hidden" tabIndex={-1} />
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-ink-700">First name</label>
-                  <div className="travel-input flex items-center gap-3">
+                  <label className="mb-2 block text-sm font-medium text-white">First name</label>
+                  <div className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-white backdrop-blur-md">
                     <User className="h-5 w-5 text-forest-500" />
                     <input
                       {...register('firstName')}
                       autoComplete="off"
-                      className="min-w-0 flex-1 bg-transparent focus:outline-none"
+                      className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-white/65 focus:outline-none"
+                      placeholder="Enter your first name"
                     />
                   </div>
-                  {errors.firstName ? <p className="mt-2 text-xs text-coral-600">{errors.firstName.message}</p> : null}
+                  {errors.firstName ? <p className="mt-2 text-xs text-white/80">{errors.firstName.message}</p> : null}
                 </div>
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-ink-700">Last name</label>
-                  <div className="travel-input flex items-center gap-3">
+                  <label className="mb-2 block text-sm font-medium text-white">Last name</label>
+                  <div className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-white backdrop-blur-md">
                     <User className="h-5 w-5 text-forest-500" />
                     <input
                       {...register('lastName')}
                       autoComplete="off"
-                      className="min-w-0 flex-1 bg-transparent focus:outline-none"
+                      className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-white/65 focus:outline-none"
+                      placeholder="Enter your last name"
                     />
                   </div>
-                  {errors.lastName ? <p className="mt-2 text-xs text-coral-600">{errors.lastName.message}</p> : null}
+                  {errors.lastName ? <p className="mt-2 text-xs text-white/80">{errors.lastName.message}</p> : null}
                 </div>
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-ink-700">Email</label>
-                <div className="travel-input flex items-center gap-3">
+                <label className="mb-2 block text-sm font-medium text-white">Email</label>
+                <div className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-white backdrop-blur-md">
                   <EnvelopeSimple className="h-5 w-5 text-forest-500" />
                   <input
                     {...register('email')}
                     type="email"
                     autoComplete="off"
-                    className="min-w-0 flex-1 bg-transparent focus:outline-none"
+                    className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-white/65 focus:outline-none"
+                    placeholder="Enter your email"
                   />
                 </div>
-                {errors.email ? <p className="mt-2 text-xs text-coral-600">{errors.email.message}</p> : null}
+                {errors.email ? <p className="mt-2 text-xs text-white/80">{errors.email.message}</p> : null}
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-ink-700">Phone</label>
-                <div className="travel-input flex items-center gap-3">
+                <label className="mb-2 block text-sm font-medium text-white">Phone</label>
+                <div className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-white backdrop-blur-md">
                   <Phone className="h-5 w-5 text-forest-500" />
                   <input
                     {...register('phone')}
                     autoComplete="off"
-                    className="min-w-0 flex-1 bg-transparent focus:outline-none"
+                    className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-white/65 focus:outline-none"
+                    placeholder="Enter your phone number"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-ink-700">Password</label>
-                <div className="travel-input flex items-center gap-3">
+                <label className="mb-2 block text-sm font-medium text-white">Password</label>
+                <div className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-white backdrop-blur-md">
                   <Lock className="h-5 w-5 text-forest-500" />
                   <input
                     {...register('password')}
                     type={showPassword ? 'text' : 'password'}
                     autoComplete="new-password"
-                    className="min-w-0 flex-1 bg-transparent focus:outline-none"
+                    className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-white/65 focus:outline-none"
+                    placeholder="Create your password"
                   />
-                  <button type="button" onClick={() => setShowPassword((current) => !current)} className="text-ink-600">
+                  <button type="button" onClick={() => setShowPassword((current) => !current)} className="text-white/80">
                     {showPassword ? <EyeSlash className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
                 </div>
-                {errors.password ? <p className="mt-2 text-xs text-coral-600">{errors.password.message}</p> : null}
+                {errors.password ? <p className="mt-2 text-xs text-white/80">{errors.password.message}</p> : null}
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-ink-700">Confirm password</label>
-                <div className="travel-input flex items-center gap-3">
+                <label className="mb-2 block text-sm font-medium text-white">Confirm password</label>
+                <div className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-white backdrop-blur-md">
                   <Lock className="h-5 w-5 text-forest-500" />
                   <input
                     {...register('confirmPassword')}
                     type="password"
                     autoComplete="new-password"
-                    className="min-w-0 flex-1 bg-transparent focus:outline-none"
+                    className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-white/65 focus:outline-none"
+                    placeholder="Confirm your password"
                   />
                 </div>
-                {errors.confirmPassword ? <p className="mt-2 text-xs text-coral-600">{errors.confirmPassword.message}</p> : null}
+                {errors.confirmPassword ? <p className="mt-2 text-xs text-white/80">{errors.confirmPassword.message}</p> : null}
               </div>
 
               <Button type="submit" size="lg" fullWidth isLoading={isSubmitting}>
@@ -214,9 +222,9 @@ export default function Register() {
               </Button>
             </form>
 
-            <p className="mt-6 text-sm text-ink-700/72">
+            <p className="mt-6 text-sm text-white/80">
               Already registered?{' '}
-              <Link to="/login" className="font-medium text-forest-500 hover:text-forest-500">
+              <Link to="/login" className="font-medium text-forest-500 hover:text-forest-400">
                 Sign in instead
               </Link>
             </p>

@@ -70,15 +70,6 @@ const galleryImages = [
   },
 ];
 
-const companyLogos = [
-  { name: 'TCS', subtext: 'Technology', color: '#1f4fa3' },
-  { name: 'Infosys', subtext: 'IT Services', color: '#007cc3' },
-  { name: 'Wipro', subtext: 'Consulting', color: '#6b3fa0' },
-  { name: 'Accenture', subtext: 'Operations', color: '#7f39fb' },
-  { name: 'Cognizant', subtext: 'Delivery', color: '#0047bb' },
-  { name: 'Capgemini', subtext: 'Enterprise', color: '#00a3e0' },
-];
-
 const corporateSchema = z.object({
   contactName: z.string().min(2, 'Contact person is required'),
   companyName: z.string().min(2, 'Company name is required'),
@@ -153,17 +144,17 @@ export default function CorporateTreks() {
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${MAHARASHTRA_MONSOON_IMAGES.sections.chooseUsRange})` }}
         />
-        <div className="absolute inset-0 bg-[linear-gradient(100deg,rgba(8,15,24,0.92),rgba(8,15,24,0.74),rgba(8,15,24,0.38))]" />
+        <div className="absolute inset-0 bg-[linear-gradient(100deg,rgba(8,15,24,0.8),rgba(8,15,24,0.58),rgba(8,15,24,0.28))]" />
 
         <div className="relative mx-auto grid max-w-7xl items-start gap-10 px-4 pb-16 pt-20 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:px-8">
           <div>
-            <span className="section-label !bg-white/10 !text-sand-100 before:!bg-gold-400">
+            <span className="section-script !text-primary-300">
               Corporate Treks
             </span>
-            <h1 className="mt-6 max-w-3xl font-heading text-5xl leading-[0.95] !text-white sm:text-6xl">
+            <h1 className="mt-6 max-w-3xl font-heading text-4xl leading-[0.95] !text-white sm:text-5xl lg:text-6xl">
               Trek outings for companies that want more than a generic offsite.
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 !text-white/85">
+            <p className="mt-6 max-w-2xl text-base leading-7 !text-white/85 sm:text-lg sm:leading-8">
               We design guided trek experiences for startups, MNCs, and company teams across Maharashtra,
               with transport planning, paced routes, safety support, and a cleaner on-ground experience.
             </p>
@@ -182,7 +173,7 @@ export default function CorporateTreks() {
 
           <div className="pt-1 lg:pt-2">
             <p className="section-script !text-primary-300">Why this works</p>
-            <h2 className="mt-4 font-heading text-4xl !text-white">Built for company groups</h2>
+            <h2 className="mt-4 font-heading text-3xl !text-white sm:text-4xl">Built for company groups</h2>
             <div className="mt-6 space-y-4">
               {[
                 'Structured pre-event planning with one point of contact',
@@ -204,7 +195,7 @@ export default function CorporateTreks() {
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="section-script">Corporate formats</p>
-            <h2 className="mt-3 font-heading text-5xl text-ink-900">Experiences shaped for teams</h2>
+            <h2 className="mt-3 font-heading text-4xl text-ink-900 sm:text-5xl">Experiences shaped for teams</h2>
           </div>
           <p className="max-w-2xl text-sm leading-7 text-ink-600">
             Suitable for annual outings, milestone celebrations, employee engagement, and culture-building
@@ -225,37 +216,11 @@ export default function CorporateTreks() {
         </div>
       </section>
 
-      <section className="bg-sand-50 py-14">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <p className="section-script">Company logos</p>
-              <h2 className="mt-3 font-heading text-4xl text-ink-900">Trusted by modern teams and enterprise groups</h2>
-            </div>
-            <p className="max-w-2xl text-sm leading-7 text-ink-600">
-              A branded corporate trek page should show social proof immediately, so this section gives the
-              page a recognisable B2B layer instead of feeling like a standard public trek listing.
-            </p>
-          </div>
-
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
-            {companyLogos.map((company) => (
-              <div key={company.name} className="rounded-[1.5rem] border border-dark-200 bg-white px-5 py-6 text-center shadow-sm">
-                <p className="text-[1.65rem] font-black uppercase tracking-[0.08em]" style={{ color: company.color }}>
-                  {company.name}
-                </p>
-                <p className="mt-2 text-xs uppercase tracking-[0.16em] text-ink-400">{company.subtext}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <section id="corporate-gallery" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="section-script">Gallery</p>
-            <h2 className="mt-3 font-heading text-5xl text-ink-900">Corporate trek gallery</h2>
+            <h2 className="mt-3 font-heading text-4xl text-ink-900 sm:text-5xl">Corporate trek gallery</h2>
           </div>
           <p className="max-w-2xl text-sm leading-7 text-ink-600">
             Use this section to showcase how the outings look on-ground: team photos, guided movement,
@@ -287,10 +252,10 @@ export default function CorporateTreks() {
       </section>
 
       <section id="corporate-enquiry" className="bg-dark-900 py-16 text-white">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[0.88fr_1.12fr] lg:px-8">
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] lg:px-8">
           <div className="space-y-4">
             <p className="section-script !text-primary-300">Corporate enquiry</p>
-            <h2 className="font-heading text-5xl !text-white">Plan your company trek</h2>
+            <h2 className="font-heading text-4xl !text-white sm:text-5xl">Plan your company trek</h2>
             <p className="max-w-xl text-sm leading-7 text-sand-100/76">
               Share your team size, preferred month, and the kind of outing you want. We will shape the
               route and logistics around your group.
@@ -324,8 +289,16 @@ export default function CorporateTreks() {
             </div>
           </div>
 
-          <div className="rounded-[2rem] bg-white p-8 text-ink-900 sm:p-10">
-            <h3 className="font-heading text-4xl text-ink-900">Corporate Trek Enquiry Form</h3>
+          <div className="relative overflow-hidden rounded-[2.2rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(249,251,248,0.98))] p-8 text-ink-900 shadow-[0_32px_90px_rgba(15,23,42,0.08)] sm:p-10">
+            <div className="absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,#5cb85c,#d9b75f,#5cb85c)]" />
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-forest-600">Send a message</p>
+            <h3 className="mt-4 max-w-2xl font-heading text-4xl leading-[0.95] text-[#163254] sm:text-5xl">
+              Start the next corporate trek conversation.
+            </h3>
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-ink-700">
+              Share your team size, preferred month, and outing goals. We will shape the route, pace, and logistics
+              around your company group.
+            </p>
             <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5">
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>

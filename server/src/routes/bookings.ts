@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { Prisma } from '@prisma/client';
+import { Prisma, ScheduleStatus } from '@prisma/client';
 import { prisma } from '../config/database.js';
 import { env } from '../config/env.js';
 import { AppError } from '../utils/AppError.js';
@@ -15,6 +15,22 @@ function firstString(value: unknown): string | undefined {
   if (typeof value === 'string') return value;
   if (Array.isArray(value) && typeof value[0] === 'string') return value[0];
   return undefined;
+}
+
+function getScheduleStatusAfterAvailabilityChange(
+  date: Date,
+  currentStatus: ScheduleStatus,
+  availableSpots: number,
+): ScheduleStatus {
+  if (currentStatus === 'CANCELLED') {
+    return 'CANCELLED';
+  }
+
+  if (date <= new Date()) {
+    return currentStatus;
+  }
+
+  return availableSpots > 0 ? 'OPEN' : 'FULL';
 }
 
 // GET /api/bookings - User's bookings
@@ -275,6 +291,13 @@ router.post(
       }
 
       await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+        const nextAvailableSpots = booking.schedule.availableSpots + booking.numberOfPeople;
+        const nextScheduleStatus = getScheduleStatusAfterAvailabilityChange(
+          booking.schedule.date,
+          booking.schedule.status,
+          nextAvailableSpots,
+        );
+
         // Cancel the booking
         await tx.booking.update({
           where: { id },
@@ -285,8 +308,8 @@ router.post(
         await tx.tripSchedule.update({
           where: { id: booking.scheduleId },
           data: {
-            availableSpots: { increment: booking.numberOfPeople },
-            status: 'OPEN',
+            availableSpots: nextAvailableSpots,
+            status: nextScheduleStatus,
           },
         });
 
@@ -354,6 +377,10 @@ router.post(
         throw new AppError(400, 'Payment already completed for this booking');
       }
 
+      if (env.NODE_ENV === 'production') {
+        throw new AppError(503, 'Online payment is temporarily unavailable. Please contact support.');
+      }
+
       // TODO: Replace with actual Razorpay integration
       // const Razorpay = (await import('razorpay')).default;
       // const razorpay = new Razorpay({
@@ -396,6 +423,91 @@ router.post(
           bookingId: id,
           keyId: env.RAZORPAY_KEY_ID,
         },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+// POST /api/bookings/:id/free-payment - Complete booking with test payment
+router.post(
+  '/:id/free-payment',
+  auth,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id = firstString(req.params.id);
+      if (!id) throw new AppError(400, 'Invalid booking ID');
+
+      const booking = await prisma.booking.findUnique({
+        where: { id },
+        include: { payment: true },
+      });
+
+      if (!booking) {
+        throw new AppError(404, 'Booking not found');
+      }
+
+      if (booking.userId !== req.user!.id) {
+        throw new AppError(403, 'Not authorized');
+      }
+
+      if (booking.status === 'CONFIRMED' && booking.payment?.status === 'COMPLETED') {
+        return res.json({
+          success: true,
+          message: 'Payment already completed and booking confirmed',
+          data: { bookingId: id, status: 'CONFIRMED', paymentMethod: 'FREE_TEST' },
+        });
+      }
+
+      if (booking.status !== 'PENDING') {
+        throw new AppError(400, 'Only pending bookings can use the test payment flow');
+      }
+
+      if (env.NODE_ENV === 'production') {
+        throw new AppError(404, 'Not found');
+      }
+
+      const testOrderId = booking.payment?.razorpayOrderId ?? `free_order_${crypto.randomBytes(12).toString('hex')}`;
+      const testPaymentId = booking.payment?.razorpayPaymentId ?? `free_payment_${crypto.randomBytes(12).toString('hex')}`;
+      const testSignature = booking.payment?.razorpaySignature ?? 'free-test-payment';
+
+      await prisma.$transaction([
+        booking.payment
+          ? prisma.payment.update({
+              where: { id: booking.payment.id },
+              data: {
+                razorpayOrderId: testOrderId,
+                razorpayPaymentId: testPaymentId,
+                razorpaySignature: testSignature,
+                amount: booking.totalAmount,
+                currency: 'INR',
+                status: 'COMPLETED',
+                paidAt: new Date(),
+              },
+            })
+          : prisma.payment.create({
+              data: {
+                bookingId: id,
+                razorpayOrderId: testOrderId,
+                razorpayPaymentId: testPaymentId,
+                razorpaySignature: testSignature,
+                amount: booking.totalAmount,
+                currency: 'INR',
+                status: 'COMPLETED',
+                paidAt: new Date(),
+              },
+            }),
+        prisma.booking.update({
+          where: { id },
+          data: { status: 'CONFIRMED' },
+        }),
+      ]);
+
+      res.json({
+        success: true,
+        message: 'Test payment completed and booking confirmed',
+        data: { bookingId: id, status: 'CONFIRMED', paymentMethod: 'FREE_TEST' },
       });
     } catch (error) {
       next(error);

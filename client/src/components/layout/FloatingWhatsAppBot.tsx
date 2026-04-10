@@ -25,7 +25,7 @@ export default function FloatingWhatsAppBot() {
         href={whatsappHref}
         target="_blank"
         rel="noreferrer"
-        className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_20px_40px_rgba(37,211,102,0.3)] transition hover:-translate-y-1 hover:bg-[#1fbe5b]"
+        className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-forest-500 text-white shadow-[0_20px_40px_rgba(92,184,92,0.3)] transition hover:-translate-y-1 hover:bg-[#4ba64b]"
         aria-label="Chat on WhatsApp"
       >
         <WhatsappLogo className="h-7 w-7" weight="fill" />

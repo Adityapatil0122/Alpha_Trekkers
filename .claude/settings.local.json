@@ -15,7 +15,8 @@
       "Bash(npx vite:*)",
       "Bash(npx concurrently:*)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173)",
-      "Bash(wc -l /c/Users/Finlec A/Desktop/Alpha Treckers/client/src/pages/*.tsx)"
+      "Bash(wc -l /c/Users/Finlec A/Desktop/Alpha Treckers/client/src/pages/*.tsx)",
+      "mcp__Claude_Preview__preview_start"
     ]
   }
 }

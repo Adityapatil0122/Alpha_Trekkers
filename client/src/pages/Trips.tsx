@@ -6,6 +6,7 @@ import {
   UsersThree,
   Star,
 } from '@phosphor-icons/react';
+import { MAHARASHTRA_MONSOON_IMAGES } from '@alpha-trekkers/shared';
 import {
   ONE_DAY_TRIP_FILTERS,
   oneDayTrips,
@@ -15,7 +16,7 @@ import {
 
 type TripFilter = 'All' | OneDayTripType;
 
-const tripsHeroBackground = '/destinations/rajmachi.png';
+const tripsHeroBackground = MAHARASHTRA_MONSOON_IMAGES.trips.torna[3];
 
 const typeCopy: Record<OneDayTripType, string> = {
   'Hill Station': 'cool-weather escapes',
@@ -41,12 +42,7 @@ const tourBenefits = [
 ];
 
 function getBookingHref(trip: OneDayTrip) {
-  const params = new URLSearchParams({
-    trip: trip.slug,
-    source: 'one-day-trips',
-  });
-
-  return `/contact?${params.toString()}`;
+  return `/tours/${trip.slug}`;
 }
 
 function TripCard({
@@ -69,7 +65,7 @@ function TripCard({
       whileHover={{ y: -6 }}
       className="flex h-full flex-col overflow-hidden rounded-[2.2rem] border border-[#dbe4de] bg-white shadow-[0_18px_48px_rgba(15,23,42,0.07)]"
     >
-      <div className="relative h-[13.5rem] overflow-hidden">
+      <div className="relative h-[12.5rem] overflow-hidden sm:h-[13.5rem]">
         <img
           src={trip.imageUrl}
           alt={trip.title}
@@ -82,8 +78,8 @@ function TripCard({
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col px-7 pb-6 pt-5">
-        <h2 className="min-h-[3.9rem] font-heading text-[1.7rem] leading-[1.08] text-[#0f2540]">
+      <div className="flex flex-1 flex-col px-5 pb-6 pt-5 sm:px-7">
+        <h2 className="min-h-[3.3rem] font-heading text-[1.45rem] leading-[1.08] text-[#0f2540] sm:min-h-[3.9rem] sm:text-[1.7rem]">
           {trip.title}
         </h2>
 
@@ -110,7 +106,7 @@ function TripCard({
         <div className="mt-auto border-t border-slate-200 pt-5">
           <div className="flex flex-wrap items-end gap-2">
             <p className="text-[1.05rem] text-slate-500">From</p>
-            <p className="font-heading text-[2.15rem] leading-none text-lime-600">
+            <p className="font-heading text-[1.8rem] leading-none text-lime-600 sm:text-[2.15rem]">
               {trip.priceLabel}
             </p>
             <p className="pb-1 text-sm text-slate-400 line-through">{trip.comparePriceLabel}</p>
@@ -155,17 +151,17 @@ export default function Trips() {
             className="h-full w-full scale-[1.04] object-cover object-center saturate-[1.05]"
           />
         </div>
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,23,18,0.64)_0%,rgba(9,28,22,0.46)_36%,rgba(8,26,23,0.22)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,23,18,0.54)_0%,rgba(9,28,22,0.36)_36%,rgba(8,26,23,0.16)_100%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(19,71,47,0.18)_0%,rgba(8,28,23,0.08)_34%,rgba(5,17,23,0.38)_100%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_16%_18%,rgba(149,233,157,0.18),transparent_22%),radial-gradient(circle_at_82%_16%,rgba(216,241,150,0.1),transparent_18%)]" />
 
-        <div className="relative mx-auto max-w-7xl px-4 pb-20 pt-20 sm:px-6 lg:px-8 lg:pb-24">
+        <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-16 sm:px-6 sm:pb-20 sm:pt-20 lg:px-8 lg:pb-24">
           <div className="max-w-4xl">
-            <span className="inline-flex items-center rounded-full border border-white/14 bg-white/10 px-5 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-sand-100 backdrop-blur-md">
+            <span className="playful-text text-2xl !text-primary-300 sm:text-3xl">
               Curated day trips
             </span>
 
-            <h1 className="mt-7 max-w-3xl font-heading text-5xl leading-[0.92] !text-white drop-shadow-[0_12px_34px_rgba(0,0,0,0.38)] sm:text-6xl lg:text-[4.6rem]">
+            <h1 className="mt-7 max-w-3xl font-heading text-4xl leading-[0.92] !text-white drop-shadow-[0_12px_34px_rgba(0,0,0,0.38)] sm:text-5xl lg:text-[4.6rem]">
               Scenic escapes around Pune worth planning next.
             </h1>
 

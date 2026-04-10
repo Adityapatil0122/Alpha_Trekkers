@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   MagnifyingGlass,
   Shield,
@@ -46,7 +46,7 @@ export default function AdminUsers() {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
 
-  const loadUsers = async (pg = page) => {
+  const loadUsers = useCallback(async (pg = page) => {
     setLoading(true);
     try {
       const res = await api.get<PaginatedResponse<{ users: UserRow[] }>>('/admin/users', {
@@ -61,10 +61,10 @@ export default function AdminUsers() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, search]);
 
-  useEffect(() => { setPage(1); void loadUsers(1); }, [search]);
-  useEffect(() => { void loadUsers(page); }, [page]);
+  useEffect(() => { setPage(1); void loadUsers(1); }, [loadUsers, search]);
+  useEffect(() => { void loadUsers(page); }, [loadUsers, page]);
 
   const adminCount = users.filter((u) => u.role === 'ADMIN').length;
   const guideCount = users.filter((u) => u.role === 'GUIDE').length;
@@ -100,13 +100,13 @@ export default function AdminUsers() {
               {total > 0 && <span className="ml-2 text-sm font-normal text-ink-400">({total} total)</span>}
             </h3>
           </div>
-          <div className="relative">
+          <div className="relative w-full sm:w-auto">
             <MagnifyingGlass className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400" />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search name or email…"
-              className="w-60 rounded-full border border-ink-900/10 bg-sand-50 py-2 pl-9 pr-4 text-sm focus:border-forest-500 focus:outline-none focus:ring-2 focus:ring-forest-500/20"
+              className="w-full rounded-full border border-ink-900/10 bg-sand-50 py-2 pl-9 pr-4 text-sm focus:border-forest-500 focus:outline-none focus:ring-2 focus:ring-forest-500/20 sm:w-60"
             />
           </div>
         </div>
@@ -181,7 +181,7 @@ export default function AdminUsers() {
         </div>
 
         {totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-ink-900/6 px-6 py-4">
+          <div className="flex flex-col gap-3 border-t border-ink-900/6 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-ink-500">Page {page} of {totalPages}</p>
             <div className="flex gap-2">
               <Button type="button" size="sm" variant="secondary" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>Previous</Button>

@@ -10,6 +10,7 @@ import { useAuthStore } from '@/stores/authStore';
 export default function Layout() {
   const location = useLocation();
   const { checkAuth, isAuthenticated, user } = useAuthStore();
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
 
   useEffect(() => {
     if (isAuthenticated && !user) {
@@ -19,7 +20,7 @@ export default function Layout() {
 
   // Scroll to top on route change
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, [location.pathname]);
 
   return (
@@ -38,7 +39,9 @@ export default function Layout() {
         </motion.main>
       </AnimatePresence>
       <FloatingWhatsAppBot />
-      <SiteCta />
+      <div className={isAuthPage ? 'mt-8 sm:mt-10 lg:mt-12' : ''}>
+        <SiteCta />
+      </div>
       <Footer />
     </div>
   );

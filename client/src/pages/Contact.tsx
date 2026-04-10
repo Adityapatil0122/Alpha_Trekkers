@@ -60,7 +60,7 @@ const info: InfoItem[] = [
   },
 ] as const;
 
-const contactHeroImage = '/destinations/harishchandragad.png';
+const contactHeroImage = `/destinations/${encodeURIComponent('Lohagad Fort panorama in Maharashtra.png')}`;
 
 const inputClassName =
   'w-full rounded-[1.15rem] border border-[#d7e2df] bg-white/90 px-4 py-3.5 text-sm text-ink-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] outline-none transition placeholder:text-ink-600/55 focus:border-forest-500 focus:bg-white focus:shadow-[0_0_0_4px_rgba(92,184,92,0.12)]';
@@ -123,44 +123,34 @@ export default function Contact() {
     <>
       <section className="relative overflow-hidden bg-[#08131f] pt-24 text-white">
         <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${contactHeroImage})` }}
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url("${contactHeroImage}")` }}
         />
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(6,16,25,0.88)_0%,rgba(7,22,33,0.78)_38%,rgba(8,24,36,0.42)_66%,rgba(7,20,28,0.22)_100%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(12,42,33,0.22)_0%,rgba(7,18,28,0.14)_28%,rgba(7,16,25,0.46)_100%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_14%,rgba(255,244,189,0.18),transparent_22%),radial-gradient(circle_at_18%_20%,rgba(112,205,126,0.12),transparent_28%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(6,16,25,0.78)_0%,rgba(7,22,33,0.64)_38%,rgba(8,24,36,0.34)_66%,rgba(7,20,28,0.18)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(12,42,33,0.18)_0%,rgba(7,18,28,0.1)_28%,rgba(7,16,25,0.42)_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_14%,rgba(255,244,189,0.16),transparent_22%),radial-gradient(circle_at_18%_20%,rgba(112,205,126,0.1),transparent_28%)]" />
 
-        <div className="relative mx-auto max-w-7xl px-4 pb-20 pt-20 sm:px-6 lg:px-8 lg:pb-24 lg:pt-24">
+        <div className="relative mx-auto max-w-7xl px-4 pb-10 pt-10 sm:px-6 sm:pb-12 sm:pt-12 lg:px-8 lg:pb-14 lg:pt-14">
           <div className="max-w-4xl">
-            <span className="inline-flex items-center rounded-full border border-white/14 bg-white/10 px-5 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-sand-100 backdrop-blur-md">
+            <span className="playful-text text-2xl !text-primary-300 sm:text-3xl">
               Contact Alpha Trekkers
             </span>
 
-            <div className="mt-7 max-w-5xl">
-              <p
-                className="text-[2.4rem] leading-none text-white sm:text-[3rem] lg:text-[3.7rem]"
-                style={{ fontFamily: 'Ziravel, Coiny, var(--font-heading)', fontWeight: 400 }}
-              >
+            <div className="mt-6 max-w-5xl">
+              <p className="font-heading font-semibold text-[2.3rem] leading-[0.9] !text-white drop-shadow-[0_10px_35px_rgba(0,0,0,0.28)] sm:text-[4rem] lg:text-[4.8rem]">
                 Plan your next
               </p>
-              <h1
-                className="mt-2 text-[4.1rem] leading-[0.9] drop-shadow-[0_10px_35px_rgba(92,184,92,0.34)] sm:text-[5.7rem] lg:text-[7.2rem]"
-                style={{
-                  fontFamily: 'Ziravel, Coiny, var(--font-heading)',
-                  fontWeight: 400,
-                  color: '#5cb85c',
-                }}
-              >
+              <h1 className="mt-2 font-semibold text-[2.8rem] leading-[0.9] !text-white drop-shadow-[0_10px_35px_rgba(0,0,0,0.28)] sm:text-[4.8rem] lg:text-[5.8rem]">
                 wild Sahyadri story.
               </h1>
             </div>
 
-            <p className="mt-6 max-w-2xl text-base leading-8 text-sand-100/86 sm:text-lg">
+            <p className="mt-5 max-w-2xl text-base leading-8 text-sand-100/86 sm:text-lg">
               Whether you need a custom monsoon escape, a private fort circuit, or a fast answer before booking,
               we will help you shape the route, difficulty, and group flow with confidence.
             </p>
 
-            <div className="mt-10 flex flex-wrap gap-4">
+            <div className="mt-8 flex flex-wrap gap-4">
               <a
                 href="tel:+919876543210"
                 className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-forest-500 to-[#6ac86a] px-7 py-3.5 text-sm font-semibold uppercase tracking-[0.14em] text-white shadow-[0_22px_55px_rgba(58,138,74,0.38)] transition hover:-translate-y-0.5 hover:shadow-[0_26px_60px_rgba(58,138,74,0.48)]"
@@ -302,11 +292,6 @@ export default function Contact() {
                     >
                       Send inquiry
                     </Button>
-
-                    <p className="max-w-xs text-xs leading-6 text-ink-600">
-                      Prefer WhatsApp-style details? A short message with your month, group, and comfort level works
-                      perfectly.
-                    </p>
                   </div>
 
                   {submitted ? (
