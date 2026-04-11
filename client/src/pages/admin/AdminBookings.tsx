@@ -18,18 +18,20 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type BookingStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' | 'REFUNDED';
+type BookingKind = 'TREK' | 'TOUR';
 
 interface BookingRow {
   id: string;
+  kind: BookingKind;
   status: BookingStatus;
   numberOfPeople: number;
   totalAmount: number;
   specialRequests?: string;
   createdAt: string;
   user?: { firstName: string; lastName: string; email: string; phone?: string };
-  trip?: { title: string; region?: string };
+  trip?: { title: string; region?: string; slug?: string };
   schedule?: { date: string };
-  participants?: Array<{ name: string; age: number }>;
+  participants?: Array<{ fullName: string; age: number; phone?: string }>;
   payment?: { status?: string };
 }
 
@@ -149,7 +151,10 @@ export default function AdminBookings() {
     if (!selected) return;
     setUpdatingStatus(true);
     try {
-      await api.put<ApiResponse<unknown>>(`/admin/bookings/${selected.id}/status`, { status: newStatus });
+      await api.put<ApiResponse<unknown>>(`/admin/bookings/${selected.id}/status`, {
+        status: newStatus,
+        kind: selected.kind,
+      });
       toast.success('Booking status updated');
       setSelected((cur) => cur ? { ...cur, status: newStatus } : cur);
       setBookings((cur) => cur.map((b) => b.id === selected.id ? { ...b, status: newStatus } : b));
@@ -260,8 +265,19 @@ export default function AdminBookings() {
                       </div>
                     </td>
                     <td className="px-5 py-4">
-                      <p className="min-w-[12rem] font-medium text-ink-700 leading-tight">{booking.trip?.title ?? '—'}</p>
-                      {booking.trip?.region && <p className="mt-0.5 text-xs text-ink-400">{booking.trip.region}</p>}
+                      <div className="min-w-[12rem]">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="font-medium text-ink-700 leading-tight">{booking.trip?.title ?? '—'}</p>
+                          <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] ${
+                            booking.kind === 'TOUR'
+                              ? 'bg-sea-500/10 text-sea-600'
+                              : 'bg-forest-500/10 text-forest-600'
+                          }`}>
+                            {booking.kind === 'TOUR' ? 'Tour' : 'Trek'}
+                          </span>
+                        </div>
+                        {booking.trip?.region && <p className="mt-0.5 text-xs text-ink-400">{booking.trip.region}</p>}
+                      </div>
                     </td>
                     <td className="px-5 py-4 whitespace-nowrap text-sm text-ink-600">
                       {booking.schedule?.date ? formatDate(booking.schedule.date) : '—'}
@@ -305,7 +321,7 @@ export default function AdminBookings() {
 
       {/* ── Booking Detail Modal ── */}
       {selected && !statusModal && (
-        <Modal title={`Booking — ${selected.user?.firstName ?? ''} ${selected.user?.lastName ?? ''}`} onClose={() => setSelected(null)}>
+        <Modal title={`${selected.kind === 'TOUR' ? 'Tour' : 'Trek'} booking — ${selected.user?.firstName ?? ''} ${selected.user?.lastName ?? ''}`} onClose={() => setSelected(null)}>
           <div className="space-y-4">
             {/* Status + action */}
             <div className="flex items-center justify-between rounded-xl border border-ink-900/6 bg-sand-50 px-4 py-3">
@@ -327,7 +343,7 @@ export default function AdminBookings() {
                 {selected.user?.phone && <p className="mt-0.5 text-sm text-ink-500">{selected.user.phone}</p>}
               </div>
               <div className="rounded-xl border border-ink-900/6 bg-sand-50 p-4">
-                <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-ink-400">Trip</p>
+                <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-ink-400">{selected.kind === 'TOUR' ? 'Tour' : 'Trip'}</p>
                 <p className="font-semibold text-ink-900">{selected.trip?.title ?? '—'}</p>
                 {selected.trip?.region && <p className="mt-0.5 text-sm text-ink-500">{selected.trip.region}</p>}
                 {selected.schedule?.date && <p className="mt-0.5 text-sm text-ink-500">Departure: {formatDate(selected.schedule.date)}</p>}
@@ -352,7 +368,7 @@ export default function AdminBookings() {
                   {selected.participants.map((p, i) => (
                     <div key={i} className="flex items-center gap-3 rounded-lg bg-white px-3 py-2 text-sm">
                       <span className="flex h-6 w-6 items-center justify-center rounded-full bg-sea-500/10 text-[10px] font-bold text-sea-600">{i + 1}</span>
-                      <span className="font-medium text-ink-900">{p.name}</span>
+                      <span className="font-medium text-ink-900">{p.fullName}</span>
                       <span className="ml-auto text-ink-500">Age {p.age}</span>
                     </div>
                   ))}
