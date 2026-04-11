@@ -45,7 +45,7 @@ router.get(
       const slug = firstString(req.params.slug);
       if (!slug) throw new AppError(400, 'Invalid tour slug');
 
-      const tour = await prisma.tour.findUnique({
+      const tour = await prisma.tour.findFirst({
         where: { slug, isActive: true },
       });
 

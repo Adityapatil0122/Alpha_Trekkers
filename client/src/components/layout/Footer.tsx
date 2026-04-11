@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
@@ -51,11 +52,20 @@ const socialLinks = [
    ───────────────────────────────────────────────────────────── */
 
 function FooterBg() {
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 768px)');
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
   return (
     <svg
       className="footer-bg pointer-events-none absolute inset-0 h-full w-full"
       viewBox="0 0 1440 900"
-      preserveAspectRatio="xMidYMax slice"
+      preserveAspectRatio={isMobile ? 'xMidYMid slice' : 'xMidYMax slice'}
       aria-hidden="true"
     >
       <defs>

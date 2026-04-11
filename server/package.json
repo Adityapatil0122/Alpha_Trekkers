@@ -8,6 +8,7 @@
     "start": "node dist/index.js",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
+    "db:seed:tours": "tsx scripts/upsert-tours.ts",
     "db:studio": "prisma studio"
   },
   "dependencies": {

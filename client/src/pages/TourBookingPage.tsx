@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -109,15 +109,34 @@ export default function TourBookingPage() {
       toast.success('Tour booked successfully');
       navigate('/my-bookings');
     } catch (error: unknown) {
+      const apiError = error as {
+        response?: { data?: { message?: string; errors?: Array<{ message?: string }> } };
+      };
       const message =
-        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        apiError.response?.data?.errors?.[0]?.message ||
+        apiError.response?.data?.message ||
         'Unable to complete the booking right now.';
       toast.error(message);
     }
   };
 
   if (loading) return <LoadingSpinner fullPage text="Loading booking journey..." />;
-  if (notFound || !tour) return <Navigate to="/trips" replace />;
+  if (notFound || !tour) {
+    return (
+      <section className="mx-auto max-w-3xl px-4 py-32 text-center sm:px-6 lg:px-8">
+        <p className="section-script">Booking unavailable</p>
+        <h1 className="mt-3 font-heading text-4xl text-ink-900 sm:text-5xl">This tour cannot be booked yet</h1>
+        <p className="mt-4 text-sm leading-7 text-ink-700/72">
+          The selected tour is missing or inactive in the admin database. Please choose an active tour from the tours page.
+        </p>
+        <div className="mt-7">
+          <Link to="/trips">
+            <Button>Back to tours</Button>
+          </Link>
+        </div>
+      </section>
+    );
+  }
 
   const totalPrice = tour.price * (participants?.length || 1);
 

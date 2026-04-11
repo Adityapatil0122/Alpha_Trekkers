@@ -104,6 +104,74 @@ const adminTripListSelect = {
   },
 };
 
+const validBookingStatuses = ['PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED', 'REFUNDED'] as const;
+const validBookingKinds = ['TREK', 'TOUR'] as const;
+
+type AdminBookingKind = (typeof validBookingKinds)[number];
+
+function normalizeTrekAdminBooking(booking: any) {
+  return {
+    id: booking.id,
+    kind: 'TREK' as const,
+    status: booking.status,
+    numberOfPeople: booking.numberOfPeople,
+    totalAmount: booking.totalAmount,
+    specialRequests: booking.specialRequests,
+    createdAt: booking.createdAt,
+    user: booking.user,
+    trip: booking.trip,
+    schedule: booking.schedule,
+    participants: (booking.participants ?? []).map((participant: any) => ({
+      id: participant.id,
+      fullName: participant.fullName,
+      age: participant.age,
+      phone: participant.phone,
+      emergencyName: participant.emergencyName,
+      emergencyPhone: participant.emergencyPhone,
+      medicalNotes: participant.medicalNotes,
+    })),
+    payment: booking.payment,
+  };
+}
+
+function normalizeTourAdminBooking(booking: any) {
+  return {
+    id: booking.id,
+    kind: 'TOUR' as const,
+    status: booking.status,
+    numberOfPeople: booking.numberOfPeople,
+    totalAmount: booking.totalAmount,
+    specialRequests: booking.specialRequests,
+    createdAt: booking.createdAt,
+    user: booking.user,
+    trip: {
+      id: booking.tourId,
+      title: booking.tourTitle,
+      slug: booking.tourSlug,
+    },
+    schedule: { date: booking.departureDate },
+    participants: (booking.participants ?? []).map((participant: any) => ({
+      id: participant.id,
+      fullName: participant.fullName,
+      age: participant.age,
+      phone: participant.phone,
+      emergencyName: participant.emergencyName,
+      emergencyPhone: participant.emergencyPhone,
+      medicalNotes: participant.medicalNotes,
+    })),
+    payment: undefined,
+  };
+}
+
+function addStatusGroups(
+  statusMap: Record<string, number>,
+  groups: Array<{ status: string; _count: { status: number } }>,
+) {
+  groups.forEach((group) => {
+    statusMap[group.status] = (statusMap[group.status] ?? 0) + group._count.status;
+  });
+}
+
 // All admin routes require auth + admin
 router.use(auth, adminOnly);
 
@@ -145,15 +213,19 @@ router.get(
       const [
         totalUsers,
         totalTrips,
-        totalBookings,
+        totalTrekBookings,
+        totalTourBookings,
         totalRevenue,
-        recentBookings,
-        bookingsByStatus,
+        recentTrekBookings,
+        recentTourBookings,
+        trekBookingsByStatus,
+        tourBookingsByStatus,
         unreadMessages,
       ] = await Promise.all([
         prisma.user.count(),
         prisma.trip.count({ where: { isActive: true } }),
         prisma.booking.count(),
+        prisma.tourBooking.count(),
         prisma.payment.aggregate({
           where: { status: 'COMPLETED' },
           _sum: { amount: true },
@@ -167,7 +239,18 @@ router.get(
             payment: { select: { status: true } },
           },
         }),
+        prisma.tourBooking.findMany({
+          take: 5,
+          orderBy: { createdAt: 'desc' },
+          include: {
+            user: { select: { firstName: true, lastName: true, email: true } },
+          },
+        }),
         prisma.booking.groupBy({
+          by: ['status'],
+          _count: { status: true },
+        }),
+        prisma.tourBooking.groupBy({
           by: ['status'],
           _count: { status: true },
         }),
@@ -191,9 +274,29 @@ router.get(
       });
 
       const statusMap: Record<string, number> = {};
-      bookingsByStatus.forEach((bookingGroup: { status: string; _count: { status: number } }) => {
-        statusMap[bookingGroup.status] = bookingGroup._count.status;
-      });
+      addStatusGroups(statusMap, trekBookingsByStatus);
+      addStatusGroups(statusMap, tourBookingsByStatus);
+
+      const totalBookings = totalTrekBookings + totalTourBookings;
+      const recentBookings = [
+        ...recentTrekBookings.map((booking) => ({
+          ...booking,
+          kind: 'TREK' as const,
+        })),
+        ...recentTourBookings.map((booking) => ({
+          id: booking.id,
+          kind: 'TOUR' as const,
+          status: booking.status,
+          numberOfPeople: booking.numberOfPeople,
+          totalAmount: booking.totalAmount,
+          createdAt: booking.createdAt,
+          user: booking.user,
+          trip: { title: booking.tourTitle },
+          payment: undefined,
+        })),
+      ]
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 5);
 
       res.json({
         success: true,
@@ -222,41 +325,78 @@ router.get(
   '/bookings',
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 20;
+      const page = Math.max(parseInt(req.query.page as string) || 1, 1);
+      const limit = Math.max(parseInt(req.query.limit as string) || 20, 1);
       const status = firstString(req.query.status);
       const tripId = firstString(req.query.tripId);
       const search = firstString(req.query.search);
 
-      const where: any = {};
-      if (status) where.status = status.toUpperCase();
-      if (tripId) where.tripId = tripId;
+      const trekWhere: any = {};
+      const tourWhere: any = {};
+      if (status) {
+        trekWhere.status = status.toUpperCase();
+        tourWhere.status = status.toUpperCase();
+      }
+      if (tripId) {
+        trekWhere.tripId = tripId;
+        tourWhere.tourId = tripId;
+      }
       if (search) {
-        where.OR = [
+        trekWhere.OR = [
           { user: { firstName: { contains: search, mode: 'insensitive' } } },
           { user: { lastName: { contains: search, mode: 'insensitive' } } },
           { user: { email: { contains: search, mode: 'insensitive' } } },
+          { trip: { title: { contains: search, mode: 'insensitive' } } },
+          { id: { contains: search, mode: 'insensitive' } },
+        ];
+        tourWhere.OR = [
+          { user: { firstName: { contains: search, mode: 'insensitive' } } },
+          { user: { lastName: { contains: search, mode: 'insensitive' } } },
+          { user: { email: { contains: search, mode: 'insensitive' } } },
+          { tourTitle: { contains: search, mode: 'insensitive' } },
+          { tourSlug: { contains: search, mode: 'insensitive' } },
           { id: { contains: search, mode: 'insensitive' } },
         ];
       }
 
-      const [bookings, total] = await Promise.all([
+      const take = page * limit;
+      const [trekBookings, tourBookings, totalTrekBookings, totalTourBookings] = await Promise.all([
         prisma.booking.findMany({
-          where,
+          where: trekWhere,
           include: {
             user: {
               select: { id: true, firstName: true, lastName: true, email: true, phone: true },
             },
-            trip: { select: { id: true, title: true, slug: true } },
+            trip: { select: { id: true, title: true, slug: true, region: true } },
             schedule: { select: { date: true } },
+            participants: true,
             payment: { select: { status: true, amount: true, paidAt: true } },
-            _count: { select: { participants: true } },
           },
           orderBy: { createdAt: 'desc' },
-          ...paginate(page, limit),
+          take,
         }),
-        prisma.booking.count({ where }),
+        prisma.tourBooking.findMany({
+          where: tourWhere,
+          include: {
+            user: {
+              select: { id: true, firstName: true, lastName: true, email: true, phone: true },
+            },
+            participants: true,
+          },
+          orderBy: { createdAt: 'desc' },
+          take,
+        }),
+        prisma.booking.count({ where: trekWhere }),
+        prisma.tourBooking.count({ where: tourWhere }),
       ]);
+
+      const total = totalTrekBookings + totalTourBookings;
+      const bookings = [
+        ...trekBookings.map(normalizeTrekAdminBooking),
+        ...tourBookings.map(normalizeTourAdminBooking),
+      ]
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice((page - 1) * limit, page * limit);
 
       res.json({
         success: true,
@@ -275,24 +415,47 @@ router.put(
     try {
       const id = firstString(req.params.id);
       const status = firstString(req.body.status)?.toUpperCase();
+      const kind = firstString(req.body.kind)?.toUpperCase() as AdminBookingKind | undefined;
       if (!id) throw new AppError(400, 'Invalid booking ID');
 
-      const validStatuses = ['PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED', 'REFUNDED'] as const;
-      if (!status || !(validStatuses as readonly string[]).includes(status)) {
-        throw new AppError(400, `Status must be one of: ${validStatuses.join(', ')}`);
+      if (!status || !(validBookingStatuses as readonly string[]).includes(status)) {
+        throw new AppError(400, `Status must be one of: ${validBookingStatuses.join(', ')}`);
+      }
+
+      if (kind && !(validBookingKinds as readonly string[]).includes(kind)) {
+        throw new AppError(400, `Booking kind must be one of: ${validBookingKinds.join(', ')}`);
       }
 
       const booking = await prisma.booking.findUnique({ where: { id } });
-      if (!booking) {
+      if (booking && kind !== 'TOUR') {
+        const updatedBooking = await prisma.booking.update({
+          where: { id },
+          data: { status: status as (typeof validBookingStatuses)[number] },
+          include: {
+            user: { select: { firstName: true, lastName: true, email: true } },
+            trip: { select: { title: true } },
+          },
+        });
+
+        res.json({
+          success: true,
+          message: `Booking status updated to ${status}`,
+          data: { booking: updatedBooking },
+        });
+        return;
+      }
+
+      const tourBooking = await prisma.tourBooking.findUnique({ where: { id } });
+      if (!tourBooking || kind === 'TREK') {
         throw new AppError(404, 'Booking not found');
       }
 
-      const updatedBooking = await prisma.booking.update({
+      const updatedBooking = await prisma.tourBooking.update({
         where: { id },
-        data: { status: status as (typeof validStatuses)[number] },
+        data: { status: status as (typeof validBookingStatuses)[number] },
         include: {
           user: { select: { firstName: true, lastName: true, email: true } },
-          trip: { select: { title: true } },
+          participants: true,
         },
       });
 

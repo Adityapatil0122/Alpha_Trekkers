@@ -1,4 +1,5 @@
-import { Link, Navigate, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import {
   ArrowRight,
   CalendarBlank,
@@ -8,23 +9,117 @@ import {
   UsersThree,
 } from '@phosphor-icons/react';
 import Button from '@/components/ui/Button';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import api from '@/lib/axios';
+import type { ApiResponse, Tour, TourType } from '@alpha-trekkers/shared';
 import {
   buildOneDayTripGuide,
-  findOneDayTripBySlug,
+  type OneDayTrip,
+  type OneDayTripType,
 } from '@/content/oneDayTrips';
 
 function buildBookingHref(slug: string) {
   return `/tour-booking/${slug}`;
 }
 
+const tourTypeLabels: Record<TourType, OneDayTripType> = {
+  HILL_STATION: 'Hill Station',
+  BEACH: 'Beach',
+  SPIRITUAL: 'Spiritual',
+  NATURE: 'Nature',
+  ADVENTURE: 'Adventure',
+};
+
+function formatMoney(amount: number) {
+  return `INR ${Math.round(amount).toLocaleString('en-IN')}`;
+}
+
+function formatDateLabel(value: string) {
+  return new Intl.DateTimeFormat('en-IN', {
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+  }).format(new Date(value));
+}
+
+function normalizeHighlights(highlights: string[]): [string, string, string, string] {
+  return [
+    highlights[0] ?? 'Scenic route',
+    highlights[1] ?? 'Guided travel flow',
+    highlights[2] ?? 'Local food stop',
+    highlights[3] ?? 'Clean return plan',
+  ];
+}
+
+function buildDisplayTrip(tour: Tour): OneDayTrip {
+  return {
+    slug: tour.slug,
+    title: tour.title,
+    typeLabel: tourTypeLabels[tour.typeLabel],
+    dateLabel: formatDateLabel(tour.departureDate),
+    groupSizeLabel: tour.groupSize,
+    distanceLabel: tour.distance,
+    driveTimeLabel: tour.driveTime,
+    priceLabel: formatMoney(tour.price),
+    comparePriceLabel: tour.comparePrice && tour.comparePrice > tour.price ? formatMoney(tour.comparePrice) : '',
+    summary: tour.summary,
+    highlights: normalizeHighlights(tour.highlights),
+    bestSeason: tour.bestSeason,
+    tip: tour.tip,
+    imageUrl: tour.imageUrl,
+  };
+}
+
 export default function OneDayTripDetail() {
   const { slug } = useParams<{ slug: string }>();
-  const trip = findOneDayTripBySlug(slug);
+  const [tour, setTour] = useState<Tour | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
 
-  if (!trip) {
-    return <Navigate to="/trips" replace />;
+  useEffect(() => {
+    if (!slug) {
+      setTour(null);
+      setLoadFailed(true);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    api
+      .get<ApiResponse<{ tour: Tour }>>(`/tours/${slug}`)
+      .then((response) => {
+        setTour(response.data.data.tour);
+        setLoadFailed(false);
+      })
+      .catch(() => {
+        setTour(null);
+        setLoadFailed(true);
+      })
+      .finally(() => setLoading(false));
+  }, [slug]);
+
+  if (loading) {
+    return <LoadingSpinner fullPage text="Loading tour..." />;
   }
 
+  if (loadFailed || !tour) {
+    return (
+      <section className="mx-auto max-w-3xl px-4 py-32 text-center sm:px-6 lg:px-8">
+        <p className="section-script">Tour unavailable</p>
+        <h1 className="mt-3 font-heading text-4xl text-ink-900 sm:text-5xl">This tour is not ready for booking</h1>
+        <p className="mt-4 text-sm leading-7 text-ink-700/72">
+          The tour may be inactive or missing from the admin database. Please check the tours page for active departures.
+        </p>
+        <div className="mt-7">
+          <Link to="/trips">
+            <Button>Back to tours</Button>
+          </Link>
+        </div>
+      </section>
+    );
+  }
+
+  const trip = buildDisplayTrip(tour);
   const bookingHref = buildBookingHref(trip.slug);
   const guide = buildOneDayTripGuide(trip);
 
@@ -180,7 +275,9 @@ export default function OneDayTripDetail() {
                   Starting from
                 </p>
                 <p className="mt-3 font-heading text-4xl text-ink-900 sm:text-5xl">{trip.priceLabel}</p>
-                <p className="mt-2 text-sm text-ink-600 line-through">{trip.comparePriceLabel}</p>
+                {trip.comparePriceLabel ? (
+                  <p className="mt-2 text-sm text-ink-600 line-through">{trip.comparePriceLabel}</p>
+                ) : null}
 
                 <div className="mt-6 space-y-3 border-t border-ink-900/8 pt-5 text-sm text-ink-700">
                   <div className="flex items-start justify-between gap-4">

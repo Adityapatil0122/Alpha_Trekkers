@@ -21,11 +21,22 @@ import Button from '@/components/ui/Button';
 
 const schema = z
   .object({
-    firstName: z.string().min(2, 'First name is required'),
-    lastName: z.string().min(2, 'Last name is required'),
-    email: z.string().email('Please enter a valid email'),
-    phone: z.string().optional(),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
+    firstName: z.string().trim().min(2, 'First name must be at least 2 characters'),
+    lastName: z.string().trim().min(2, 'Last name must be at least 2 characters'),
+    email: z.string().trim().email('Please enter a valid email').toLowerCase(),
+    phone: z
+      .string()
+      .trim()
+      .regex(/^[6-9]\d{9}$/, 'Enter a valid 10-digit Indian phone number')
+      .optional()
+      .or(z.literal('')),
+    password: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+      .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+      .regex(/[0-9]/, 'Password must contain at least one number')
+      .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character'),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -71,10 +82,10 @@ export default function Register() {
   const onSubmit = async (data: FormData) => {
     try {
       const payload = {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        phone: data.phone,
+        firstName: data.firstName.trim(),
+        lastName: data.lastName.trim(),
+        email: data.email.trim().toLowerCase(),
+        phone: data.phone?.trim() || undefined,
         password: data.password,
       };
       const response = await api.post<ApiResponse<AuthResponse & { refreshToken: string }>>('/auth/register', payload);
@@ -82,8 +93,12 @@ export default function Register() {
       toast.success('Account created successfully');
       navigate('/', { replace: true });
     } catch (error: unknown) {
+      const apiError = error as {
+        response?: { data?: { message?: string; errors?: Array<{ message?: string }> } };
+      };
       const message =
-        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        apiError.response?.data?.errors?.[0]?.message ||
+        apiError.response?.data?.message ||
         'Registration failed. Please try again.';
       toast.error(message);
     }
