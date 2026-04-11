@@ -423,126 +423,142 @@ export default function AdminTrips() {
   // ── Render ────────────────────────────────────────────────────────────
 
   return (
-    <div className="space-y-5">
-      {/* Table card */}
-      <div className="rounded-[1.6rem] border border-forest-500/12 bg-white shadow-[0_14px_34px_rgba(34,120,69,0.08)]">
-        {/* Table header */}
-        <div className="flex flex-col gap-3 border-b border-forest-500/10 px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-forest-600">Trip Directory</p>
-            <h3 className="mt-1 text-xl font-bold text-ink-900">Trips table</h3>
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <div className="relative w-full sm:w-[18rem]">
-              <MagnifyingGlass className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-forest-500" />
-              <input
-                value={tripSearch}
-                onChange={(e) => setTripSearch(e.target.value)}
-                placeholder="Search title, fort, or region"
-                className="w-full rounded-full border border-forest-500/12 bg-primary-50/60 py-2.5 pl-9 pr-4 text-sm text-ink-700 focus:border-forest-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-forest-500/20"
-              />
-            </div>
-            <div className="inline-flex rounded-full border border-forest-500/12 bg-white px-4 py-2 text-sm font-semibold text-forest-700">
-              Featured: {featuredCount}
-            </div>
-          </div>
+    <section className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.18em] text-forest-500">
+            Trip Directory
+          </span>
+          <h1 className="text-2xl font-extrabold tracking-tight text-ink-900">Trips directory</h1>
         </div>
 
-        {/* Table */}
-        <div className="admin-table-scroll">
-          {listLoading ? (
-            <div className="py-16"><LoadingSpinner text="Loading trips..." /></div>
-          ) : (
-            <table className="admin-table admin-table--compact min-w-[1024px]">
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <MagnifyingGlass className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400" />
+            <input
+              type="text"
+              placeholder="Search trips..."
+              value={tripSearch}
+              onChange={(e) => setTripSearch(e.target.value)}
+              className="h-10 w-56 rounded-full border border-ink-900/12 bg-white pl-9 pr-4 text-sm text-ink-900 placeholder:text-ink-400 focus:border-forest-500 focus:outline-none focus:ring-2 focus:ring-forest-500/20 transition"
+            />
+          </div>
+          <span className="inline-flex h-10 items-center rounded-full border border-forest-500/12 bg-forest-500/5 px-4 text-sm font-semibold text-forest-700">
+            <Star className="mr-1.5 h-3.5 w-3.5" weight="fill" /> {featuredCount} Featured
+          </span>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="rounded-xl border border-forest-500/10 bg-white">
+        {listLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <LoadingSpinner />
+          </div>
+        ) : tripList.length === 0 ? (
+          <div className="py-20 text-center text-sm text-ink-400">
+            {tripSearch ? 'No trips match your search.' : 'No trips found.'}
+          </div>
+        ) : (
+          <div className="admin-table-scroll overflow-x-auto">
+            <table className="admin-table admin-table--compact w-full text-left text-sm">
               <thead>
-                <tr>
-                  {['Trip', 'Category', 'Region', 'Price', 'Schedules', 'Bookings', 'Updated', 'Actions'].map((h) => (
-                    <th key={h}>{h}</th>
-                  ))}
+                <tr className="border-b border-ink-900/8">
+                  <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Trip</th>
+                  <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Difficulty</th>
+                  <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Region</th>
+                  <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Price</th>
+                  <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Status</th>
+                  <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Updated</th>
+                  <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {tripList.length === 0 ? (
-                  <tr><td colSpan={8} className="py-14 text-center text-sm text-ink-400">No trips found.</td></tr>
-                ) : tripList.map((trip) => (
-                  <tr key={trip.id}>
-                    <td>
-                      <div className="flex min-w-[16rem] items-center gap-3">
-                        <div className="h-12 w-12 shrink-0 overflow-hidden rounded-[14px] border border-forest-500/10 bg-primary-50/60">
-                          {trip.images?.[0]?.url ? (
-                            <img src={trip.images[0].url} alt={trip.title} className="h-full w-full object-cover" />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center text-forest-400">
-                              <ImageSquare className="h-4.5 w-4.5" />
-                            </div>
-                          )}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="font-semibold text-ink-900 leading-tight">{trip.title}</p>
-                          <p className="mt-0.5 max-w-[17rem] truncate text-xs text-ink-500">{trip.shortDescription}</p>
-                          <div className="mt-1.5">
-                            <StatusBadge active={trip.isActive} featured={trip.isFeatured} />
+                {tripList.map((trip) => (
+                  <tr
+                    key={trip.id}
+                    className="border-b border-ink-900/6 last:border-b-0 hover:bg-sand-50/60 transition-colors"
+                  >
+                    {/* TRIP column */}
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        {trip.images?.[0]?.url ? (
+                          <img
+                            src={trip.images[0].url}
+                            alt={trip.title}
+                            className="h-10 w-10 shrink-0 rounded-lg object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sand-100 text-ink-300 text-xs">
+                            <ImageSquare className="h-4 w-4" />
                           </div>
+                        )}
+                        <div className="min-w-0">
+                          <p className="truncate font-semibold text-ink-900">{trip.title}</p>
+                          <p className="truncate text-xs text-ink-400 max-w-[220px]">{trip.shortDescription}</p>
                         </div>
                       </div>
                     </td>
-                    <td>
-                      <div>
-                        <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-ink-700">{trip.category.replace('_', ' ')}</p>
-                        <div className="mt-1"><DifficultyBadge value={trip.difficulty} /></div>
-                      </div>
+
+                    {/* DIFFICULTY */}
+                    <td className="px-4 py-3">
+                      <DifficultyBadge value={trip.difficulty} />
                     </td>
-                    <td className="text-sm text-ink-600">{trip.region}</td>
-                    <td className="whitespace-nowrap">
-                      <p className="font-semibold text-ink-900">
+
+                    {/* REGION */}
+                    <td className="px-4 py-3 whitespace-nowrap text-ink-600">
+                      {trip.region}
+                    </td>
+
+                    {/* PRICE */}
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className="font-semibold text-forest-600">
                         INR {(trip.discountPrice ?? trip.basePrice).toLocaleString('en-IN')}
-                      </p>
+                      </span>
                       {trip.discountPrice && (
-                        <p className="mt-0.5 text-xs text-ink-400 line-through">
+                        <span className="ml-1.5 text-xs text-ink-400 line-through">
                           INR {trip.basePrice.toLocaleString('en-IN')}
-                        </p>
+                        </span>
                       )}
                     </td>
-                    <td className="text-center">
-                      <span className="inline-flex min-w-[2.25rem] items-center justify-center rounded-full bg-primary-50 px-2.5 py-1 text-sm font-semibold text-forest-700">
-                        {trip._count?.schedules ?? 0}
-                      </span>
+
+                    {/* STATUS */}
+                    <td className="px-4 py-3">
+                      <StatusBadge active={trip.isActive} featured={trip.isFeatured} />
                     </td>
-                    <td className="text-center">
-                      <span className="inline-flex min-w-[2.25rem] items-center justify-center rounded-full bg-forest-500/10 px-2.5 py-1 text-sm font-semibold text-forest-700">
-                        {trip._count?.bookings ?? 0}
-                      </span>
+
+                    {/* UPDATED */}
+                    <td className="px-4 py-3 whitespace-nowrap text-ink-500 text-xs">
+                      {formatDate(trip.updatedAt)}
                     </td>
-                    <td className="whitespace-nowrap">
-                      <span className="inline-flex rounded-full border border-forest-500/10 bg-white px-3 py-1 text-xs font-semibold text-ink-600">
-                        {formatDate(trip.updatedAt)}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="flex items-center gap-1.5">
+
+                    {/* ACTIONS */}
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-1">
                         <button
                           type="button"
                           onClick={() => openTripModal(trip.id)}
-                          className="flex h-8 w-8 items-center justify-center rounded-lg border border-forest-500/12 bg-forest-500/10 text-forest-700 hover:bg-forest-500/20 transition"
+                          className="flex h-8 w-8 items-center justify-center rounded-lg text-ink-400 hover:bg-forest-500/10 hover:text-forest-600 transition"
                           title="Edit trip"
                         >
-                          <PencilSimple className="h-3.5 w-3.5" />
+                          <PencilSimple className="h-4 w-4" />
                         </button>
                         <button
                           type="button"
                           onClick={() => { openTripModal(trip.id); setTimeout(() => setScheduleModalOpen(true), 400); }}
-                          className="flex h-8 w-8 items-center justify-center rounded-lg border border-forest-500/12 bg-primary-50 text-forest-700 hover:bg-primary-100 transition"
+                          className="flex h-8 w-8 items-center justify-center rounded-lg text-ink-400 hover:bg-sea-500/10 hover:text-sea-600 transition"
                           title="Manage schedules"
                         >
-                          <CalendarDots className="h-3.5 w-3.5" />
+                          <CalendarDots className="h-4 w-4" />
                         </button>
                         <button
                           type="button"
                           onClick={() => { openTripModal(trip.id); setTimeout(() => setImageModalOpen(true), 400); }}
-                          className="flex h-8 w-8 items-center justify-center rounded-lg border border-forest-500/12 bg-white text-forest-700 hover:bg-primary-50 transition"
+                          className="flex h-8 w-8 items-center justify-center rounded-lg text-ink-400 hover:bg-gold-500/10 hover:text-gold-600 transition"
                           title="Manage images"
                         >
-                          <ImageSquare className="h-3.5 w-3.5" />
+                          <ImageSquare className="h-4 w-4" />
                         </button>
                       </div>
                     </td>
@@ -550,8 +566,8 @@ export default function AdminTrips() {
                 ))}
               </tbody>
             </table>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* ── Edit Trip Modal ── */}
@@ -841,6 +857,6 @@ export default function AdminTrips() {
           </div>
         </Modal>
       )}
-    </div>
+    </section>
   );
 }

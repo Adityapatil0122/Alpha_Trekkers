@@ -14,8 +14,9 @@ import { MAHARASHTRA_MONSOON_IMAGES, type PaginatedResponse, type Trip } from '@
 import api from '@/lib/axios';
 import { useAuthStore } from '@/stores/authStore';
 import Button from '@/components/ui/Button';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
-const siteLogo = '/destinations/alogo.jpg';
+const siteLogo = '/destinations/alogo.png';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -27,6 +28,7 @@ export default function Navbar() {
   const [featuredTripsLoading, setFeaturedTripsLoading] = useState(true);
   const [expandedMobileMenu, setExpandedMobileMenu] = useState<'treks' | null>(null);
   const [mobileTrekCategory, setMobileTrekCategory] = useState<'WEEKEND' | 'WEEKDAY'>('WEEKEND');
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
   const treksMenuRef = useRef<HTMLDivElement | null>(null);
   const scrollFrameRef = useRef<number | null>(null);
   const { isAuthenticated, user, logout } = useAuthStore();
@@ -90,6 +92,9 @@ export default function Navbar() {
   }, []);
 
   const handleLogout = () => {
+    setLogoutDialogOpen(false);
+    setDropdownOpen(false);
+    setMobileOpen(false);
     logout();
     navigate('/');
   };
@@ -346,7 +351,7 @@ export default function Navbar() {
                         </Link>
                         <button
                           type="button"
-                          onClick={handleLogout}
+                          onClick={() => setLogoutDialogOpen(true)}
                           className="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-left text-sm text-red-500 hover:bg-red-50"
                         >
                           <SignOut className="h-4 w-4" />
@@ -590,7 +595,7 @@ export default function Navbar() {
                     </Link>
                     <button
                       type="button"
-                      onClick={handleLogout}
+                      onClick={() => setLogoutDialogOpen(true)}
                       className="w-full rounded-lg border border-red-200 px-4 py-3 text-sm font-medium text-red-500"
                     >
                       Sign Out
@@ -615,6 +620,17 @@ export default function Navbar() {
           </>
         )}
       </AnimatePresence>
+
+      <ConfirmDialog
+        open={logoutDialogOpen}
+        title="Sign out from your account?"
+        description="You will be logged out from the current session and returned to the home page."
+        confirmLabel="Sign out"
+        cancelLabel="Stay signed in"
+        icon={<SignOut className="h-7 w-7" weight="bold" />}
+        onClose={() => setLogoutDialogOpen(false)}
+        onConfirm={handleLogout}
+      />
     </>
   );
 }

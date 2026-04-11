@@ -9,18 +9,12 @@ import {
 } from '@phosphor-icons/react';
 import Button from '@/components/ui/Button';
 import {
-  buildOneDayTripInquiryMessage,
-  buildOneDayTripInquirySubject,
+  buildOneDayTripGuide,
   findOneDayTripBySlug,
 } from '@/content/oneDayTrips';
 
-function buildContactHref(slug: string) {
-  const params = new URLSearchParams({
-    trip: slug,
-    source: 'one-day-trips',
-  });
-
-  return `/contact?${params.toString()}`;
+function buildBookingHref(slug: string) {
+  return `/tour-booking/${slug}`;
 }
 
 export default function OneDayTripDetail() {
@@ -31,14 +25,16 @@ export default function OneDayTripDetail() {
     return <Navigate to="/trips" replace />;
   }
 
-  const contactHref = buildContactHref(trip.slug);
+  const bookingHref = buildBookingHref(trip.slug);
+  const guide = buildOneDayTripGuide(trip);
 
   return (
     <>
       <section className="relative overflow-hidden bg-[#08131f] pt-24 text-white">
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${trip.imageUrl})` }}
+        <img
+          src={trip.imageUrl}
+          alt={trip.title}
+          className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(6,16,25,0.78)_0%,rgba(7,22,33,0.62)_38%,rgba(8,24,36,0.24)_72%,rgba(7,20,28,0.14)_100%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(12,42,33,0.2)_0%,rgba(7,18,28,0.14)_32%,rgba(7,16,25,0.46)_100%)]" />
@@ -91,9 +87,9 @@ export default function OneDayTripDetail() {
           </div>
 
           <div className="mt-8">
-            <Link to={contactHref}>
+            <Link to={bookingHref}>
               <Button size="lg" rightIcon={<ArrowRight className="h-4 w-4" />}>
-                Plan this tour
+                Book this tour
               </Button>
             </Link>
           </div>
@@ -103,13 +99,31 @@ export default function OneDayTripDetail() {
       <section className="bg-[linear-gradient(180deg,#f7fbf8_0%,#ffffff_100%)] py-14 sm:py-16">
         <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:px-8">
           <div className="travel-panel rounded-[2rem] p-8">
-            <div className="border-t border-ink-900/8 pt-0 first:border-t-0">
+            <div className="border-t border-ink-900/8 pb-8 pt-0 first:border-t-0">
               <p className="section-script">Overview</p>
               <h2 className="mt-2 font-heading text-3xl text-ink-900 sm:text-4xl">About this location</h2>
-              <p className="mt-5 text-base leading-8 text-ink-700/78">{trip.summary}</p>
+              <div className="mt-5 space-y-5 text-base leading-8 text-ink-700/78">
+                {guide.intro.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
+              </div>
             </div>
 
-            <div className="border-t border-ink-900/8 pt-8">
+            <div className="border-t border-ink-900/8 pb-8 pt-8">
+              <h3 className="font-heading text-2xl text-ink-900 sm:text-3xl">Quick route facts</h3>
+              <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                {guide.quickFacts.map((fact) => (
+                  <div key={fact.label} className="rounded-[1.5rem] bg-sand-100 px-5 py-4">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-forest-600/82">
+                      {fact.label}
+                    </p>
+                    <p className="mt-2 text-sm leading-7 text-ink-800">{fact.value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="border-t border-ink-900/8 pb-8 pt-8">
               <h3 className="font-heading text-2xl text-ink-900 sm:text-3xl">Trip highlights</h3>
               <div className="mt-5 grid gap-4 sm:grid-cols-2">
                 {trip.highlights.map((item) => (
@@ -120,11 +134,40 @@ export default function OneDayTripDetail() {
               </div>
             </div>
 
-            <div className="border-t border-ink-900/8 pt-8">
+            <div className="border-t border-ink-900/8 pb-8 pt-8">
+              <h3 className="font-heading text-2xl text-ink-900 sm:text-3xl">How the day usually flows</h3>
+              <div className="mt-5 space-y-4">
+                {guide.dayPlan.map((step, index) => (
+                  <div key={step.title} className="rounded-[1.5rem] border border-ink-900/8 bg-white px-5 py-4 shadow-[0_14px_30px_rgba(15,23,42,0.04)]">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-forest-600/82">
+                      Stop {index + 1}
+                    </p>
+                    <h4 className="mt-2 text-lg font-semibold text-ink-900">{step.title}</h4>
+                    <p className="mt-2 text-sm leading-7 text-ink-700/78">{step.detail}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="border-t border-ink-900/8 pb-8 pt-8">
               <h3 className="font-heading text-2xl text-ink-900 sm:text-3xl">Travel notes</h3>
               <div className="mt-5 space-y-4 text-base leading-8 text-ink-700/78">
                 <p><strong className="text-ink-900">Best season:</strong> {trip.bestSeason}</p>
+                <p><strong className="text-ink-900">Drive time:</strong> {trip.driveTimeLabel}</p>
+                <p><strong className="text-ink-900">Works well for:</strong> {guide.quickFacts[1].value}</p>
                 <p><strong className="text-ink-900">Tip:</strong> {trip.tip}</p>
+              </div>
+            </div>
+
+            <div className="border-t border-ink-900/8 pt-8">
+              <h3 className="font-heading text-2xl text-ink-900 sm:text-3xl">Good add-ons nearby</h3>
+              <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                {guide.nearbyPicks.map((item) => (
+                  <div key={item.name} className="rounded-[1.5rem] bg-sand-100 px-5 py-4">
+                    <h4 className="text-lg font-semibold text-ink-900">{item.name}</h4>
+                    <p className="mt-2 text-sm leading-7 text-ink-700/78">{item.description}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -159,7 +202,7 @@ export default function OneDayTripDetail() {
                 </div>
 
                 <div className="mt-6">
-                  <Link to={contactHref} className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary-500 px-5 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-primary-600">
+                  <Link to={bookingHref} className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary-500 px-5 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-primary-600">
                     Book Now
                     <ArrowRight className="h-4 w-4" />
                   </Link>
@@ -169,14 +212,16 @@ export default function OneDayTripDetail() {
 
             <div className="travel-panel rounded-[2rem] p-6">
               <p className="section-script">Ready to book?</p>
-              <h3 className="mt-2 font-heading text-2xl text-ink-900 sm:text-3xl">Send a quick enquiry</h3>
+              <h3 className="mt-2 font-heading text-2xl text-ink-900 sm:text-3xl">Open instant booking</h3>
               <p className="mt-3 text-sm leading-7 text-ink-700/76">
-                We will prefill the subject and message for {trip.title}, then you can confirm availability,
-                pickup options, and final pricing.
+                Move into the dedicated reservation flow for {trip.title}, add traveler details, and confirm it directly without dropping into the general contact page.
               </p>
-              <div className="mt-5 rounded-[1.5rem] bg-sand-100 p-4 text-sm text-ink-700">
-                <p><strong className="text-ink-900">Subject:</strong> {buildOneDayTripInquirySubject(trip)}</p>
-                <p className="mt-2"><strong className="text-ink-900">Message:</strong> {buildOneDayTripInquiryMessage(trip)}</p>
+              <div className="mt-5">
+                <Link to={bookingHref}>
+                  <Button fullWidth rightIcon={<ArrowRight className="h-4 w-4" />}>
+                    Continue to booking
+                  </Button>
+                </Link>
               </div>
             </div>
           </aside>

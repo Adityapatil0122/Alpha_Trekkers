@@ -105,19 +105,19 @@ export default function AdminLogin() {
 
             <div>
               <label className="mb-2 block text-sm font-medium text-white">Password</label>
-              <div className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-white backdrop-blur-md">
-                <Lock className="h-5 w-5 text-forest-500" />
+              <div className="relative">
+                <Lock className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-forest-500" />
                 <input
                   {...register('password')}
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="section-admin current-password"
-                  className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-white/65 focus:outline-none"
+                  className="w-full rounded-2xl border border-white/20 bg-white/10 py-3 pl-12 pr-12 text-sm text-white placeholder:text-white/65 backdrop-blur-md focus:border-white/35 focus:outline-none"
                   placeholder="Enter your password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((current) => !current)}
-                  className="text-white/80"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/80"
                 >
                   {showPassword ? <EyeSlash className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>

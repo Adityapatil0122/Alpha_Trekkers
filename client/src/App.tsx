@@ -14,6 +14,7 @@ const About = lazy(() => import('@/pages/About'));
 const Contact = lazy(() => import('@/pages/Contact'));
 const CorporateTreks = lazy(() => import('@/pages/CorporateTreks'));
 const BookingPage = lazy(() => import('@/pages/BookingPage'));
+const TourBookingPage = lazy(() => import('@/pages/TourBookingPage'));
 const MyBookings = lazy(() => import('@/pages/MyBookings'));
 const AdminLogin = lazy(() => import('@/pages/admin/AdminLogin'));
 const AdminLayout = lazy(() => import('@/pages/admin/AdminLayout'));
@@ -22,6 +23,7 @@ const AdminTrips = lazy(() => import('@/pages/admin/AdminTrips'));
 const AdminBookings = lazy(() => import('@/pages/admin/AdminBookings'));
 const AdminMessages = lazy(() => import('@/pages/admin/AdminMessages'));
 const AdminUsers = lazy(() => import('@/pages/admin/AdminUsers'));
+const AdminTours = lazy(() => import('@/pages/admin/AdminTours'));
 
 function App() {
   return (
@@ -44,6 +46,7 @@ function App() {
           {/* Protected user routes */}
           <Route element={<ProtectedRoute />}>
             <Route path="/booking/:tripId/:scheduleId" element={<BookingPage />} />
+            <Route path="/tour-booking/:slug" element={<TourBookingPage />} />
             <Route path="/my-bookings" element={<MyBookings />} />
           </Route>
         </Route>
@@ -55,6 +58,7 @@ function App() {
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="trips" element={<AdminTrips />} />
+            <Route path="tours" element={<AdminTours />} />
             <Route path="bookings" element={<AdminBookings />} />
             <Route path="messages" element={<AdminMessages />} />
             <Route path="users" element={<AdminUsers />} />

@@ -173,10 +173,7 @@ export default function Trips() {
         </div>
       </section>
 
-      <section className="relative bg-[linear-gradient(180deg,#f7fbf8_0%,#ffffff_28%,#f7faf8_100%)] py-14 sm:py-16">
-        <div className="absolute left-0 top-10 h-56 w-56 rounded-full bg-[#dff0de] blur-3xl" />
-        <div className="absolute bottom-0 right-0 h-64 w-64 rounded-full bg-[#f5ecd0] blur-3xl" />
-
+      <section className="relative bg-white py-14 sm:py-16">
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-4xl text-center">
             <p className="section-script">Why choose us</p>

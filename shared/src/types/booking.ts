@@ -45,3 +45,28 @@ export interface CreateBookingRequest {
   promoCode?: string;
   participants: Omit<BookingParticipant, 'id'>[];
 }
+
+export interface TourBooking {
+  id: string;
+  userId: string;
+  tourId?: string | null;
+  tourSlug: string;
+  tourTitle: string;
+  tourImageUrl: string;
+  departureDate: string;
+  numberOfPeople: number;
+  pricePerPerson: number;
+  totalAmount: number;
+  status: BookingStatus;
+  specialRequests?: string;
+  participants: BookingParticipant[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateTourBookingRequest {
+  tourId: string;
+  numberOfPeople: number;
+  specialRequests?: string;
+  participants: Omit<BookingParticipant, 'id'>[];
+}

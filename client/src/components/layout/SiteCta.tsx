@@ -39,7 +39,6 @@ export default function SiteCta() {
                 alt="Explorer standing beside an ancient fort"
                 className="relative z-10 w-full object-contain drop-shadow-[0_22px_44px_rgba(0,0,0,0.28)]"
               />
-              <div className="pointer-events-none absolute inset-x-[31%] bottom-[9.5%] z-20 h-[16%] rounded-[999px] bg-[#f2efea]" />
             </div>
           </div>
         </div>

@@ -15,6 +15,7 @@ export interface PaginatedResponse<T> extends ApiResponse<T> {
 
 export * from './user.js';
 export * from './trip.js';
+export * from './tour.js';
 export * from './booking.js';
 export * from './payment.js';
 export * from './review.js';
