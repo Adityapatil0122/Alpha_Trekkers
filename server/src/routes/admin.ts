@@ -650,6 +650,189 @@ router.put(
   }
 );
 
+// ---------- TOURS ----------
+
+const tourSchema = z.object({
+  title: z.string().min(1, 'Title is required'),
+  typeLabel: z.enum(['HILL_STATION', 'BEACH', 'SPIRITUAL', 'NATURE', 'ADVENTURE']),
+  departureDate: z
+    .string()
+    .min(1, 'Departure date is required')
+    .refine((value) => !Number.isNaN(new Date(value).getTime()), 'Invalid departure date'),
+  groupSize: z.string().min(1, 'Group size is required'),
+  distance: z.string().min(1, 'Distance is required'),
+  driveTime: z.string().min(1, 'Drive time is required'),
+  price: z.coerce.number().positive('Price must be positive'),
+  comparePrice: z.coerce.number().positive('Compare price must be positive').optional(),
+  summary: z.string().min(1, 'Summary is required'),
+  highlights: z.array(z.string()),
+  bestSeason: z.string().min(1, 'Best season is required'),
+  tip: z.string().min(1, 'Tip is required'),
+  imageUrl: z.string().url('Invalid image URL'),
+  isActive: z.boolean().default(true),
+});
+
+function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+}
+
+router.get(
+  '/tours',
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 20;
+      const search = firstString(req.query.search);
+
+      const where: any = {};
+      if (search) {
+        where.OR = [
+          { title: { contains: search, mode: 'insensitive' } },
+          { slug: { contains: search, mode: 'insensitive' } },
+          { summary: { contains: search, mode: 'insensitive' } },
+        ];
+      }
+
+      const [tours, total] = await Promise.all([
+        prisma.tour.findMany({
+          where,
+          orderBy: { updatedAt: 'desc' },
+          ...paginate(page, limit),
+        }),
+        prisma.tour.count({ where }),
+      ]);
+
+      res.json({
+        success: true,
+        data: { tours },
+        pagination: paginationMeta(total, page, limit),
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+router.get(
+  '/tours/:id',
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id = firstString(req.params.id);
+      if (!id) throw new AppError(400, 'Invalid tour ID');
+
+      const tour = await prisma.tour.findUnique({ where: { id } });
+
+      if (!tour) {
+        throw new AppError(404, 'Tour not found');
+      }
+
+      res.json({
+        success: true,
+        data: { tour },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+router.post(
+  '/tours',
+  validate(tourSchema),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const slug = generateSlug(req.body.title);
+
+      const existing = await prisma.tour.findUnique({ where: { slug } });
+      if (existing) {
+        throw new AppError(409, 'A tour with a similar title already exists');
+      }
+
+      const tour = await prisma.tour.create({
+        data: {
+          ...req.body,
+          slug,
+          departureDate: parseDate(req.body.departureDate),
+        },
+      });
+
+      res.status(201).json({
+        success: true,
+        message: 'Tour created successfully',
+        data: { tour },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+router.put(
+  '/tours/:id',
+  validate(tourSchema.partial()),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id = firstString(req.params.id);
+      if (!id) throw new AppError(400, 'Invalid tour ID');
+
+      const existing = await prisma.tour.findUnique({ where: { id } });
+      if (!existing) {
+        throw new AppError(404, 'Tour not found');
+      }
+
+      const data: any = { ...req.body };
+      if (data.departureDate) {
+        data.departureDate = parseDate(data.departureDate);
+      }
+      if (data.title) {
+        data.slug = generateSlug(data.title);
+      }
+
+      const tour = await prisma.tour.update({
+        where: { id },
+        data,
+      });
+
+      res.json({
+        success: true,
+        message: 'Tour updated successfully',
+        data: { tour },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+router.delete(
+  '/tours/:id',
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id = firstString(req.params.id);
+      if (!id) throw new AppError(400, 'Invalid tour ID');
+
+      const existing = await prisma.tour.findUnique({ where: { id } });
+      if (!existing) {
+        throw new AppError(404, 'Tour not found');
+      }
+
+      await prisma.tour.delete({ where: { id } });
+
+      res.json({
+        success: true,
+        message: 'Tour deleted successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 // ---------- HERO IMAGES ----------
 
 router.get(

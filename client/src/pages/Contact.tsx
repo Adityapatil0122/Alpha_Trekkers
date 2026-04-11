@@ -170,9 +170,6 @@ export default function Contact() {
       </section>
 
       <section className="relative overflow-hidden bg-white py-16 sm:py-20">
-        <div className="absolute left-0 top-12 h-56 w-56 rounded-full bg-[#e1f0db] blur-3xl" />
-        <div className="absolute bottom-10 right-0 h-64 w-64 rounded-full bg-[#f4ecd3] blur-3xl" />
-
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-8 lg:grid-cols-[0.92fr_1.08fr]">
             <div className="space-y-5">
@@ -204,9 +201,7 @@ export default function Contact() {
             </div>
 
             <div className="relative">
-              <div className="absolute -left-8 top-10 hidden h-36 w-36 rounded-full bg-forest-500/10 blur-3xl lg:block" />
               <div className="relative overflow-hidden rounded-[2.2rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(249,251,248,0.98))] p-8 shadow-[0_32px_90px_rgba(15,23,42,0.08)] sm:p-10">
-                <div className="absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,#5cb85c,#d9b75f,#5cb85c)]" />
                 <p className="text-xs font-semibold uppercase tracking-[0.28em] text-forest-600">Send a message</p>
                 <h2 className="mt-4 max-w-md font-heading text-5xl leading-[0.95] text-[#163254]">
                   Start the next adventure conversation.

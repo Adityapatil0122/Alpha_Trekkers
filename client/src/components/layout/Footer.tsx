@@ -9,7 +9,7 @@ import {
   YoutubeLogo,
 } from '@phosphor-icons/react';
 
-const siteLogo = '/destinations/alogo.jpg';
+const siteLogo = '/destinations/alogo.png';
 
 const destinations = [
   { label: 'Mahabaleshwar', to: '/tours/mahabaleshwar' },

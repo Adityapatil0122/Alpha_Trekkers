@@ -16,7 +16,11 @@
       "Bash(npx concurrently:*)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173)",
       "Bash(wc -l /c/Users/Finlec A/Desktop/Alpha Treckers/client/src/pages/*.tsx)",
-      "mcp__Claude_Preview__preview_start"
+      "mcp__Claude_Preview__preview_start",
+      "Bash(xargs grep:*)",
+      "Bash(npx prisma:*)",
+      "Bash(node -e ':*)",
+      "Bash(node seed-tours.cjs)"
     ]
   }
 }

@@ -4,6 +4,7 @@ import {
   BellSimpleRinging,
   ChartBar,
   ChatCircleDots,
+  Compass,
   List,
   Mountains,
   SignOut,
@@ -12,10 +13,12 @@ import {
   X,
 } from '@phosphor-icons/react';
 import { useAuthStore } from '@/stores/authStore';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 const links = [
   { to: '/admin',          label: 'Dashboard', desc: 'Analytics and status',   Icon: ChartBar        },
   { to: '/admin/trips',    label: 'Trips',     desc: 'Table view and editing', Icon: Mountains       },
+  { to: '/admin/tours',    label: 'Tours',     desc: 'One-day trip manager',   Icon: Compass         },
   { to: '/admin/bookings', label: 'Bookings',  desc: 'Reservation control',    Icon: SuitcaseRolling },
   { to: '/admin/messages', label: 'Messages',  desc: 'Inbox and replies',      Icon: ChatCircleDots  },
   { to: '/admin/users',    label: 'Users',     desc: 'Registered accounts',    Icon: Users           },
@@ -24,10 +27,13 @@ const links = [
 const pageMeta: Record<string, { label: string; title: string }> = {
   '/admin':           { label: 'Analytics Dashboard', title: 'Control Center' },
   '/admin/trips':     { label: 'Trip Directory',       title: 'Trips'         },
+  '/admin/tours':     { label: 'Tour Directory',       title: 'Tours'         },
   '/admin/bookings':  { label: 'Reservation Hub',      title: 'Bookings'      },
   '/admin/messages':  { label: 'Inbox',                title: 'Messages'      },
   '/admin/users':     { label: 'User Directory',       title: 'Users'         },
 };
+
+const adminLogo = '/destinations/alogo.png';
 
 function getInitials(f?: string, l?: string) {
   return `${f?.[0] ?? 'A'}${l?.[0] ?? 'T'}`.toUpperCase();
@@ -36,6 +42,7 @@ function getInitials(f?: string, l?: string) {
 export default function AdminLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
@@ -48,6 +55,13 @@ export default function AdminLayout() {
   useEffect(() => {
     setMobileNavOpen(false);
   }, [location.pathname]);
+
+  const handleLogout = () => {
+    setLogoutDialogOpen(false);
+    setMobileNavOpen(false);
+    logout();
+    navigate('/admin/login', { replace: true });
+  };
 
   const W = collapsed ? 'lg:w-[68px]' : 'lg:w-60';
   const sidebarCopyClass = collapsed
@@ -75,13 +89,15 @@ export default function AdminLayout() {
       ) : null}
 
       {/* ── Fixed Sidebar ──────────────────────────────────────────── */}
-      <aside className={`fixed inset-y-0 left-0 z-40 flex w-60 max-w-[86vw] flex-col overflow-hidden border-r border-black/[0.07] bg-white shadow-[2px_0_16px_rgba(15,23,42,0.07)] transition-[transform,width,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${mobileNavOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 ${W}`}>
+      <aside className={`fixed inset-y-0 left-0 z-40 flex w-60 max-w-[86vw] flex-col overflow-hidden border-r border-black/[0.07] bg-white shadow-[2px_0_16px_rgba(15,23,42,0.07)] will-change-[width,transform] transition-[transform,width] duration-300 ease-out ${mobileNavOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 ${W}`}>
 
         {/* Logo row */}
         <div className="flex h-14 shrink-0 items-center gap-3 border-b border-black/[0.07] px-3">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-forest-500 to-sea-600 shadow-[0_4px_12px_rgba(34,120,69,0.3)]">
-            <Mountains className="h-4 w-4 text-white" weight="fill" />
-          </div>
+          <img
+            src={adminLogo}
+            alt="Alpha Trekkers logo"
+            className="h-8 w-8 shrink-0 rounded-full object-cover ring-1 ring-black/5"
+          />
           <div className={`overflow-hidden whitespace-nowrap transition-all duration-300 ease-out ${sidebarCopyClass}`}>
             <p className="text-[9px] font-bold uppercase tracking-[0.24em] text-ink-400 whitespace-nowrap">Alpha Trekkers</p>
             <p className="text-sm font-extrabold text-ink-900 leading-tight whitespace-nowrap">Admin Panel</p>
@@ -162,7 +178,7 @@ export default function AdminLayout() {
               <div title={user ? `${user.firstName} ${user.lastName}` : 'Admin'} className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-sea-500 to-forest-500 text-[11px] font-bold text-white">
                 {getInitials(user?.firstName, user?.lastName)}
               </div>
-              <button type="button" title="Sign out" onClick={() => { logout(); navigate('/admin/login', { replace: true }); }} className="flex h-7 w-7 items-center justify-center rounded-lg text-ink-400 hover:bg-coral-500/10 hover:text-coral-600 transition">
+              <button type="button" title="Sign out" onClick={() => setLogoutDialogOpen(true)} className="flex h-7 w-7 items-center justify-center rounded-lg text-ink-400 hover:bg-coral-500/10 hover:text-coral-600 transition">
                 <SignOut className="h-3.5 w-3.5" />
               </button>
             </div>
@@ -180,7 +196,7 @@ export default function AdminLayout() {
               </div>
               <button
                 type="button"
-                onClick={() => { logout(); navigate('/admin/login', { replace: true }); }}
+                onClick={() => setLogoutDialogOpen(true)}
                 className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg border border-black/[0.07] bg-sand-50 py-1.5 text-xs font-medium text-ink-600 hover:bg-coral-500/8 hover:text-coral-600 transition"
               >
                 <SignOut className="h-3.5 w-3.5" /> Sign out
@@ -192,7 +208,7 @@ export default function AdminLayout() {
       </aside>
 
       {/* ── Content area ───────────────────────────────────────────── */}
-      <div className={`flex min-h-screen flex-1 flex-col transition-[margin] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${collapsed ? 'lg:ml-[68px]' : 'lg:ml-60'}`}>
+      <div className={`flex min-h-screen flex-1 flex-col will-change-[margin] transition-[margin] duration-300 ease-out ${collapsed ? 'lg:ml-[68px]' : 'lg:ml-60'}`}>
 
         {/* Sticky top header bar */}
         <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-3 border-b border-black/[0.07] bg-white/96 px-4 backdrop-blur-sm shadow-[0_1px_6px_rgba(15,23,42,0.05)]">
@@ -245,6 +261,17 @@ export default function AdminLayout() {
           <Outlet />
         </main>
       </div>
+
+      <ConfirmDialog
+        open={logoutDialogOpen}
+        title="Sign out from admin?"
+        description="You will be logged out from the admin panel and sent back to the admin login page."
+        confirmLabel="Sign out"
+        cancelLabel="Stay here"
+        icon={<SignOut className="h-7 w-7" weight="bold" />}
+        onClose={() => setLogoutDialogOpen(false)}
+        onConfirm={handleLogout}
+      />
     </div>
   );
 }

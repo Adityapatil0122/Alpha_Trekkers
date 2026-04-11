@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   CalendarCheck,
-  ChatCircleDots,
   CheckCircle,
   ClockCounterClockwise,
   Mountains,
@@ -9,10 +8,13 @@ import {
   TrendUp,
   Users,
   XCircle,
+  Compass,
+  ChatCircleDots,
 } from '@phosphor-icons/react';
 import type { ApiResponse } from '@alpha-trekkers/shared';
 import api from '@/lib/axios';
 
+/* ── Types ── */
 interface DashboardStats {
   totalUsers: number;
   totalTrips: number;
@@ -27,17 +29,9 @@ interface RecentBooking {
   numberOfPeople: number;
   totalAmount: number;
   createdAt: string;
-  user?: {
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-  trip?: {
-    title: string;
-  };
-  payment?: {
-    status?: string;
-  };
+  user?: { firstName: string; lastName: string; email: string };
+  trip?: { title: string };
+  payment?: { status?: string };
 }
 
 interface DashboardPayload {
@@ -48,475 +42,247 @@ interface DashboardPayload {
 }
 
 const emptyPayload: DashboardPayload = {
-  stats: {
-    totalUsers: 0,
-    totalTrips: 0,
-    totalBookings: 0,
-    totalRevenue: 0,
-    unreadMessages: 0,
-  },
+  stats: { totalUsers: 0, totalTrips: 0, totalBookings: 0, totalRevenue: 0, unreadMessages: 0 },
   bookingsByStatus: {},
   monthlyRevenue: {},
   recentBookings: [],
 };
 
-const statCards = [
-  {
-    key: 'totalUsers',
-    label: 'Travelers',
-    subtitle: 'Registered accounts',
-    Icon: Users,
-    accentClass: 'bg-forest-500/10 text-forest-600',
-  },
-  {
-    key: 'totalTrips',
-    label: 'Trips live',
-    subtitle: 'Published departures',
-    Icon: Mountains,
-    accentClass: 'bg-forest-500/12 text-forest-700',
-  },
-  {
-    key: 'totalBookings',
-    label: 'Bookings',
-    subtitle: 'Reservations recorded',
-    Icon: SuitcaseRolling,
-    accentClass: 'bg-primary-100 text-primary-800',
-  },
-  {
-    key: 'unreadMessages',
-    label: 'Inbox',
-    subtitle: 'Pending replies',
-    Icon: ChatCircleDots,
-    accentClass: 'bg-primary-50 text-primary-800',
-  },
-] as const;
-
-const statusCards = [
-  {
-    key: 'CONFIRMED',
-    label: 'Confirmed',
-    Icon: CheckCircle,
-    pillClass: 'bg-forest-500/10 text-forest-700',
-    barClass: 'from-forest-500 to-forest-600',
-  },
-  {
-    key: 'PENDING',
-    label: 'Pending',
-    Icon: ClockCounterClockwise,
-    pillClass: 'bg-primary-50 text-forest-700',
-    barClass: 'from-primary-400 to-forest-500',
-  },
-  {
-    key: 'COMPLETED',
-    label: 'Completed',
-    Icon: CalendarCheck,
-    pillClass: 'bg-forest-500/12 text-forest-700',
-    barClass: 'from-forest-400 to-primary-600',
-  },
-  {
-    key: 'CANCELLED',
-    label: 'Cancelled',
-    Icon: XCircle,
-    pillClass: 'bg-coral-500/10 text-coral-600',
-    barClass: 'from-coral-400 to-coral-500',
-  },
-] as const;
-
-function formatMoney(amount: number) {
-  return `INR ${Math.round(amount).toLocaleString('en-IN')}`;
+/* ── Helpers ── */
+function fmt(n: number) {
+  return n.toLocaleString('en-IN');
+}
+function fmtMoney(n: number) {
+  return `INR ${Math.round(n).toLocaleString('en-IN')}`;
+}
+function fmtDate(v: string) {
+  return new Intl.DateTimeFormat('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(v));
+}
+function fmtMonth(v: string) {
+  const [y, m] = v.split('-');
+  return new Intl.DateTimeFormat('en-IN', { month: 'short' }).format(new Date(Number(y), Number(m) - 1, 1));
+}
+function initials(f?: string, l?: string) {
+  return `${f?.[0] ?? 'A'}${l?.[0] ?? 'T'}`.toUpperCase();
+}
+function linePath(vals: number[], w: number, h: number) {
+  if (!vals.length) return '';
+  const mx = Math.max(...vals, 1);
+  const s = vals.length === 1 ? w : w / (vals.length - 1);
+  return vals.map((v, i) => `${i === 0 ? 'M' : 'L'} ${(s * i).toFixed(1)} ${(h - (v / mx) * h).toFixed(1)}`).join(' ');
+}
+function areaPath(vals: number[], w: number, h: number) {
+  if (!vals.length) return '';
+  return `${linePath(vals, w, h)} L ${w} ${h} L 0 ${h} Z`;
 }
 
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat('en-IN', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(value));
-}
+const statusMeta: Record<string, { label: string; Icon: typeof CheckCircle; cls: string }> = {
+  CONFIRMED: { label: 'Confirmed', Icon: CheckCircle, cls: 'text-forest-600 bg-forest-500/10' },
+  PENDING: { label: 'Pending', Icon: ClockCounterClockwise, cls: 'text-amber-600 bg-amber-500/10' },
+  COMPLETED: { label: 'Completed', Icon: CalendarCheck, cls: 'text-sea-600 bg-sea-500/10' },
+  CANCELLED: { label: 'Cancelled', Icon: XCircle, cls: 'text-coral-600 bg-coral-500/10' },
+};
 
-function formatMonthLabel(value: string) {
-  const [year, month] = value.split('-');
-  return new Intl.DateTimeFormat('en-IN', {
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(Number(year), Number(month) - 1, 1));
-}
-
-function buildLinePath(values: number[], width: number, height: number) {
-  if (values.length === 0) return '';
-
-  const max = Math.max(...values, 1);
-  const step = values.length === 1 ? width : width / (values.length - 1);
-
-  return values
-    .map((value, index) => {
-      const x = step * index;
-      const y = height - (value / max) * height;
-      return `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`;
-    })
-    .join(' ');
-}
-
-function buildAreaPath(values: number[], width: number, height: number) {
-  if (values.length === 0) return '';
-
-  const line = buildLinePath(values, width, height);
-  return `${line} L ${width} ${height} L 0 ${height} Z`;
-}
-
-function getInitials(firstName?: string, lastName?: string) {
-  return `${firstName?.[0] ?? 'A'}${lastName?.[0] ?? 'T'}`.toUpperCase();
-}
-
-function getBookingStatusClass(status: string) {
-  const tones: Record<string, string> = {
-    CONFIRMED: 'bg-forest-500/10 text-forest-700',
-    PENDING: 'bg-primary-50 text-forest-700',
-    COMPLETED: 'bg-forest-500/12 text-forest-700',
-    CANCELLED: 'bg-coral-500/10 text-coral-600',
-  };
-
-  return tones[status] ?? 'bg-sand-100 text-ink-600';
-}
-
-function getPaymentStatusClass(status?: string) {
-  const tones: Record<string, string> = {
-    PAID: 'bg-forest-500/10 text-forest-700',
-    CAPTURED: 'bg-forest-500/10 text-forest-700',
-    PENDING: 'bg-primary-50 text-forest-700',
-    FAILED: 'bg-coral-500/10 text-coral-600',
-  };
-
-  if (!status) return 'bg-sand-100 text-ink-500';
-  return tones[status] ?? 'bg-sand-100 text-ink-600';
-}
-
+/* ── Component ── */
 export default function Dashboard() {
-  const [payload, setPayload] = useState<DashboardPayload>(emptyPayload);
+  const [data, setData] = useState<DashboardPayload>(emptyPayload);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     api
       .get<ApiResponse<DashboardPayload>>('/admin/dashboard')
-      .then((res) => setPayload(res.data.data))
-      .catch(() => setPayload(emptyPayload));
+      .then((r) => setData(r.data.data))
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
-  const revenueEntries = useMemo(
-    () => Object.entries(payload.monthlyRevenue).sort(([left], [right]) => left.localeCompare(right)),
-    [payload.monthlyRevenue],
+  const revEntries = useMemo(
+    () => Object.entries(data.monthlyRevenue).sort(([a], [b]) => a.localeCompare(b)),
+    [data.monthlyRevenue],
   );
-  const bookingTotal = Object.values(payload.bookingsByStatus).reduce((sum, count) => sum + count, 0);
-  const revenueValues = revenueEntries.map(([, amount]) => amount);
-  const revenuePath = buildLinePath(revenueValues, 540, 120);
-  const revenueAreaPath = buildAreaPath(revenueValues, 540, 120);
-  const latestRevenue = revenueEntries[revenueEntries.length - 1]?.[1] ?? 0;
-  const previousRevenue = revenueEntries[revenueEntries.length - 2]?.[1] ?? 0;
-  const revenueDelta =
-    previousRevenue > 0 ? ((latestRevenue - previousRevenue) / previousRevenue) * 100 : 0;
-  const headlineChip =
-    revenueEntries.length > 0
-      ? `${formatMonthLabel(revenueEntries[revenueEntries.length - 1][0])} closed`
-      : 'Live data';
+  const revVals = revEntries.map(([, v]) => v);
+  const bookTotal = Object.values(data.bookingsByStatus).reduce((s, c) => s + c, 0);
+  const latestRev = revEntries[revEntries.length - 1]?.[1] ?? 0;
+  const prevRev = revEntries[revEntries.length - 2]?.[1] ?? 0;
+  const delta = prevRev > 0 ? ((latestRev - prevRev) / prevRev) * 100 : 0;
+
+  if (loading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-[3px] border-forest-500 border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-4">
-      <section className="rounded-[1.5rem] border border-forest-500/12 bg-white shadow-[0_14px_36px_rgba(34,120,69,0.08)]">
-        <div className="flex flex-col gap-4 border-b border-forest-500/10 px-5 py-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-forest-600">
-              Analytics Dashboard
-            </p>
-            <h3 className="mt-1 text-2xl font-bold text-ink-900">Portfolio performance</h3>
-            <p className="mt-1 text-sm text-ink-500">
-              Revenue, booking flow, and recent reservations in one compact control surface.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex rounded-full border border-forest-500/12 bg-primary-50 px-3 py-1.5 text-xs font-semibold text-forest-700">
-              {headlineChip}
-            </span>
-            <span className="inline-flex items-center gap-1 rounded-full border border-forest-500/12 bg-white px-3 py-1.5 text-xs font-semibold text-ink-700">
-              <TrendUp className="h-3.5 w-3.5 text-forest-600" />
-              {revenueDelta.toFixed(1)}% trend
-            </span>
-          </div>
-        </div>
-
-        <div className="grid gap-0 border-t-0 md:grid-cols-3">
-          <div className="border-b border-forest-500/10 px-5 py-4 md:border-b-0 md:border-r">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-400">
-              Revenue window
-            </p>
-            <p className="mt-2 text-3xl font-bold text-ink-900">
-              {revenueEntries.length.toLocaleString('en-IN')}
-            </p>
-            <p className="mt-1 text-xs text-ink-500">Months included in the current snapshot</p>
-          </div>
-          <div className="border-b border-forest-500/10 px-5 py-4 md:border-b-0 md:border-r">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-400">
-              Booking pool
-            </p>
-            <p className="mt-2 text-3xl font-bold text-ink-900">
-              {bookingTotal.toLocaleString('en-IN')}
-            </p>
-            <p className="mt-1 text-xs text-ink-500">Reservation statuses currently tracked</p>
-          </div>
-          <div className="px-5 py-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-400">
-              Latest collections
-            </p>
-            <p className="mt-2 text-3xl font-bold text-forest-600">{formatMoney(latestRevenue)}</p>
-            <p className="mt-1 text-xs text-ink-500">Most recent completed revenue month</p>
-          </div>
-        </div>
-      </section>
-
-      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {statCards.map(({ key, label, subtitle, Icon, accentClass }) => (
+    <div className="space-y-5">
+      {/* ── Quick stats row ── */}
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+        {[
+          { label: 'Revenue', value: fmtMoney(data.stats.totalRevenue), Icon: TrendUp, accent: 'text-forest-600 bg-forest-500/10' },
+          { label: 'Travelers', value: fmt(data.stats.totalUsers), Icon: Users, accent: 'text-sea-600 bg-sea-500/10' },
+          { label: 'Trips', value: fmt(data.stats.totalTrips), Icon: Mountains, accent: 'text-forest-700 bg-forest-500/8' },
+          { label: 'Bookings', value: fmt(data.stats.totalBookings), Icon: SuitcaseRolling, accent: 'text-primary-700 bg-primary-100' },
+          { label: 'Messages', value: fmt(data.stats.unreadMessages), Icon: ChatCircleDots, accent: 'text-amber-600 bg-amber-500/10' },
+        ].map(({ label, value, Icon, accent }) => (
           <div
-            key={key}
-            className="rounded-[1.25rem] border border-forest-500/10 bg-white px-4 py-4 shadow-[0_10px_28px_rgba(34,120,69,0.06)]"
+            key={label}
+            className="flex items-center gap-3 rounded-2xl border border-black/[0.06] bg-white px-4 py-3.5"
           >
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-ink-400">
-                  {label}
-                </p>
-                <p className="mt-1 text-sm text-ink-500">{subtitle}</p>
-              </div>
-              <span className={`rounded-xl p-2.5 ${accentClass}`}>
-                <Icon className="h-4.5 w-4.5" />
-              </span>
+            <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${accent}`}>
+              <Icon className="h-5 w-5" />
+            </span>
+            <div className="min-w-0">
+              <p className="text-[11px] font-medium uppercase tracking-wider text-ink-400">{label}</p>
+              <p className="text-lg font-bold text-ink-900 leading-tight">{value}</p>
             </div>
-            <p className="mt-5 text-3xl font-bold text-ink-900">
-              {payload.stats[key].toLocaleString('en-IN')}
-            </p>
           </div>
         ))}
-      </section>
+      </div>
 
-      <section className="grid gap-4 xl:grid-cols-[minmax(0,1.12fr)_22rem]">
-        <div className="rounded-[1.5rem] border border-forest-500/12 bg-white p-5 shadow-[0_14px_36px_rgba(34,120,69,0.08)]">
-          <div className="flex flex-col gap-2 border-b border-forest-500/10 pb-4 sm:flex-row sm:items-center sm:justify-between">
+      {/* ── Revenue chart + Booking breakdown ── */}
+      <div className="grid gap-4 xl:grid-cols-[1fr_18rem]">
+        {/* Chart */}
+        <div className="rounded-2xl border border-black/[0.06] bg-white p-5">
+          <div className="flex items-center justify-between gap-3 pb-4">
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-forest-600">
-                Revenue Snapshot
-              </p>
-              <h3 className="mt-1 text-2xl font-bold text-ink-900">Monthly collections</h3>
+              <h3 className="text-lg font-bold text-ink-900">Revenue</h3>
+              <p className="text-xs text-ink-400">Last {revEntries.length} months</p>
             </div>
-            <p className="text-sm text-ink-500">Last six months of completed payments</p>
+            {delta !== 0 && (
+              <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${delta >= 0 ? 'bg-forest-500/10 text-forest-700' : 'bg-coral-500/10 text-coral-600'}`}>
+                <TrendUp className={`h-3.5 w-3.5 ${delta < 0 ? 'rotate-180' : ''}`} />
+                {Math.abs(delta).toFixed(1)}%
+              </span>
+            )}
           </div>
 
-          {revenueEntries.length > 0 ? (
-            <>
-              <div className="mt-5 rounded-[1.25rem] border border-forest-500/10 bg-[linear-gradient(180deg,#f8fff8_0%,#ffffff_100%)] p-4">
-                <svg viewBox="0 0 540 150" className="h-40 w-full">
-                  <defs>
-                    <linearGradient id="dashboard-revenue-area" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stopColor="rgba(92,184,92,0.24)" />
-                      <stop offset="100%" stopColor="rgba(92,184,92,0)" />
-                    </linearGradient>
-                  </defs>
-                  <path d={revenueAreaPath} fill="url(#dashboard-revenue-area)" transform="translate(0,10)" />
-                  <path
-                    d={revenuePath}
-                    fill="none"
-                    stroke="#5cb85c"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    transform="translate(0,10)"
-                  />
-                  {revenueValues.map((value, index) => {
-                    const x = revenueValues.length === 1 ? 0 : (540 / (revenueValues.length - 1)) * index;
-                    const max = Math.max(...revenueValues, 1);
-                    const y = 10 + 120 - (value / max) * 120;
-
-                    return (
-                      <g key={`${index}-${value}`}>
-                        <circle cx={x} cy={y} r="4.5" fill="#ffffff" stroke="#5cb85c" strokeWidth="2.5" />
-                        <text
-                          x={x}
-                          y="148"
-                          textAnchor="middle"
-                          fill="#64748b"
-                          fontSize="11"
-                          fontWeight="600"
-                        >
-                          {formatMonthLabel(revenueEntries[index][0]).split(' ')[0]}
-                        </text>
-                      </g>
-                    );
-                  })}
-                </svg>
-              </div>
-
-              <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                {revenueEntries.map(([month, amount]) => {
-                  const max = Math.max(...revenueValues, 1);
-                  return (
-                    <div
-                      key={month}
-                      className="rounded-[1rem] border border-forest-500/10 bg-primary-50/60 px-4 py-3"
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <div>
-                          <p className="text-sm font-semibold text-ink-900">{formatMonthLabel(month)}</p>
-                          <p className="text-[11px] uppercase tracking-[0.14em] text-ink-400">
-                            Completed
-                          </p>
-                        </div>
-                        <p className="text-sm font-bold text-forest-700">{formatMoney(amount)}</p>
-                      </div>
-                      <div className="mt-3 h-1.5 rounded-full bg-white">
-                        <div
-                          className="h-1.5 rounded-full bg-gradient-to-r from-primary-400 to-forest-600"
-                          style={{ width: `${Math.max((amount / max) * 100, 8)}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
+          {revEntries.length > 0 ? (
+            <div className="rounded-xl border border-black/[0.04] bg-gradient-to-b from-forest-500/[0.03] to-transparent p-4">
+              <svg viewBox="0 0 500 120" className="h-32 w-full" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="rv-area" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#22c55e" stopOpacity="0.18" />
+                    <stop offset="100%" stopColor="#22c55e" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+                <path d={areaPath(revVals, 500, 110)} fill="url(#rv-area)" transform="translate(0,5)" />
+                <path d={linePath(revVals, 500, 110)} fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" transform="translate(0,5)" />
+                {revVals.map((v, i) => {
+                  const x = revVals.length === 1 ? 0 : (500 / (revVals.length - 1)) * i;
+                  const mx = Math.max(...revVals, 1);
+                  const y = 5 + 110 - (v / mx) * 110;
+                  return <circle key={i} cx={x} cy={y} r="4" fill="#fff" stroke="#22c55e" strokeWidth="2" />;
                 })}
+              </svg>
+              <div className="mt-2 flex justify-between text-[10px] font-medium text-ink-400">
+                {revEntries.map(([m]) => (
+                  <span key={m}>{fmtMonth(m)}</span>
+                ))}
               </div>
-            </>
+            </div>
           ) : (
-            <div className="mt-5 rounded-[1.2rem] border border-dashed border-forest-500/18 bg-primary-50/50 px-5 py-10 text-center text-sm text-ink-500">
-              No completed payments were returned for the recent six-month window.
+            <div className="rounded-xl border border-dashed border-black/10 py-10 text-center text-sm text-ink-400">
+              No revenue data yet.
             </div>
           )}
         </div>
 
-        <div className="rounded-[1.5rem] border border-forest-500/12 bg-white p-5 shadow-[0_14px_36px_rgba(34,120,69,0.08)]">
-          <div className="flex items-center justify-between gap-3 border-b border-forest-500/10 pb-4">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-forest-600">
-                Reservation Stages
-              </p>
-              <h3 className="mt-1 text-2xl font-bold text-ink-900">Operational status</h3>
-            </div>
-            <span className="rounded-full border border-forest-500/12 bg-primary-50 px-3 py-1 text-xs font-semibold text-forest-700">
-              {bookingTotal.toLocaleString('en-IN')} total
-            </span>
+        {/* Booking breakdown */}
+        <div className="rounded-2xl border border-black/[0.06] bg-white p-5">
+          <div className="flex items-center justify-between gap-2 pb-4">
+            <h3 className="text-lg font-bold text-ink-900">Bookings</h3>
+            <span className="text-xs font-semibold text-ink-400">{fmt(bookTotal)} total</span>
           </div>
-
-          <div className="mt-5 space-y-4">
-            {statusCards.map(({ key, label, Icon, pillClass, barClass }) => {
-              const count = payload.bookingsByStatus[key] ?? 0;
-              const width = bookingTotal === 0 ? 0 : Math.max((count / bookingTotal) * 100, 4);
-
+          <div className="space-y-2.5">
+            {Object.entries(statusMeta).map(([key, { label, Icon, cls }]) => {
+              const count = data.bookingsByStatus[key] ?? 0;
+              const pct = bookTotal === 0 ? 0 : Math.max((count / bookTotal) * 100, 3);
               return (
-                <div key={key} className="rounded-[1rem] border border-forest-500/10 bg-white px-4 py-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <span className={`rounded-full p-2.5 ${pillClass}`}>
-                        <Icon className="h-4.5 w-4.5" />
-                      </span>
-                      <div>
-                        <p className="text-sm font-semibold text-ink-900">{label}</p>
-                        <p className="text-[11px] text-ink-400">Booking status</p>
-                      </div>
+                <div key={key} className="flex items-center gap-3">
+                  <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${cls}`}>
+                    <Icon className="h-4 w-4" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-medium text-ink-700">{label}</span>
+                      <span className="font-bold text-ink-900">{count}</span>
                     </div>
-                    <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${pillClass}`}>
-                      {count.toLocaleString('en-IN')}
-                    </span>
-                  </div>
-                  <div className="mt-3 h-1.5 rounded-full bg-sand-100">
-                    <div
-                      className={`h-1.5 rounded-full bg-gradient-to-r ${barClass}`}
-                      style={{ width: `${width}%` }}
-                    />
+                    <div className="mt-1 h-1.5 rounded-full bg-black/[0.04]">
+                      <div
+                        className="h-1.5 rounded-full bg-current transition-all"
+                        style={{ width: `${pct}%`, color: cls.includes('forest') ? '#16a34a' : cls.includes('amber') ? '#d97706' : cls.includes('sea') ? '#0284c7' : '#ef4444' }}
+                      />
+                    </div>
                   </div>
                 </div>
               );
             })}
           </div>
         </div>
-      </section>
+      </div>
 
-      <section className="rounded-[1.5rem] border border-forest-500/12 bg-white p-5 shadow-[0_14px_36px_rgba(34,120,69,0.08)]">
-        <div className="flex flex-col gap-2 border-b border-forest-500/10 pb-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-forest-600">
-              Recent Activity
-            </p>
-            <h3 className="mt-1 text-2xl font-bold text-ink-900">Latest bookings</h3>
-          </div>
-          <span className="rounded-full border border-forest-500/12 bg-primary-50 px-3 py-1 text-xs font-semibold text-forest-700">
-            {payload.recentBookings.length.toLocaleString('en-IN')} rows
-          </span>
+      {/* ── Recent bookings table ── */}
+      <div className="rounded-2xl border border-black/[0.06] bg-white p-5">
+        <div className="flex items-center justify-between gap-3 pb-4">
+          <h3 className="text-lg font-bold text-ink-900">Recent bookings</h3>
+          <span className="text-xs text-ink-400">{data.recentBookings.length} latest</span>
         </div>
 
-        <div className="admin-table-scroll mt-4">
+        <div className="admin-table-scroll">
           <table className="admin-table admin-table--compact min-w-full">
             <thead>
               <tr>
                 <th>Traveler</th>
                 <th>Trip</th>
-                <th>People</th>
                 <th>Status</th>
-                <th>Payment</th>
-                <th>Total</th>
-                <th>Booked on</th>
+                <th>Amount</th>
+                <th>Date</th>
               </tr>
             </thead>
             <tbody>
-              {payload.recentBookings.length > 0 ? (
-                payload.recentBookings.map((booking) => {
-                  const paymentStatus = booking.payment?.status ?? 'NA';
-                  return (
-                    <tr key={booking.id}>
-                      <td>
-                        <div className="flex min-w-[15rem] items-center gap-3">
-                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#7fd67f_0%,#33a05b_100%)] text-sm font-bold text-white">
-                            {getInitials(booking.user?.firstName, booking.user?.lastName)}
-                          </span>
-                          <div>
-                            <p className="font-semibold text-ink-900">
-                              {booking.user
-                                ? `${booking.user.firstName} ${booking.user.lastName}`
-                                : 'Unknown traveler'}
-                            </p>
-                            <p className="mt-0.5 text-xs text-ink-500">
-                              {booking.user?.email ?? 'No email'}
-                            </p>
-                          </div>
+              {data.recentBookings.length > 0 ? (
+                data.recentBookings.map((b) => (
+                  <tr key={b.id}>
+                    <td>
+                      <div className="flex items-center gap-2.5">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-forest-400 to-forest-600 text-[10px] font-bold text-white">
+                          {initials(b.user?.firstName, b.user?.lastName)}
+                        </span>
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-semibold text-ink-900">
+                            {b.user ? `${b.user.firstName} ${b.user.lastName}` : 'Unknown'}
+                          </p>
                         </div>
-                      </td>
-                      <td className="min-w-[15rem] font-medium text-ink-700">
-                        {booking.trip?.title ?? 'Trip unavailable'}
-                      </td>
-                      <td>{booking.numberOfPeople.toLocaleString('en-IN')}</td>
-                      <td>
-                        <span
-                          className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] ${getBookingStatusClass(booking.status)}`}
-                        >
-                          {booking.status}
-                        </span>
-                      </td>
-                      <td>
-                        <span
-                          className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] ${getPaymentStatusClass(paymentStatus)}`}
-                        >
-                          {paymentStatus.replace(/_/g, ' ')}
-                        </span>
-                      </td>
-                      <td className="font-semibold text-ink-900">{formatMoney(booking.totalAmount)}</td>
-                      <td className="text-sm text-ink-600">{formatDate(booking.createdAt)}</td>
-                    </tr>
-                  );
-                })
+                      </div>
+                    </td>
+                    <td className="max-w-[14rem] truncate text-sm text-ink-600">
+                      {b.trip?.title ?? '—'}
+                    </td>
+                    <td>
+                      <span
+                        className={`inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${
+                          statusMeta[b.status]?.cls ?? 'bg-sand-100 text-ink-500'
+                        }`}
+                      >
+                        {b.status}
+                      </span>
+                    </td>
+                    <td className="text-sm font-semibold text-ink-900">{fmtMoney(b.totalAmount)}</td>
+                    <td className="text-xs text-ink-500">{fmtDate(b.createdAt)}</td>
+                  </tr>
+                ))
               ) : (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-sm text-ink-500">
-                    No recent bookings were returned.
+                  <td colSpan={5} className="py-10 text-center text-sm text-ink-400">
+                    No recent bookings.
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
-      </section>
+      </div>
     </div>
   );
 }

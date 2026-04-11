@@ -64,8 +64,9 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  bookings Booking[]
-  reviews  Review[]
+  bookings     Booking[]
+  tourBookings TourBooking[]
+  reviews      Review[]
 
   @@map("users")
 }
@@ -242,4 +243,76 @@ model ContactMessage {
   createdAt DateTime @default(now())
 
   @@map("contact_messages")
+}
+
+enum TourType {
+  HILL_STATION
+  BEACH
+  SPIRITUAL
+  NATURE
+  ADVENTURE
+}
+
+model Tour {
+  id            String   @id @default(uuid())
+  title         String
+  slug          String   @unique
+  typeLabel     TourType
+  departureDate DateTime
+  groupSize     String
+  distance      String
+  driveTime     String
+  price         Float
+  comparePrice  Float?
+  summary       String
+  highlights    Json
+  bestSeason    String
+  tip           String
+  imageUrl      String
+  isActive      Boolean  @default(true)
+  totalBookings Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  bookings TourBooking[]
+
+  @@map("tours")
+}
+
+model TourBooking {
+  id              String        @id @default(uuid())
+  userId          String
+  tourId          String?
+  tourSlug        String
+  tourTitle       String
+  tourImageUrl    String
+  departureDate   DateTime
+  numberOfPeople  Int
+  pricePerPerson  Float
+  totalAmount     Float
+  status          BookingStatus @default(CONFIRMED)
+  specialRequests String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  user         User                     @relation(fields: [userId], references: [id])
+  tour         Tour?                    @relation(fields: [tourId], references: [id], onDelete: SetNull)
+  participants TourBookingParticipant[]
+
+  @@map("tour_bookings")
+}
+
+model TourBookingParticipant {
+  id             String  @id @default(uuid())
+  tourBookingId  String
+  fullName       String
+  age            Int
+  phone          String
+  emergencyName  String?
+  emergencyPhone String?
+  medicalNotes   String?
+
+  tourBooking TourBooking @relation(fields: [tourBookingId], references: [id], onDelete: Cascade)
+
+  @@map("tour_booking_participants")
 }
