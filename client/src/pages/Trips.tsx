@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
+  CalendarBlank,
   UsersThree,
   Star,
 } from '@phosphor-icons/react';
@@ -10,6 +11,7 @@ import { MAHARASHTRA_MONSOON_IMAGES } from '@alpha-trekkers/shared';
 import type { ApiResponse, Tour, TourType } from '@alpha-trekkers/shared';
 import api from '@/lib/axios';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { getTourDisplayImage } from '@/content/tourImageOverrides';
 
 type TripFilter = 'All' | TourType;
 
@@ -60,7 +62,7 @@ function getBookingHref(tour: Tour) {
 }
 
 function formatMoney(amount: number) {
-  return `INR ${Math.round(amount).toLocaleString('en-IN')}`;
+  return `₹${Math.round(amount).toLocaleString('en-IN')}`;
 }
 
 function formatDateLabel(value: string) {
@@ -78,43 +80,46 @@ function TripCard({
   tour: Tour;
   index: number;
 }) {
+  const displayImage = getTourDisplayImage(tour);
+
   return (
     <motion.article
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 36, scale: 0.97 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, amount: 0.18 }}
       transition={{
-        duration: 0.42,
-        delay: Math.min(index, 5) * 0.04,
+        duration: 0.55,
+        delay: Math.min(index, 5) * 0.08,
         ease: [0.22, 1, 0.36, 1],
       }}
       whileHover={{ y: -6 }}
-      className="flex h-full flex-col overflow-hidden rounded-[2.2rem] border border-[#dbe4de] bg-white shadow-[0_18px_48px_rgba(15,23,42,0.07)]"
+      className="group flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-slate-200/70 bg-white shadow-[0_10px_28px_rgba(15,23,42,0.045)]"
     >
-      <div className="relative h-[12.5rem] overflow-hidden sm:h-[13.5rem]">
+      <div className="relative h-52 overflow-hidden sm:h-56">
         <img
-          src={tour.imageUrl}
-          alt={tour.title}
-          className="h-full w-full object-cover"
+          src={displayImage.src}
+          alt={displayImage.alt}
+          className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
         />
-        <div className="absolute left-4 top-4 flex items-center gap-2">
-          <span className="rounded-[0.8rem] bg-[#57b94f] px-3.5 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-white shadow-[0_12px_24px_rgba(87,185,79,0.24)]">
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,14,24,0.03)_0%,rgba(7,14,24,0.12)_48%,rgba(7,14,24,0.68)_100%)]" />
+      </div>
+
+      <div className="relative flex flex-1 flex-col bg-white px-5 pb-5 pt-4 sm:px-6">
+        <div className="flex flex-wrap items-center gap-2 text-[0.88rem] text-slate-500">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-forest-500/10 px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-forest-600">
+            {typeLabels[tour.typeLabel]}
+          </span>
+          <span className="inline-flex items-center gap-1.5 text-slate-500">
+            <CalendarBlank className="h-4 w-4 shrink-0 text-lime-500" weight="fill" />
             {formatDateLabel(tour.departureDate)}
           </span>
         </div>
-      </div>
 
-      <div className="flex flex-1 flex-col px-5 pb-6 pt-5 sm:px-7">
-        <div className="mb-3">
-          <span className="rounded-full bg-forest-500/10 px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-forest-600">
-            {typeLabels[tour.typeLabel]}
-          </span>
-        </div>
-        <h2 className="min-h-[3.3rem] font-heading text-[1.45rem] leading-[1.08] text-[#0f2540] sm:min-h-[3.9rem] sm:text-[1.7rem]">
+        <h2 className="mt-2.5 min-h-[3.5rem] line-clamp-2 font-semibold leading-tight tracking-[-0.03em] text-slate-950 text-[1.45rem] sm:min-h-[3.9rem] sm:text-[1.65rem]">
           {tour.title}
         </h2>
 
-        <div className="mt-4 flex items-center gap-2 text-sm text-slate-600">
+        <div className="mt-2 flex items-center gap-2 text-sm text-slate-600">
           <div className="flex items-center gap-1 text-amber-400">
             {Array.from({ length: 5 }).map((_, starIndex) => (
               <Star
@@ -127,32 +132,30 @@ function TripCard({
           <span className="text-slate-700">(1 Review)</span>
         </div>
 
-        <div className="mt-5 flex flex-wrap items-center gap-6 text-[0.95rem] text-slate-500">
+        <div className="mt-4 flex flex-wrap items-center gap-6 text-[0.95rem] text-slate-500">
           <div className="flex items-center gap-2">
             <UsersThree className="h-5 w-5 text-lime-500" weight="fill" />
             <span>{tour.groupSize}</span>
           </div>
         </div>
 
-        <div className="mt-auto border-t border-slate-200 pt-5">
+        <div className="mt-auto border-t border-slate-200 pt-4">
           <div className="flex flex-wrap items-end gap-2">
             <p className="text-[1.05rem] text-slate-500">From</p>
-            <p className="font-heading text-[1.8rem] leading-none text-lime-600 sm:text-[2.15rem]">
+            <p className="font-semibold leading-none text-lime-600 text-[1.45rem] sm:text-[1.65rem]">
               {formatMoney(tour.price)}
             </p>
             {tour.comparePrice && tour.comparePrice > tour.price ? (
-              <p className="pb-1 text-sm text-slate-400 line-through">{formatMoney(tour.comparePrice)}</p>
+              <p className="pb-0.5 text-base text-slate-400 line-through">{formatMoney(tour.comparePrice)}</p>
             ) : null}
           </div>
-        </div>
 
-        <div className="mt-6">
           <Link
             to={getBookingHref(tour)}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#5dbb59] px-5 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-[#51ae4d]"
+            className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary-500 px-4 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white transition duration-300 group-hover:-translate-y-0.5 group-hover:bg-primary-600"
           >
             Book Now
-            <ArrowRight className="h-4 w-4" />
+            <ArrowRight className="h-4 w-4" weight="bold" />
           </Link>
         </div>
       </div>

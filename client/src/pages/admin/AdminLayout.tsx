@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
-  BellSimpleRinging,
   ChartBar,
-  ChatCircleDots,
   Compass,
   List,
   Mountains,
@@ -17,21 +15,11 @@ import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 const links = [
   { to: '/admin',          label: 'Dashboard', desc: 'Analytics and status',   Icon: ChartBar        },
-  { to: '/admin/trips',    label: 'Trips',     desc: 'Table view and editing', Icon: Mountains       },
+  { to: '/admin/trips',    label: 'Treks',     desc: 'Table view and editing', Icon: Mountains       },
   { to: '/admin/tours',    label: 'Tours',     desc: 'One-day trip manager',   Icon: Compass         },
   { to: '/admin/bookings', label: 'Bookings',  desc: 'Reservation control',    Icon: SuitcaseRolling },
-  { to: '/admin/messages', label: 'Messages',  desc: 'Inbox and replies',      Icon: ChatCircleDots  },
   { to: '/admin/users',    label: 'Users',     desc: 'Registered accounts',    Icon: Users           },
 ] as const;
-
-const pageMeta: Record<string, { label: string; title: string }> = {
-  '/admin':           { label: 'Analytics Dashboard', title: 'Control Center' },
-  '/admin/trips':     { label: 'Trip Directory',       title: 'Trips'         },
-  '/admin/tours':     { label: 'Tour Directory',       title: 'Tours'         },
-  '/admin/bookings':  { label: 'Reservation Hub',      title: 'Bookings'      },
-  '/admin/messages':  { label: 'Inbox',                title: 'Messages'      },
-  '/admin/users':     { label: 'User Directory',       title: 'Users'         },
-};
 
 const adminLogo = '/destinations/alogo.png';
 
@@ -43,11 +31,8 @@ export default function AdminLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
-  const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
-
-  const meta = pageMeta[location.pathname] ?? pageMeta['/admin'];
   const activeDate = new Intl.DateTimeFormat('en-IN', {
     weekday: 'short', day: 'numeric', month: 'short', year: 'numeric',
   }).format(new Date());
@@ -63,33 +48,46 @@ export default function AdminLayout() {
     navigate('/admin/login', { replace: true });
   };
 
-  const W = collapsed ? 'lg:w-[68px]' : 'lg:w-60';
-  const sidebarCopyClass = collapsed
-    ? 'max-w-[160px] translate-x-0 opacity-100 lg:max-w-0 lg:-translate-x-2 lg:opacity-0 lg:pointer-events-none'
-    : 'max-w-[160px] translate-x-0 opacity-100';
-  const sidebarSectionClass = collapsed
-    ? 'max-h-24 translate-y-0 opacity-100 lg:max-h-0 lg:-translate-y-2 lg:opacity-0 lg:pointer-events-none'
-    : 'max-h-24 translate-y-0 opacity-100';
-  const compactUserClass = collapsed
-    ? 'max-h-0 translate-y-2 opacity-0 pointer-events-none lg:max-h-20 lg:translate-y-0 lg:opacity-100 lg:pointer-events-auto'
-    : 'max-h-0 translate-y-2 opacity-0 pointer-events-none';
-  const expandedUserClass = collapsed
-    ? 'max-h-32 translate-y-0 opacity-100 lg:max-h-0 lg:-translate-y-2 lg:opacity-0 lg:pointer-events-none'
-    : 'max-h-32 translate-y-0 opacity-100';
+  // Sidebar width class — only width transitions on desktop, transform on mobile
+  const sidebarW = collapsed ? 'lg:w-[68px]' : 'lg:w-60';
+
+  // Text/labels hide when collapsed (desktop only)
+  const textHide = collapsed
+    ? 'lg:w-0 lg:opacity-0 lg:overflow-hidden'
+    : 'w-auto opacity-100';
+
+  // Section hide (admin badge, menu label)
+  const sectionHide = collapsed
+    ? 'lg:h-0 lg:opacity-0 lg:overflow-hidden lg:m-0 lg:p-0'
+    : 'opacity-100';
 
   return (
-    <div className="flex min-h-screen bg-[#f0f4f2]">
-      {mobileNavOpen ? (
+    <div className="admin-shell flex min-h-screen bg-[#f0f4f2]">
+      {/* Mobile backdrop — no backdrop-blur to avoid lag */}
+      {mobileNavOpen && (
         <button
           type="button"
           aria-label="Close admin navigation"
-          className="fixed inset-0 z-30 bg-ink-950/40 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-30 bg-ink-950/40 lg:hidden"
           onClick={() => setMobileNavOpen(false)}
         />
-      ) : null}
+      )}
 
-      {/* ── Fixed Sidebar ──────────────────────────────────────────── */}
-      <aside className={`fixed inset-y-0 left-0 z-40 flex w-60 max-w-[86vw] flex-col overflow-hidden border-r border-black/[0.07] bg-white shadow-[2px_0_16px_rgba(15,23,42,0.07)] will-change-[width,transform] transition-[transform,width] duration-300 ease-out ${mobileNavOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 ${W}`}>
+      {/* ── Sidebar ─────────────────────────────────────────────── */}
+      <aside
+        className={[
+          'fixed inset-y-0 left-0 z-40 flex max-w-[86vw] flex-col overflow-hidden',
+          'border-r border-black/[0.07] bg-white shadow-[2px_0_12px_rgba(15,23,42,0.05)]',
+          // Mobile: slide via transform
+          mobileNavOpen ? 'translate-x-0' : '-translate-x-full',
+          'lg:translate-x-0',
+          // Desktop: width transition only
+          'w-60 transition-[width] duration-200 ease-out',
+          // Mobile: also transition transform
+          'max-lg:transition-transform max-lg:duration-200',
+          sidebarW,
+        ].join(' ')}
+      >
 
         {/* Logo row */}
         <div className="flex h-14 shrink-0 items-center gap-3 border-b border-black/[0.07] px-3">
@@ -98,33 +96,35 @@ export default function AdminLayout() {
             alt="Alpha Trekkers logo"
             className="h-8 w-8 shrink-0 rounded-full object-cover ring-1 ring-black/5"
           />
-          <div className={`overflow-hidden whitespace-nowrap transition-all duration-300 ease-out ${sidebarCopyClass}`}>
-            <p className="text-[9px] font-bold uppercase tracking-[0.24em] text-ink-400 whitespace-nowrap">Alpha Trekkers</p>
-            <p className="text-sm font-extrabold text-ink-900 leading-tight whitespace-nowrap">Admin Panel</p>
+          <div className={`overflow-hidden whitespace-nowrap transition-[width,opacity] duration-200 ease-out ${textHide}`}>
+            <p className="text-[9px] font-bold uppercase tracking-[0.24em] text-ink-400">Alpha Trekkers</p>
+            <p className="text-sm font-extrabold text-ink-900 leading-tight">Admin Panel</p>
           </div>
+          {/* Mobile close */}
           <button
             type="button"
             onClick={() => setMobileNavOpen(false)}
-            className="ml-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-black/[0.06] bg-sand-50 text-ink-400 transition-all duration-300 ease-out hover:border-forest-500/20 hover:bg-white hover:text-forest-600 lg:hidden"
+            className="ml-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-black/[0.06] bg-sand-50 text-ink-400 hover:text-forest-600 transition-colors lg:hidden"
             title="Close navigation"
           >
             <X className="h-4 w-4" />
           </button>
+          {/* Desktop collapse */}
           {!collapsed && (
             <button
               type="button"
               onClick={() => setCollapsed(true)}
-              className="ml-auto hidden h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-black/[0.06] bg-sand-50 text-ink-400 transition-all duration-300 ease-out hover:border-forest-500/20 hover:bg-white hover:text-forest-600 lg:flex"
-              title="Close sidebar"
+              className="ml-auto hidden h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-black/[0.06] bg-sand-50 text-ink-400 hover:text-forest-600 transition-colors lg:flex"
+              title="Collapse sidebar"
             >
               <X className="h-4 w-4" />
             </button>
           )}
         </div>
 
-        {/* Nav */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden py-4 px-2 space-y-0.5">
-          <div className={`overflow-hidden px-2 transition-all duration-300 ease-out ${sidebarSectionClass}`}>
+        {/* Nav links */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden py-3 px-2 space-y-0.5">
+          <div className={`overflow-hidden px-2 transition-[height,opacity] duration-200 ease-out ${sectionHide}`}>
             <p className="mb-2 text-[9px] font-bold uppercase tracking-[0.24em] text-ink-400">Menu</p>
           </div>
           {links.map(({ to, label, desc, Icon }) => (
@@ -134,21 +134,23 @@ export default function AdminLayout() {
               end={to === '/admin'}
               title={collapsed ? label : undefined}
               className={({ isActive }) =>
-                `group flex items-center rounded-xl transition-all duration-300 ease-out ${collapsed ? 'gap-3 px-2.5 py-2.5 lg:justify-center lg:gap-0 lg:px-0' : 'gap-3 px-2.5 py-2.5'} ${
+                `group flex items-center rounded-xl transition-colors duration-150 ${
+                  collapsed ? 'gap-3 px-2.5 py-2.5 lg:justify-center lg:gap-0 lg:px-0' : 'gap-3 px-2.5 py-2.5'
+                } ${
                   isActive
-                    ? 'bg-gradient-to-r from-forest-500 to-forest-600 text-white shadow-[0_4px_12px_rgba(34,120,69,0.22)]'
-                    : 'text-ink-600 hover:bg-sand-50 hover:text-ink-900'
+                    ? 'bg-gradient-to-r from-forest-500 to-forest-600 text-white shadow-sm'
+                    : 'text-ink-600 hover:bg-forest-500/5 hover:text-ink-900'
                 }`
               }
             >
               {({ isActive }) => (
                 <>
-                  <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${isActive ? 'bg-white/20' : 'bg-sand-100 group-hover:bg-white'}`}>
+                  <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors duration-150 ${isActive ? 'bg-white/20' : 'bg-sand-100 group-hover:bg-forest-500/10'}`}>
                     <Icon className="h-4 w-4" />
                   </span>
-                  <span className={`min-w-0 overflow-hidden whitespace-nowrap transition-all duration-300 ease-out ${sidebarCopyClass}`}>
-                    <span className="block text-sm font-semibold leading-tight whitespace-nowrap">{label}</span>
-                    <span className={`block text-[10px] whitespace-nowrap truncate ${isActive ? 'text-white/65' : 'text-ink-400'}`}>{desc}</span>
+                  <span className={`min-w-0 overflow-hidden whitespace-nowrap transition-[width,opacity] duration-200 ease-out ${textHide}`}>
+                    <span className="block text-sm font-semibold leading-tight">{label}</span>
+                    <span className={`block text-[10px] truncate ${isActive ? 'text-white/65' : 'text-ink-400'}`}>{desc}</span>
                   </span>
                 </>
               )}
@@ -156,37 +158,33 @@ export default function AdminLayout() {
           ))}
         </div>
 
-        {/* Admin badge */}
-        <div className={`mx-2 mb-2 shrink-0 overflow-hidden rounded-xl border border-forest-500/15 bg-sand-50 transition-all duration-300 ease-out ${sidebarSectionClass}`}>
-          <div className="p-2.5">
-            <div className="flex items-center gap-2">
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-forest-500/12 text-forest-500">
-                <BellSimpleRinging className="h-3 w-3" />
-              </span>
-              <div className="min-w-0">
-                <p className="text-[11px] font-semibold text-ink-900 whitespace-nowrap">Admin mode</p>
-                <p className="text-[9px] text-ink-500 whitespace-nowrap">Elevated access active.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* User */}
+        {/* Admin badge — only visible when expanded */}
+        {/* User section */}
         <div className="shrink-0 border-t border-black/[0.07] p-2.5">
-          <div className={`overflow-hidden transition-all duration-300 ease-out ${compactUserClass}`}>
-            <div className="flex flex-col items-center gap-2">
-              <div title={user ? `${user.firstName} ${user.lastName}` : 'Admin'} className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-sea-500 to-forest-500 text-[11px] font-bold text-white">
+          {/* Collapsed view — icon only */}
+          {collapsed && (
+            <div className="hidden lg:flex flex-col items-center gap-2">
+              <div
+                title={user ? `${user.firstName} ${user.lastName}` : 'Admin'}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-forest-500 to-forest-600 text-[11px] font-bold text-white"
+              >
                 {getInitials(user?.firstName, user?.lastName)}
               </div>
-              <button type="button" title="Sign out" onClick={() => setLogoutDialogOpen(true)} className="flex h-7 w-7 items-center justify-center rounded-lg text-ink-400 hover:bg-coral-500/10 hover:text-coral-600 transition">
+              <button
+                type="button"
+                title="Sign out"
+                onClick={() => setLogoutDialogOpen(true)}
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-ink-400 hover:bg-coral-500/10 hover:text-coral-600 transition-colors"
+              >
                 <SignOut className="h-3.5 w-3.5" />
               </button>
             </div>
-          </div>
-          <div className={`overflow-hidden transition-all duration-300 ease-out ${expandedUserClass}`}>
+          )}
+          {/* Expanded view — full user info */}
+          {!collapsed && (
             <div>
               <div className="flex items-center gap-2.5">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-sea-500 to-forest-500 text-[11px] font-bold text-white">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-forest-500 to-forest-600 text-[11px] font-bold text-white">
                   {getInitials(user?.firstName, user?.lastName)}
                 </div>
                 <div className="min-w-0">
@@ -197,55 +195,73 @@ export default function AdminLayout() {
               <button
                 type="button"
                 onClick={() => setLogoutDialogOpen(true)}
-                className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg border border-black/[0.07] bg-sand-50 py-1.5 text-xs font-medium text-ink-600 hover:bg-coral-500/8 hover:text-coral-600 transition"
+                className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg border border-black/[0.07] bg-sand-50 py-1.5 text-xs font-medium text-ink-600 hover:bg-coral-500/8 hover:text-coral-600 transition-colors"
               >
                 <SignOut className="h-3.5 w-3.5" /> Sign out
               </button>
             </div>
-          </div>
+          )}
+          {/* Mobile: always show expanded */}
+          {collapsed && (
+            <div className="lg:hidden">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-forest-500 to-forest-600 text-[11px] font-bold text-white">
+                  {getInitials(user?.firstName, user?.lastName)}
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-ink-900 leading-tight">{user ? `${user.firstName} ${user.lastName}` : 'Admin'}</p>
+                  <p className="truncate text-[10px] text-ink-500">{user?.email ?? 'admin@alphatrekkers.com'}</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setLogoutDialogOpen(true)}
+                className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg border border-black/[0.07] bg-sand-50 py-1.5 text-xs font-medium text-ink-600 hover:bg-coral-500/8 hover:text-coral-600 transition-colors"
+              >
+                <SignOut className="h-3.5 w-3.5" /> Sign out
+              </button>
+            </div>
+          )}
         </div>
 
       </aside>
 
       {/* ── Content area ───────────────────────────────────────────── */}
-      <div className={`flex min-h-screen flex-1 flex-col will-change-[margin] transition-[margin] duration-300 ease-out ${collapsed ? 'lg:ml-[68px]' : 'lg:ml-60'}`}>
+      <div className={`flex min-h-screen min-w-0 flex-1 flex-col transition-[margin-left] duration-200 ease-out ${collapsed ? 'lg:ml-[68px]' : 'lg:ml-60'}`}>
 
-        {/* Sticky top header bar */}
-        <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-3 border-b border-black/[0.07] bg-white/96 px-4 backdrop-blur-sm shadow-[0_1px_6px_rgba(15,23,42,0.05)]">
-          {/* Hamburger */}
+        {/* Top header bar */}
+        <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 border-b border-black/[0.07] bg-white/95 px-3 shadow-[0_1px_4px_rgba(15,23,42,0.04)] sm:gap-3 sm:px-4">
+          {/* Mobile hamburger */}
           <button
             type="button"
             onClick={() => setMobileNavOpen(true)}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-ink-500 transition hover:bg-sand-100 hover:text-ink-900 lg:hidden"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-ink-500 hover:bg-sand-100 hover:text-ink-900 transition-colors lg:hidden"
           >
             <List className="h-4.5 w-4.5" />
           </button>
+          {/* Desktop toggle */}
           <button
             type="button"
             onClick={() => setCollapsed((c) => !c)}
-            className="hidden h-8 w-8 items-center justify-center rounded-lg text-ink-500 transition hover:bg-sand-100 hover:text-ink-900 lg:flex"
+            className="hidden h-8 w-8 items-center justify-center rounded-lg text-ink-500 hover:bg-sand-100 hover:text-ink-900 transition-colors lg:flex"
           >
             <List className="h-4.5 w-4.5" />
           </button>
 
-          {/* Divider */}
-          <span className="h-5 w-px bg-ink-900/10" />
+          <span className="hidden h-5 w-px bg-ink-900/10 sm:block" />
 
-          {/* Page crumb */}
-          <div className="flex items-center gap-1.5 min-w-0">
-            <span className="hidden sm:block text-[10px] font-bold uppercase tracking-[0.18em] text-ink-400 whitespace-nowrap">{meta.label}</span>
-            <span className="hidden sm:block text-ink-300 text-xs">/</span>
-            <span className="text-sm font-bold text-ink-900 whitespace-nowrap">{meta.title}</span>
+          <div className="min-w-0 flex-1">
+            <span className="block truncate font-heading text-base font-extrabold text-forest-600 sm:text-xl">Welcome admin!</span>
           </div>
 
-          {/* Right */}
+          {/* Right side */}
           <div className="ml-auto flex items-center gap-2.5">
-            <span className="hidden md:inline-flex items-center gap-1.5 rounded-full bg-sand-100 px-3 py-1 text-[11px] font-medium text-ink-500">
+            <span className="hidden md:inline-flex items-center gap-1.5 text-[11px] font-medium text-ink-700">
               <span className="h-1.5 w-1.5 rounded-full bg-forest-500" />
               {activeDate}
             </span>
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-sea-500 to-forest-500 text-[11px] font-bold text-white">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-forest-500 to-forest-600 text-[11px] font-bold text-white">
                 {getInitials(user?.firstName, user?.lastName)}
               </div>
               <div className="hidden lg:block">
@@ -256,8 +272,8 @@ export default function AdminLayout() {
           </div>
         </header>
 
-        {/* Page */}
-        <main className="flex-1 p-4 sm:p-5">
+        {/* Page content */}
+        <main className="min-w-0 flex-1 px-3 py-4 sm:p-6">
           <Outlet />
         </main>
       </div>

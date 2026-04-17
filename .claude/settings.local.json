@@ -20,7 +20,19 @@
       "Bash(xargs grep:*)",
       "Bash(npx prisma:*)",
       "Bash(node -e ':*)",
-      "Bash(node seed-tours.cjs)"
+      "Bash(node seed-tours.cjs)",
+      "Bash(node -e \"const sharp = require\\('sharp'\\); console.log\\('sharp available'\\)\")",
+      "Bash(cmd.exe /c \"dir /b \\\\\"C:\\\\Users\\\\Finlec A\\\\Desktop\\\\Alpha Treckers\\\\client\\\\public\\\\destinations\\\\\" 2>&1 | sort\")",
+      "Bash(cmd.exe /c \"dir /b \\\\\"C:\\\\Users\\\\Finlec A\\\\Desktop\\\\Alpha Treckers\\\\client\\\\public\\\\destinations\\\\\"\")",
+      "Bash(cmd.exe /c \"dir \\\\\"C:\\\\Users\\\\Finlec A\\\\Desktop\\\\Alpha Treckers\\\\client\\\\public\\\\destinations\\\\\"\")",
+      "Bash(cmd.exe /c \"dir /s /b \\\\\"C:\\\\Users\\\\Finlec A\\\\Desktop\\\\Alpha Treckers\\\\client\\\\public\\\\\"\")",
+      "Bash(cmd.exe /c \"cd /d \\\\\"C:\\\\Users\\\\Finlec A\\\\Desktop\\\\Alpha Treckers\\\\\" && dir /s /b client\\\\public\")",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(cmd.exe /c \"powershell -Command \\\\\"Invoke-WebRequest -Uri 'https://commons.wikimedia.org/wiki/Special:FilePath/View%%20from%%20Panorama%%20Point%%2C%%20Matheran%%20%%2851877071706%%29.jpg' -OutFile 'C:\\\\\\\\Users\\\\\\\\Finlec A\\\\\\\\Desktop\\\\\\\\Alpha Treckers\\\\\\\\client\\\\\\\\public\\\\\\\\destinations\\\\\\\\matheran.jpg' -UseBasicParsing; Write-Host 'Done'\\\\\"\")",
+      "Bash(powershell.exe -NoProfile -Command \"Write-Host 'PS works'\")",
+      "Bash(powershell.exe -NoProfile -Command ':*)",
+      "WebSearch",
+      "WebFetch(domain:commons.wikimedia.org)"
     ]
   }
 }

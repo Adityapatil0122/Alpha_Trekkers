@@ -45,7 +45,7 @@ export default function Login() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      const response = await api.post<ApiResponse<AuthResponse & { refreshToken: string }>>('/auth/login', data);
+      const response = await api.post<ApiResponse<AuthResponse>>('/auth/login', data);
 
       if (response.data.data.user.role === 'ADMIN') {
         toast.error('Administrator accounts must sign in from /admin/login');
@@ -104,13 +104,13 @@ export default function Login() {
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-white">Email</label>
-                <div className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-white backdrop-blur-md">
-                  <EnvelopeSimple className="h-5 w-5 text-forest-500" />
+                <div className="relative">
+                  <EnvelopeSimple className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-forest-500" />
                   <input
                     {...register('email')}
                     type="email"
                     autoComplete="off"
-                    className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-white/65 focus:outline-none"
+                    className="w-full rounded-2xl border border-white/20 bg-white/10 py-3 pl-12 pr-4 text-sm text-white placeholder:text-white/65 backdrop-blur-md focus:border-white/35 focus:outline-none"
                     placeholder="Enter your email"
                   />
                 </div>

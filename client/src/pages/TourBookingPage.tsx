@@ -17,6 +17,7 @@ import toast from 'react-hot-toast';
 import api from '@/lib/axios';
 import Button from '@/components/ui/Button';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { getTourDisplayImage } from '@/content/tourImageOverrides';
 
 const indianPhonePattern = /^[6-9]\d{9}$/;
 const optionalTextField = z
@@ -139,13 +140,14 @@ export default function TourBookingPage() {
   }
 
   const totalPrice = tour.price * (participants?.length || 1);
+  const displayImage = getTourDisplayImage(tour);
 
   return (
     <>
       <section className="travel-dark relative overflow-hidden pt-28">
         <img
-          src={tour.imageUrl}
-          alt={tour.title}
+          src={displayImage.src}
+          alt={displayImage.alt}
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(15,23,42,0.78),rgba(15,23,42,0.48),rgba(15,23,42,0.18))]" />
@@ -271,8 +273,8 @@ export default function TourBookingPage() {
             <div className="sticky top-[7.5rem] space-y-6">
               <div className="travel-panel overflow-hidden rounded-[2rem]">
                 <img
-                  src={tour.imageUrl}
-                  alt={tour.title}
+                  src={displayImage.src}
+                  alt={displayImage.alt}
                   className="h-52 w-full object-cover"
                 />
                 <div className="p-6">

@@ -17,6 +17,12 @@ import Button from '@/components/ui/Button';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 const siteLogo = '/destinations/alogo.png';
+const featuredTripImageOverrides: Record<string, { src: string; alt: string }> = {
+  'devkund-waterfall-trek': {
+    src: '/destinations/Devkund Waterfall in lush surroundings.png',
+    alt: 'Devkund Waterfall',
+  },
+};
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -106,6 +112,11 @@ export default function Navbar() {
   const mobileFeaturedTrips = mobileTrekCategory === 'WEEKEND' ? featuredWeekendTrips : featuredWeekdayTrips;
   const activeCategoryLabel = activeTrekCategory === 'WEEKEND' ? 'Weekend' : 'Weekday';
   const mobileCategoryLabel = mobileTrekCategory === 'WEEKEND' ? 'Weekend' : 'Weekday';
+  const getFeaturedTripCardImage = (trip: Trip) =>
+    featuredTripImageOverrides[trip.slug] ?? {
+      src: trip.images[0]?.url ?? MAHARASHTRA_MONSOON_IMAGES.fallback.tripCard,
+      alt: trip.images[0]?.altText || trip.title,
+    };
 
   return (
     <>
@@ -224,6 +235,7 @@ export default function Navbar() {
                           ) : activeFeaturedTrips.length > 0 ? (
                             <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                               {activeFeaturedTrips.map((trip) => {
+                                const cardImage = getFeaturedTripCardImage(trip);
                                 return (
                                   <Link
                                     key={trip.id}
@@ -233,8 +245,8 @@ export default function Navbar() {
                                   >
                                     <div className="relative aspect-[16/10] overflow-hidden bg-sand-100">
                                       <img
-                                        src={trip.images[0]?.url ?? MAHARASHTRA_MONSOON_IMAGES.fallback.tripCard}
-                                        alt={trip.images[0]?.altText || trip.title}
+                                        src={cardImage.src}
+                                        alt={cardImage.alt}
                                         className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
                                       />
                                       <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-dark-900/84 via-dark-900/45 to-transparent px-3.5 pb-3 pt-8">
@@ -487,33 +499,37 @@ export default function Navbar() {
                               <p className="text-sm text-dark-400">Loading featured treks...</p>
                             ) : mobileFeaturedTrips.length > 0 ? (
                               <div className="grid grid-cols-2 gap-2.5">
-                                {mobileFeaturedTrips.map((trip) => (
-                                  <Link
-                                    key={trip.id}
-                                    to={`/trips/${trip.slug}`}
-                                    title={trip.title}
-                                    className="group block overflow-hidden rounded-[1rem] border border-dark-200/70 bg-white"
-                                  >
-                                    <div className="relative aspect-[4/3] overflow-hidden bg-sand-100">
-                                      <img
-                                        src={trip.images[0]?.url ?? MAHARASHTRA_MONSOON_IMAGES.fallback.tripCard}
-                                        alt={trip.images[0]?.altText || trip.title}
-                                        className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
-                                      />
-                                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-dark-900/84 via-dark-900/45 to-transparent px-3 pb-2.5 pt-8">
-                                        <div className="flex items-center justify-between gap-2">
-                                          <span className="text-xs font-semibold text-white">
-                                            INR {(trip.discountPrice ?? trip.basePrice).toLocaleString('en-IN')}
-                                          </span>
-                                          <span className="max-w-[58%] truncate text-[0.62rem] font-semibold uppercase tracking-[0.1em] text-primary-300">
-                                            {trip.title}
-                                          </span>
+                                {mobileFeaturedTrips.map((trip) => {
+                                  const cardImage = getFeaturedTripCardImage(trip);
+
+                                  return (
+                                    <Link
+                                      key={trip.id}
+                                      to={`/trips/${trip.slug}`}
+                                      title={trip.title}
+                                      className="group block overflow-hidden rounded-[1rem] border border-dark-200/70 bg-white"
+                                    >
+                                      <div className="relative aspect-[4/3] overflow-hidden bg-sand-100">
+                                        <img
+                                          src={cardImage.src}
+                                          alt={cardImage.alt}
+                                          className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+                                        />
+                                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-dark-900/84 via-dark-900/45 to-transparent px-3 pb-2.5 pt-8">
+                                          <div className="flex items-center justify-between gap-2">
+                                            <span className="text-xs font-semibold text-white">
+                                              INR {(trip.discountPrice ?? trip.basePrice).toLocaleString('en-IN')}
+                                            </span>
+                                            <span className="max-w-[58%] truncate text-[0.62rem] font-semibold uppercase tracking-[0.1em] text-primary-300">
+                                              {trip.title}
+                                            </span>
+                                          </div>
                                         </div>
+                                        <span className="sr-only">{trip.title}</span>
                                       </div>
-                                      <span className="sr-only">{trip.title}</span>
-                                    </div>
-                                  </Link>
-                                ))}
+                                    </Link>
+                                  );
+                                })}
                               </div>
                             ) : (
                               <p className="text-sm text-dark-400">
@@ -579,11 +595,11 @@ export default function Navbar() {
                 </NavLink>
               </div>
 
-              <div className="mt-6 rounded-lg bg-dark-900 px-5 py-5 text-white">
-                <p className="text-xs font-semibold uppercase tracking-wider text-primary-400">Contact</p>
-                <div className="mt-3 space-y-2.5 text-sm text-dark-300">
-                  <p className="flex items-center gap-2"><PhoneCall className="h-4 w-4 text-primary-400" /> +91 98765 43210</p>
-                  <p className="flex items-center gap-2"><EnvelopeSimple className="h-4 w-4 text-primary-400" /> hello@alphatrekkers.com</p>
+              <div className="mt-6 rounded-lg border border-dark-200 bg-sand-50 px-5 py-5 text-dark-800">
+                <p className="text-xs font-semibold uppercase tracking-wider text-primary-500">Contact</p>
+                <div className="mt-3 space-y-2.5 text-sm text-dark-600">
+                  <p className="flex items-center gap-2"><PhoneCall className="h-4 w-4 text-primary-500" /> +91 98765 43210</p>
+                  <p className="flex items-center gap-2"><EnvelopeSimple className="h-4 w-4 text-primary-500" /> hello@alphatrekkers.com</p>
                 </div>
               </div>
 

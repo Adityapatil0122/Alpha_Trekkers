@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  CalendarDots,
+  ImageSquare,
   MagnifyingGlass,
   PencilSimple,
   Plus,
@@ -9,6 +11,7 @@ import {
 import toast from 'react-hot-toast';
 import type { ApiResponse } from '@alpha-trekkers/shared';
 import api from '@/lib/axios';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -91,7 +94,7 @@ const emptyForm: TourFormState = {
 };
 
 function formatMoney(amount: number) {
-  return `INR ${Math.round(amount).toLocaleString('en-IN')}`;
+  return `₹${Math.round(amount).toLocaleString('en-IN')}`;
 }
 
 function formatDate(value: string) {
@@ -169,12 +172,12 @@ function Modal({ title, onClose, children }: {
   }, [onClose]);
 
   return (
-    <div className="admin-modal-overlay fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-ink-950/40 px-4 py-8 backdrop-blur-sm">
+    <div className="admin-modal-overlay fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-ink-950/40 px-3 py-3 backdrop-blur-sm sm:px-4 sm:py-8">
       <div
         ref={ref}
-        className="admin-modal-panel relative w-full max-w-2xl rounded-[1.6rem] border border-white/80 bg-white shadow-[0_32px_80px_rgba(15,23,42,0.18)]"
+        className="admin-modal-panel relative flex max-h-[calc(100vh-1.5rem)] w-full max-w-2xl flex-col rounded-[1.6rem] border border-white/80 bg-white shadow-[0_32px_80px_rgba(15,23,42,0.18)] sm:max-h-[calc(100vh-4rem)]"
       >
-        <div className="flex items-center justify-between border-b border-ink-900/8 px-6 py-4">
+        <div className="flex items-center justify-between gap-3 border-b border-ink-900/8 px-4 py-4 sm:px-6">
           <h3 className="text-lg font-bold text-ink-900">{title}</h3>
           <button
             type="button"
@@ -184,7 +187,7 @@ function Modal({ title, onClose, children }: {
             <X className="h-4 w-4" />
           </button>
         </div>
-        <div className="px-6 py-5 max-h-[75vh] overflow-y-auto">{children}</div>
+        <div className="overflow-y-auto px-4 py-4 sm:px-6 sm:py-5">{children}</div>
       </div>
     </div>
   );
@@ -227,7 +230,18 @@ export default function AdminTours() {
   const [saving, setSaving] = useState(false);
 
   // Delete state
+  const [tourToDelete, setTourToDelete] = useState<Pick<Tour, 'id' | 'title'> | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // Image modal state
+  const [imageModalTour, setImageModalTour] = useState<Tour | null>(null);
+  const [imageUrl, setImageUrl] = useState('');
+  const [savingImage, setSavingImage] = useState(false);
+
+  // Schedule modal state
+  const [scheduleModalTour, setScheduleModalTour] = useState<Tour | null>(null);
+  const [scheduleDate, setScheduleDate] = useState('');
+  const [savingSchedule, setSavingSchedule] = useState(false);
 
   // ── Data loading ─────────────────────────────────────────────────────
 
@@ -319,11 +333,13 @@ export default function AdminTours() {
 
   // ── Delete ───────────────────────────────────────────────────────────
 
-  const handleDelete = async (tourId: string) => {
-    setDeletingId(tourId);
+  const handleDelete = async () => {
+    if (!tourToDelete) return;
+    setDeletingId(tourToDelete.id);
     try {
-      await api.delete(`/admin/tours/${tourId}`);
+      await api.delete(`/admin/tours/${tourToDelete.id}`);
       toast.success('Tour deleted');
+      setTourToDelete(null);
       void loadTours();
     } catch (error) {
       toast.error(getErrorMessage(error));
@@ -332,9 +348,53 @@ export default function AdminTours() {
     }
   };
 
-  const confirmDelete = (tour: Tour) => {
-    if (window.confirm(`Delete "${tour.title}"? This action cannot be undone.`)) {
-      void handleDelete(tour.id);
+  // ── Image modal ─────────────────────────────────────────────────
+
+  const openImageModal = (tour: Tour) => {
+    setImageModalTour(tour);
+    setImageUrl(tour.imageUrl ?? '');
+  };
+
+  const openScheduleModal = (tour: Tour) => {
+    setScheduleModalTour(tour);
+    setScheduleDate(tour.departureDate ? tour.departureDate.slice(0, 10) : '');
+  };
+
+  const saveSchedule = async () => {
+    if (!scheduleModalTour) return;
+    if (!scheduleDate) {
+      toast.error('Select a departure date');
+      return;
+    }
+
+    setSavingSchedule(true);
+    try {
+      await api.put(`/admin/tours/${scheduleModalTour.id}`, { departureDate: scheduleDate });
+      toast.success('Tour schedule updated');
+      setScheduleModalTour(null);
+      void loadTours();
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    } finally {
+      setSavingSchedule(false);
+    }
+  };
+
+  const saveImage = async () => {
+    if (!imageModalTour) return;
+    setSavingImage(true);
+    try {
+      await api.put(`/admin/tours/${imageModalTour.id}`, {
+        ...buildPayload(normalizeTour(imageModalTour)),
+        imageUrl: imageUrl.trim(),
+      });
+      toast.success('Tour image updated');
+      setImageModalTour(null);
+      void loadTours();
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    } finally {
+      setSavingImage(false);
     }
   };
 
@@ -343,29 +403,26 @@ export default function AdminTours() {
   return (
     <section className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.18em] text-forest-500">
-            Tour Directory
-          </span>
-          <h1 className="text-2xl font-extrabold tracking-tight text-ink-900">Tours directory</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight text-ink-900 sm:text-3xl">Tours Section</h1>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="relative">
+        <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center lg:w-auto">
+          <div className="relative w-full sm:w-auto">
             <MagnifyingGlass className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400" />
             <input
               type="text"
               placeholder="Search tours..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="h-10 w-56 rounded-full border border-ink-900/12 bg-white pl-9 pr-4 text-sm text-ink-900 placeholder:text-ink-400 focus:border-forest-500 focus:outline-none focus:ring-2 focus:ring-forest-500/20 transition"
+              className="h-10 w-full rounded-full border border-ink-900/12 bg-white pl-9 pr-4 text-sm text-ink-900 placeholder:text-ink-400 transition focus:border-forest-500 focus:outline-none focus:ring-2 focus:ring-forest-500/20 sm:w-56"
             />
           </div>
           <button
             type="button"
             onClick={openCreate}
-            className="inline-flex h-10 items-center gap-2 rounded-full bg-forest-500 px-5 text-sm font-semibold text-white shadow-sm hover:bg-forest-600 active:scale-[0.97] transition"
+            className="admin-action-button inline-flex h-10 w-full items-center justify-center gap-2 rounded-full bg-forest-600 px-5 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md active:scale-[0.97] sm:w-auto"
           >
             <Plus className="h-4 w-4" weight="bold" /> Add Tour
           </button>
@@ -373,7 +430,7 @@ export default function AdminTours() {
       </div>
 
       {/* Table */}
-      <div className="rounded-xl border border-forest-500/10 bg-white">
+      <div className="overflow-hidden rounded-xl border border-ink-900/12 bg-white">
         {listLoading ? (
           <div className="flex items-center justify-center py-20">
             <LoadingSpinner />
@@ -384,92 +441,96 @@ export default function AdminTours() {
           </div>
         ) : (
           <div className="admin-table-scroll overflow-x-auto">
-            <table className="admin-table admin-table--compact w-full text-left text-sm">
-              <thead>
-                <tr className="border-b border-ink-900/8">
-                  <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Tour</th>
-                  <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Type</th>
-                  <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Departure</th>
-                  <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Price</th>
-                  <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Status</th>
-                  <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Updated</th>
-                  <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Actions</th>
+            <table className="admin-table admin-table--compact admin-table--head-center min-w-[940px] w-full text-left text-sm">
+              <thead className="bg-sand-50/95">
+                <tr className="border-b border-ink-900/14">
+                  <th className="px-4 py-3 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">No.</th>
+                  <th className="px-4 py-3 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Tour</th>
+                  <th className="px-4 py-3 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Type</th>
+                  <th className="px-4 py-3 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Departure</th>
+                  <th className="px-4 py-3 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Price</th>
+                  <th className="px-4 py-3 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Status</th>
+                  <th className="px-4 py-3 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Updated</th>
+                  <th className="px-4 py-3 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {tours.map((tour) => (
+                {tours.map((tour, index) => (
                   <tr
                     key={tour.id}
                     className="border-b border-ink-900/6 last:border-b-0 hover:bg-sand-50/60 transition-colors"
                   >
-                    {/* TOUR column */}
+                    <td className="px-4 py-3 text-center font-semibold text-ink-500">
+                      {index + 1}
+                    </td>
+
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        {tour.imageUrl ? (
-                          <img
-                            src={tour.imageUrl}
-                            alt={tour.title}
-                            className="h-10 w-10 shrink-0 rounded-lg object-cover"
-                          />
-                        ) : (
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sand-100 text-ink-300 text-xs">
-                            --
-                          </div>
-                        )}
-                        <div className="min-w-0">
-                          <p className="truncate font-semibold text-ink-900">{tour.title}</p>
-                          <p className="truncate text-xs text-ink-400 max-w-[220px]">{tour.summary}</p>
-                        </div>
+                      <div className="mx-auto min-w-0 max-w-[220px] text-left">
+                        <p className="truncate font-semibold text-ink-900">{tour.title}</p>
+                        <p className="max-w-[220px] truncate text-xs text-ink-400">{tour.summary}</p>
                       </div>
                     </td>
 
                     {/* TYPE */}
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-center">
                       <TypeBadge value={tour.typeLabel} />
                     </td>
 
                     {/* DEPARTURE */}
-                    <td className="px-4 py-3 whitespace-nowrap text-ink-600">
+                    <td className="px-4 py-3 whitespace-nowrap text-center text-ink-600">
                       {tour.departureDate ? formatDate(tour.departureDate) : '—'}
                     </td>
 
                     {/* PRICE */}
-                    <td className="px-4 py-3 whitespace-nowrap">
+                    <td className="px-4 py-3 whitespace-nowrap text-center">
                       <span className="font-semibold text-forest-600">{formatMoney(tour.price)}</span>
-                      {tour.comparePrice > tour.price && (
-                        <span className="ml-1.5 text-xs text-ink-400 line-through">{formatMoney(tour.comparePrice)}</span>
-                      )}
                     </td>
 
                     {/* STATUS */}
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-center">
                       <StatusBadge active={tour.isActive} />
                     </td>
 
                     {/* UPDATED */}
-                    <td className="px-4 py-3 whitespace-nowrap text-ink-500 text-xs">
+                    <td className="px-4 py-3 whitespace-nowrap text-center text-xs text-ink-500">
                       {formatDate(tour.updatedAt)}
                     </td>
 
                     {/* ACTIONS */}
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center justify-center gap-1">
                         <button
                           type="button"
                           onClick={() => void openEdit(tour.id)}
-                          className="flex h-8 w-8 items-center justify-center rounded-lg text-ink-400 hover:bg-forest-500/10 hover:text-forest-600 transition"
+                          className="flex h-9 w-9 items-center justify-center rounded-full text-forest-600 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-110 hover:text-forest-500"
                           title="Edit"
                         >
-                          <PencilSimple className="h-4 w-4" />
+                          <PencilSimple className="h-4.5 w-4.5" weight="duotone" />
                         </button>
                         <button
                           type="button"
-                          onClick={() => confirmDelete(tour)}
+                          onClick={() => openScheduleModal(tour)}
+                          className="flex h-9 w-9 items-center justify-center rounded-full text-sea-600 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-110 hover:text-sea-500"
+                          title="Manage schedules"
+                        >
+                          <CalendarDots className="h-4.5 w-4.5" weight="duotone" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => openImageModal(tour)}
+                          className="flex h-9 w-9 items-center justify-center rounded-full text-gold-700 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-110 hover:text-gold-600"
+                          title="Manage image"
+                        >
+                          <ImageSquare className="h-4.5 w-4.5" weight="duotone" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setTourToDelete({ id: tour.id, title: tour.title })}
                           disabled={deletingId === tour.id}
-                          className="flex h-8 w-8 items-center justify-center rounded-lg text-ink-400 hover:bg-coral-500/10 hover:text-coral-600 transition disabled:opacity-50"
+                          className="flex h-9 w-9 items-center justify-center rounded-full text-coral-600 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-110 hover:text-coral-500 disabled:opacity-50"
                           title="Delete"
                         >
-                          <Trash className="h-4 w-4" />
+                          <Trash className="h-4.5 w-4.5" weight="duotone" />
                         </button>
                       </div>
                     </td>
@@ -480,6 +541,102 @@ export default function AdminTours() {
           </div>
         )}
       </div>
+
+      {/* Schedule Modal */}
+      {scheduleModalTour && (
+        <Modal
+          title={`Manage schedules — ${scheduleModalTour.title}`}
+          onClose={() => setScheduleModalTour(null)}
+        >
+          <div className="space-y-5">
+            <div className="rounded-xl border border-ink-900/8 bg-sand-50 p-4">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-ink-400">Departure</p>
+              <p className="mt-1 text-sm text-ink-600">
+                Tours currently store one departure date. Update it here from the schedules action.
+              </p>
+            </div>
+
+            <Field label="Departure date">
+              <input
+                type="date"
+                className={inputCls}
+                value={scheduleDate}
+                onChange={(e) => setScheduleDate(e.target.value)}
+              />
+            </Field>
+
+            <div className="flex flex-col-reverse gap-3 border-t border-ink-900/8 pt-5 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setScheduleModalTour(null)}
+                className="h-10 w-full rounded-xl border border-ink-900/12 bg-white px-5 text-sm font-semibold text-ink-600 transition hover:bg-sand-50 sm:w-auto"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => void saveSchedule()}
+                disabled={savingSchedule}
+                className="admin-action-button inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-forest-500 px-5 text-sm font-semibold text-white shadow-sm transition disabled:opacity-60 sm:w-auto"
+              >
+                {savingSchedule ? 'Saving...' : 'Save schedule'}
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Image Modal */}
+      {imageModalTour && (
+        <Modal
+          title={`Image — ${imageModalTour.title}`}
+          onClose={() => setImageModalTour(null)}
+        >
+          <div className="space-y-5">
+            {/* Preview */}
+            {imageUrl.trim() ? (
+              <div className="overflow-hidden rounded-xl border border-ink-900/8">
+                <img
+                  src={imageUrl}
+                  alt={imageModalTour.title}
+                  className="h-48 w-full object-cover"
+                />
+              </div>
+            ) : (
+              <div className="flex h-48 items-center justify-center rounded-xl border border-dashed border-ink-900/12 bg-sand-50 text-ink-400 text-sm">
+                No image set
+              </div>
+            )}
+
+            <Field label="Image URL">
+              <input
+                className={inputCls}
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                placeholder="https://..."
+              />
+            </Field>
+
+            <div className="flex flex-col-reverse gap-3 border-t border-ink-900/8 pt-5 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setImageModalTour(null)}
+                className="h-10 w-full rounded-xl border border-ink-900/12 bg-white px-5 text-sm font-semibold text-ink-600 transition hover:bg-sand-50 sm:w-auto"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => void saveImage()}
+                disabled={savingImage}
+                className="admin-action-button inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-forest-500 px-5 text-sm font-semibold text-white shadow-sm transition disabled:opacity-60 sm:w-auto"
+              >
+                {savingImage ? 'Saving...' : 'Save Image'}
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
 
       {/* Create / Edit Modal */}
       {modalOpen && (
@@ -650,11 +807,11 @@ export default function AdminTours() {
             </label>
 
             {/* Buttons */}
-            <div className="flex items-center justify-end gap-3 border-t border-ink-900/8 pt-5">
+            <div className="flex flex-col-reverse gap-3 border-t border-ink-900/8 pt-5 sm:flex-row sm:justify-end">
               <button
                 type="button"
                 onClick={closeModal}
-                className="h-10 rounded-xl border border-ink-900/12 bg-white px-5 text-sm font-semibold text-ink-600 hover:bg-sand-50 transition"
+                className="h-10 w-full rounded-xl border border-ink-900/12 bg-white px-5 text-sm font-semibold text-ink-600 transition hover:bg-sand-50 sm:w-auto"
               >
                 Cancel
               </button>
@@ -662,7 +819,7 @@ export default function AdminTours() {
                 type="button"
                 onClick={() => void handleSave()}
                 disabled={saving}
-                className="inline-flex h-10 items-center gap-2 rounded-xl bg-forest-500 px-5 text-sm font-semibold text-white shadow-sm hover:bg-forest-600 active:scale-[0.97] transition disabled:opacity-60"
+                className="admin-action-button inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-forest-500 px-5 text-sm font-semibold text-white shadow-sm transition disabled:opacity-60 sm:w-auto"
               >
                 {saving ? 'Saving...' : 'Save Tour'}
               </button>
@@ -670,6 +827,28 @@ export default function AdminTours() {
           </div>
         </Modal>
       )}
+
+      <ConfirmDialog
+        open={Boolean(tourToDelete)}
+        title={tourToDelete ? `Delete ${tourToDelete.title}?` : 'Delete tour?'}
+        description={
+          tourToDelete ? (
+            <>
+              <span className="font-semibold text-ink-900">{tourToDelete.title}</span> will be removed from the tours
+              section if deletion is allowed. This action cannot be undone.
+            </>
+          ) : null
+        }
+        confirmLabel="Delete tour"
+        cancelLabel="Keep tour"
+        confirmLoading={deletingId === tourToDelete?.id}
+        icon={<Trash className="h-7 w-7" weight="bold" />}
+        onClose={() => {
+          if (deletingId === tourToDelete?.id) return;
+          setTourToDelete(null);
+        }}
+        onConfirm={() => void handleDelete()}
+      />
     </section>
   );
 }

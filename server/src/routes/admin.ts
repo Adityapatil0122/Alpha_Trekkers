@@ -213,6 +213,7 @@ router.get(
       const [
         totalUsers,
         totalTrips,
+        totalTours,
         totalTrekBookings,
         totalTourBookings,
         totalRevenue,
@@ -224,6 +225,7 @@ router.get(
       ] = await Promise.all([
         prisma.user.count(),
         prisma.trip.count({ where: { isActive: true } }),
+        prisma.tour.count({ where: { isActive: true } }),
         prisma.booking.count(),
         prisma.tourBooking.count(),
         prisma.payment.aggregate({
@@ -304,6 +306,7 @@ router.get(
           stats: {
             totalUsers,
             totalTrips,
+            totalTours,
             totalBookings,
             totalRevenue: totalRevenue._sum.amount || 0,
             unreadMessages,

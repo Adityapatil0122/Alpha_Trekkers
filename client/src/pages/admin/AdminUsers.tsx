@@ -70,15 +70,15 @@ export default function AdminUsers() {
   const guideCount = users.filter((u) => u.role === 'GUIDE').length;
 
   return (
-    <div className="space-y-5">
+    <section className="space-y-6">
       {/* Summary */}
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {[
-          { label: 'Total users', value: total, Icon: Users, cls: 'bg-sea-500/10 text-sea-600' },
+          { label: 'Total users', value: total, Icon: Users, cls: 'bg-forest-500/10 text-forest-600' },
           { label: 'Admins', value: adminCount, Icon: Shield, cls: 'bg-forest-500/10 text-forest-600' },
           { label: 'Guides', value: guideCount, Icon: User, cls: 'bg-gold-500/12 text-gold-700' },
         ].map(({ label, value, Icon, cls }) => (
-          <div key={label} className="flex items-center gap-3 rounded-[1.4rem] border border-white/80 bg-white p-4 shadow-[0_8px_24px_rgba(15,23,42,0.05)]">
+          <div key={label} className="admin-card flex items-center gap-3 rounded-xl p-4">
             <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${cls}`}>
               <Icon className="h-5 w-5" />
             </span>
@@ -90,86 +90,75 @@ export default function AdminUsers() {
         ))}
       </div>
 
-      {/* Table card */}
-      <div className="rounded-[1.8rem] border border-white/80 bg-white shadow-[0_16px_40px_rgba(15,23,42,0.06)]">
-        <div className="flex flex-col gap-3 border-b border-ink-900/8 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-ink-400">User Directory</p>
-            <h3 className="mt-0.5 text-xl font-extrabold text-ink-900">
-              Users table
-              {total > 0 && <span className="ml-2 text-sm font-normal text-ink-400">({total} total)</span>}
-            </h3>
-          </div>
-          <div className="relative w-full sm:w-auto">
-            <MagnifyingGlass className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400" />
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search name or email…"
-              className="w-full rounded-full border border-ink-900/10 bg-sand-50 py-2 pl-9 pr-4 text-sm focus:border-forest-500 focus:outline-none focus:ring-2 focus:ring-forest-500/20 sm:w-60"
-            />
-          </div>
+      {/* Header */}
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <h1 className="text-2xl font-extrabold tracking-tight text-ink-900 sm:text-3xl">
+            Users
+            {total > 0 && <span className="ml-2 text-base font-normal text-ink-400">({total})</span>}
+          </h1>
         </div>
+        <div className="relative w-full sm:w-auto">
+          <MagnifyingGlass className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search name or email…"
+            className="h-10 w-full rounded-full border border-ink-900/12 bg-white pl-9 pr-4 text-sm text-ink-900 placeholder:text-ink-400 transition focus:border-forest-500 focus:outline-none focus:ring-2 focus:ring-forest-500/20 sm:w-60"
+          />
+        </div>
+      </div>
 
-        <div className="overflow-x-auto">
+      {/* Table */}
+      <div className="admin-card overflow-hidden rounded-xl">
+        <div className="admin-table-scroll overflow-x-auto">
           {loading ? (
-            <div className="py-16"><LoadingSpinner text="Loading users…" /></div>
+            <div className="flex items-center justify-center py-20"><LoadingSpinner /></div>
+          ) : users.length === 0 ? (
+            <div className="py-20 text-center text-sm text-ink-400">No users found.</div>
           ) : (
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-ink-900/6 bg-sand-50/60">
-                  {['FACULTY', 'CONTACT', 'SPECIALIZATION', 'COURSE', 'BATCH', 'JOINED DATE', 'STATUS'].map((h) => (
-                    <th key={h} className="px-5 py-3 text-left text-[10px] font-bold uppercase tracking-[0.18em] text-ink-400 whitespace-nowrap">{h}</th>
-                  ))}
+            <table className="admin-table admin-table--compact admin-table--head-center min-w-[760px] w-full text-left text-sm">
+              <thead className="bg-sand-50/95">
+                <tr className="border-b border-ink-900/14">
+                  <th className="px-4 py-3 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">No.</th>
+                  <th className="px-4 py-3 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">User</th>
+                  <th className="px-4 py-3 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Contact</th>
+                  <th className="px-4 py-3 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Role</th>
+                  <th className="px-4 py-3 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Bookings</th>
+                  <th className="px-4 py-3 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Joined</th>
+                  <th className="px-4 py-3 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-ink-900/5">
-                {users.length === 0 ? (
-                  <tr><td colSpan={7} className="py-14 text-center text-sm text-ink-400">No users found.</td></tr>
-                ) : users.map((user) => {
+              <tbody>
+                {users.map((user, index) => {
                   const roleCfg = ROLE_CONFIG[user.role] ?? ROLE_CONFIG.USER;
-                  const initials = `${user.firstName[0] ?? ''}${user.lastName[0] ?? ''}`.toUpperCase();
+                  const rowNumber = (page - 1) * 15 + index + 1;
                   return (
-                    <tr key={user.id} className="hover:bg-sand-50/60 transition-colors">
-                      {/* FACULTY = Name+Avatar */}
-                      <td className="px-5 py-4">
-                        <div className="flex items-center gap-3 min-w-[12rem]">
-                          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ${user.role === 'ADMIN' ? 'bg-gradient-to-br from-forest-500 to-forest-600' : user.role === 'GUIDE' ? 'bg-gradient-to-br from-gold-500 to-coral-500' : 'bg-gradient-to-br from-sea-500 to-sea-600'}`}>
-                            {initials}
-                          </div>
-                          <div>
-                            <p className="font-semibold text-ink-900 leading-tight">{user.firstName} {user.lastName}</p>
-                            <p className="text-xs text-ink-500">{user.email}</p>
-                          </div>
+                    <tr key={user.id} className="border-b border-ink-900/6 last:border-b-0 hover:bg-sand-50/60 transition-colors">
+                      <td className="px-4 py-3 text-center font-semibold text-ink-500">{rowNumber}</td>
+                      <td className="px-4 py-3">
+                        <div className="mx-auto min-w-0 max-w-[190px] text-center">
+                          <p className="truncate font-semibold text-ink-900">{user.firstName} {user.lastName}</p>
+                          <p className="truncate text-xs text-ink-400">{user.email}</p>
                         </div>
                       </td>
-                      {/* CONTACT = phone */}
-                      <td className="px-5 py-4 text-sm text-ink-600">{user.phone ?? 'No phone'}</td>
-                      {/* SPECIALIZATION = role */}
-                      <td className="px-5 py-4">
+                      <td className="px-4 py-3 text-center text-ink-600">{user.phone ?? '—'}</td>
+                      <td className="px-4 py-3 text-center">
                         <span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] ${roleCfg.cls}`}>
                           {roleCfg.label}
                         </span>
                       </td>
-                      {/* COURSE = bookings */}
-                      <td className="px-5 py-4 text-sm text-ink-600">
-                        {(user._count?.bookings ?? 0) > 0 ? `${user._count?.bookings} bookings` : 'Not assigned'}
+                      <td className="px-4 py-3 text-center text-ink-600">
+                        {(user._count?.bookings ?? 0) > 0 ? `${user._count?.bookings}` : '0'}
                       </td>
-                      {/* BATCH = N/A for now */}
-                      <td className="px-5 py-4 text-sm text-ink-400">No batch assigned</td>
-                      {/* JOINED DATE */}
-                      <td className="px-5 py-4">
-                        <span className="inline-flex rounded-full border border-ink-900/10 bg-sand-50 px-3 py-1 text-xs font-semibold text-ink-700">
-                          {formatDate(user.createdAt)}
-                        </span>
+                      <td className="px-4 py-3 whitespace-nowrap text-center text-xs text-ink-500">
+                        {formatDate(user.createdAt)}
                       </td>
-                      {/* STATUS = email verified toggle-like */}
-                      <td className="px-5 py-4">
-                        <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold ${user.isEmailVerified ? 'bg-forest-500/10 text-forest-700' : 'bg-coral-500/10 text-coral-600'}`}>
-                          <span className={`h-2 w-4 rounded-full relative inline-block ${user.isEmailVerified ? 'bg-forest-500' : 'bg-coral-400'}`}>
-                            <span className={`absolute top-0.5 h-1 w-1 rounded-full bg-white transition-all ${user.isEmailVerified ? 'right-0.5' : 'left-0.5'}`} />
-                          </span>
-                          {user.isEmailVerified ? 'Active' : 'Unverified'}
+                      <td className="px-4 py-3 text-center">
+                        <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] ${user.isEmailVerified ? 'bg-forest-500/10 text-forest-600' : 'bg-coral-500/10 text-coral-600'}`}>
+                          <span className={`h-1.5 w-1.5 rounded-full ${user.isEmailVerified ? 'bg-forest-500' : 'bg-coral-500'}`} />
+                          {user.isEmailVerified ? 'Verified' : 'Unverified'}
                         </span>
                       </td>
                     </tr>
@@ -181,15 +170,15 @@ export default function AdminUsers() {
         </div>
 
         {totalPages > 1 && (
-          <div className="flex flex-col gap-3 border-t border-ink-900/6 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 border-t border-ink-900/6 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-ink-500">Page {page} of {totalPages}</p>
-            <div className="flex gap-2">
-              <Button type="button" size="sm" variant="secondary" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>Previous</Button>
-              <Button type="button" size="sm" variant="secondary" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>Next</Button>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Button type="button" size="sm" variant="secondary" className="w-full sm:w-auto" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>Previous</Button>
+              <Button type="button" size="sm" variant="secondary" className="w-full sm:w-auto" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>Next</Button>
             </div>
           </div>
         )}
       </div>
-    </div>
+    </section>
   );
 }

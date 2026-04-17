@@ -800,7 +800,44 @@ a, button, input, select, textarea {
   min-height: 100vh;
 }
 
+.admin-shell a,
+.admin-shell button:not(:disabled),
+.admin-shell [role='button'],
+.admin-shell input[type='checkbox'],
+.admin-shell input[type='radio'],
+.admin-shell select {
+  cursor: pointer;
+}
+
+.admin-shell button:disabled {
+  cursor: not-allowed;
+}
+
+.admin-shell .button--primary {
+  background: #43a047;
+  background-image: none;
+  box-shadow: 0 14px 30px rgba(34, 120, 69, 0.22);
+}
+
+.admin-shell .button--primary:hover:not(:disabled) {
+  background: #43a047;
+  background-image: none;
+  transform: translateY(-2px);
+  box-shadow: 0 18px 36px rgba(34, 120, 69, 0.28);
+}
+
+.admin-shell .admin-action-button:hover:not(:disabled) {
+  background: #43a047;
+  transform: translateY(-2px);
+  box-shadow: 0 18px 36px rgba(34, 120, 69, 0.28);
+}
+
 /* Admin table */
+.admin-card {
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  background: #ffffff;
+}
+
 .admin-table-scroll {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -811,69 +848,92 @@ a, button, input, select, textarea {
   border-collapse: separate;
   border-spacing: 0;
   font-size: 0.875rem;
-  background: #ffffff;
+}
+
+.admin-table thead {
+  background: linear-gradient(135deg, #57b94f 0%, #43a047 100%);
 }
 
 .admin-table th {
-  border-bottom: 1px solid rgba(92, 184, 92, 0.12);
-  background: #ffffff;
-  padding: 1rem 1.5rem;
+  padding: 0.75rem 1rem;
   text-align: left;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.18em;
-  color: #0f172a;
+  letter-spacing: 0.14em;
   white-space: nowrap;
+  color: #f8fff6;
+}
+
+.admin-table--head-center th {
+  text-align: center;
 }
 
 .admin-table td {
-  border-bottom: 1px solid rgba(92, 184, 92, 0.08);
-  padding: 1.15rem 1.5rem;
-  color: #475569;
+  padding: 0.75rem 1rem;
   vertical-align: middle;
 }
 
-.admin-table tbody tr:last-child td {
-  border-bottom: 0;
-}
-
-.admin-table tbody tr {
-  transition: background-color 150ms ease;
-}
-
-.admin-table tbody tr:hover td {
-  background: rgba(92, 184, 92, 0.035);
-}
-
-.admin-table th:first-child,
-.admin-table td:first-child {
-  padding-left: 1.8rem;
-}
-
-.admin-table th:last-child,
-.admin-table td:last-child {
-  padding-right: 1.8rem;
-}
-
 .admin-table--compact th {
-  padding-top: 0.95rem;
-  padding-bottom: 0.95rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
 }
 
 .admin-table--compact td {
-  padding-top: 1rem;
-  padding-bottom: 1rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.admin-bookings-table {
+  table-layout: fixed;
+}
+
+.admin-bookings-table th,
+.admin-bookings-table td {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+.admin-bookings-table td {
+  font-size: 0.8125rem;
+}
+
+@media (max-width: 1280px) {
+  .admin-bookings-table th,
+  .admin-bookings-table td {
+    padding-left: 0.625rem;
+    padding-right: 0.625rem;
+  }
+
+  .admin-bookings-table td {
+    font-size: 0.78rem;
+  }
 }
 
 .admin-modal-overlay {
-  animation: admin-modal-overlay-in 220ms ease-out;
+  animation: admin-modal-overlay-in 180ms ease-out;
 }
 
 .admin-modal-panel {
   transform-origin: top center;
-  animation: admin-modal-panel-in 280ms cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform, opacity;
+  animation: admin-modal-panel-in 220ms ease-out;
+}
+
+@media (max-width: 640px) {
+  .admin-table th,
+  .admin-table td {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .admin-table th {
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+  }
+
+  .admin-modal-panel {
+    border-radius: 1.25rem;
+  }
 }
 
 /* Swiper overrides */

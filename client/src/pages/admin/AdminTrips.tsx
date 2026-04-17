@@ -24,6 +24,7 @@ import {
 } from '@alpha-trekkers/shared';
 import api from '@/lib/axios';
 import Button from '@/components/ui/Button';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -148,12 +149,12 @@ function Modal({ title, onClose, children, wide }: {
   }, [onClose]);
 
   return (
-    <div className="admin-modal-overlay fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-ink-950/40 px-4 py-8 backdrop-blur-sm">
+    <div className="admin-modal-overlay fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-ink-950/40 px-3 py-3 backdrop-blur-sm sm:px-4 sm:py-8">
       <div
         ref={ref}
-        className={`admin-modal-panel relative w-full rounded-[1.6rem] border border-white/80 bg-white shadow-[0_32px_80px_rgba(15,23,42,0.18)] ${wide ? 'max-w-4xl' : 'max-w-2xl'}`}
+        className={`admin-modal-panel relative flex max-h-[calc(100vh-1.5rem)] w-full flex-col rounded-[1.6rem] border border-white/80 bg-white shadow-[0_32px_80px_rgba(15,23,42,0.18)] sm:max-h-[calc(100vh-4rem)] ${wide ? 'max-w-4xl' : 'max-w-2xl'}`}
       >
-        <div className="flex items-center justify-between border-b border-ink-900/8 px-6 py-4">
+        <div className="flex items-center justify-between gap-3 border-b border-ink-900/8 px-4 py-4 sm:px-6">
           <h3 className="text-lg font-bold text-ink-900">{title}</h3>
           <button
             type="button"
@@ -163,7 +164,7 @@ function Modal({ title, onClose, children, wide }: {
             <X className="h-4 w-4" />
           </button>
         </div>
-        <div className="px-6 py-5">{children}</div>
+        <div className="overflow-y-auto px-4 py-4 sm:px-6 sm:py-5">{children}</div>
       </div>
     </div>
   );
@@ -208,10 +209,12 @@ function DifficultyBadge({ value }: { value: string }) {
 export default function AdminTrips() {
   const [tripList, setTripList] = useState<AdminTripSummary[]>([]);
   const [tripSearch, setTripSearch] = useState('');
-  const [featuredCount, setFeaturedCount] = useState(0);
   const [listLoading, setListLoading] = useState(true);
+  const [trekToDelete, setTrekToDelete] = useState<Pick<AdminTripSummary, 'id' | 'title'> | null>(null);
+  const [deletingTrek, setDeletingTrek] = useState(false);
 
   // Selected trip for detail modal
+  const [tripModalOpen, setTripModalOpen] = useState(false);
   const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
   const [selectedTrip, setSelectedTrip] = useState<AdminTripDetail | null>(null);
   const [tripForm, setTripForm] = useState<TripFormState>(emptyForm);
@@ -239,9 +242,7 @@ export default function AdminTrips() {
       const res = await api.get<PaginatedResponse<{ trips: AdminTripSummary[] }>>(
         '/admin/trips', { params: { search: tripSearch || undefined, limit: 50 } },
       );
-      const trips = res.data.data.trips;
-      setTripList(trips);
-      setFeaturedCount(trips.filter((t) => t.isFeatured).length);
+      setTripList(res.data.data.trips);
     } catch (error) {
       toast.error(getErrorMessage(error));
       setTripList([]);
@@ -272,9 +273,11 @@ export default function AdminTrips() {
         }]),
       ));
       setNewImage((cur) => ({ ...cur, sortOrder: String(trip.images.length) }));
+      return trip;
     } catch (error) {
       toast.error(getErrorMessage(error));
       setSelectedTrip(null);
+      return null;
     } finally {
       setDetailLoading(false);
     }
@@ -283,13 +286,54 @@ export default function AdminTrips() {
   useEffect(() => { void loadTrips(); }, [loadTrips]);
 
   const openTripModal = (tripId: string) => {
+    setTripModalOpen(true);
     setSelectedTripId(tripId);
     void loadTripDetail(tripId);
   };
 
-  const closeTripModal = () => {
+  const openScheduleManager = async (tripId: string) => {
+    setTripModalOpen(false);
+    setImageModalOpen(false);
+    setScheduleModalOpen(false);
+    setSelectedTripId(tripId);
+    const trip = await loadTripDetail(tripId);
+    if (trip) {
+      setScheduleModalOpen(true);
+    }
+  };
+
+  const openImageManager = async (tripId: string) => {
+    setTripModalOpen(false);
+    setScheduleModalOpen(false);
+    setImageModalOpen(false);
+    setSelectedTripId(tripId);
+    const trip = await loadTripDetail(tripId);
+    if (trip) {
+      setImageModalOpen(true);
+    }
+  };
+
+  const openCreateTrek = () => {
+    setTripModalOpen(true);
     setSelectedTripId(null);
     setSelectedTrip(null);
+    setTripForm(emptyForm);
+    setDetailLoading(false);
+    setScheduleModalOpen(false);
+    setImageModalOpen(false);
+  };
+
+  const closeTripModal = () => {
+    setTripModalOpen(false);
+    setScheduleModalOpen(false);
+    setImageModalOpen(false);
+    setSelectedTripId(null);
+    setSelectedTrip(null);
+    setTripForm(emptyForm);
+    setScheduleDrafts({});
+    setImageDrafts({});
+    setNewSchedule(emptySchedule);
+    setNewImage(emptyImage);
   };
 
   // ── Mutations ─────────────────────────────────────────────────────────
@@ -298,11 +342,22 @@ export default function AdminTrips() {
     setTripForm((cur) => ({ ...cur, [field]: value }));
   };
 
+  const buildDefaultItinerary = () => [
+    {
+      time: tripForm.meetingTime.trim() || '06:00',
+      title: `Start ${tripForm.title.trim() || 'the trek'}`,
+      description:
+        tripForm.description.trim() ||
+        `Meet at ${tripForm.meetingPoint.trim() || 'the meeting point'}, begin from ${
+          tripForm.startLocation.trim() || 'the base location'
+        }, and finish at ${tripForm.endLocation.trim() || 'the endpoint'}.`,
+    },
+  ];
+
   const saveTrip = async () => {
-    if (!selectedTripId) return;
     setSavingTrip(true);
     try {
-      await api.put(`/trips/${selectedTripId}`, {
+      const payload = {
         title: tripForm.title.trim(), shortDescription: tripForm.shortDescription.trim(),
         description: tripForm.description.trim(), difficulty: tripForm.difficulty,
         category: tripForm.category, region: tripForm.region.trim(),
@@ -317,10 +372,25 @@ export default function AdminTrips() {
         highlights: textToLines(tripForm.highlights), inclusions: textToLines(tripForm.inclusions),
         exclusions: textToLines(tripForm.exclusions), thingsToCarry: textToLines(tripForm.thingsToCarry),
         isActive: tripForm.isActive, isFeatured: tripForm.isFeatured,
-      });
-      toast.success('Trip updated');
-      await loadTrips();
-      await loadTripDetail(selectedTripId);
+      };
+
+      if (selectedTripId) {
+        await api.put(`/trips/${selectedTripId}`, payload);
+        toast.success('Trek updated');
+        await loadTrips();
+        await loadTripDetail(selectedTripId);
+      } else {
+        const res = await api.post<ApiResponse<{ trip: AdminTripDetail }>>('/trips', {
+          ...payload,
+          itinerary: buildDefaultItinerary(),
+        });
+        if (!tripForm.isActive) {
+          await api.put(`/trips/${res.data.data.trip.id}`, { isActive: false });
+        }
+        toast.success('Trek created');
+        closeTripModal();
+        await loadTrips();
+      }
     } catch (error) {
       toast.error(getErrorMessage(error));
     } finally {
@@ -420,145 +490,156 @@ export default function AdminTrips() {
     finally { setUploadingImages(false); }
   };
 
+  const deleteTrek = async () => {
+    if (!trekToDelete) return;
+    setDeletingTrek(true);
+    try {
+      await api.delete(`/trips/${trekToDelete.id}`);
+      toast.success('Trek deleted');
+      if (selectedTripId === trekToDelete.id) closeTripModal();
+      setTrekToDelete(null);
+      await loadTrips();
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    } finally {
+      setDeletingTrek(false);
+    }
+  };
+
   // ── Render ────────────────────────────────────────────────────────────
 
   return (
     <section className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.18em] text-forest-500">
-            Trip Directory
-          </span>
-          <h1 className="text-2xl font-extrabold tracking-tight text-ink-900">Trips directory</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight text-ink-900 sm:text-3xl">Trek Section</h1>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="relative">
+        <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center lg:w-auto">
+          <div className="relative w-full sm:w-auto">
             <MagnifyingGlass className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400" />
             <input
               type="text"
-              placeholder="Search trips..."
+              placeholder="Search treks..."
               value={tripSearch}
               onChange={(e) => setTripSearch(e.target.value)}
-              className="h-10 w-56 rounded-full border border-ink-900/12 bg-white pl-9 pr-4 text-sm text-ink-900 placeholder:text-ink-400 focus:border-forest-500 focus:outline-none focus:ring-2 focus:ring-forest-500/20 transition"
+              className="h-10 w-full rounded-full border border-ink-900/12 bg-white pl-9 pr-4 text-sm text-ink-900 placeholder:text-ink-400 transition focus:border-forest-500 focus:outline-none focus:ring-2 focus:ring-forest-500/20 sm:w-56"
             />
           </div>
-          <span className="inline-flex h-10 items-center rounded-full border border-forest-500/12 bg-forest-500/5 px-4 text-sm font-semibold text-forest-700">
-            <Star className="mr-1.5 h-3.5 w-3.5" weight="fill" /> {featuredCount} Featured
-          </span>
+          <button
+            type="button"
+            onClick={openCreateTrek}
+            className="admin-action-button inline-flex h-10 w-full items-center justify-center gap-2 rounded-full bg-forest-600 px-5 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md active:scale-[0.97] sm:w-auto"
+          >
+            <Plus className="h-4 w-4" weight="bold" /> Add Trek
+          </button>
         </div>
       </div>
 
       {/* Table */}
-      <div className="rounded-xl border border-forest-500/10 bg-white">
+      <div className="overflow-hidden rounded-xl border border-ink-900/12 bg-white">
         {listLoading ? (
           <div className="flex items-center justify-center py-20">
             <LoadingSpinner />
           </div>
         ) : tripList.length === 0 ? (
           <div className="py-20 text-center text-sm text-ink-400">
-            {tripSearch ? 'No trips match your search.' : 'No trips found.'}
+            {tripSearch ? 'No treks match your search.' : 'No treks found.'}
           </div>
         ) : (
           <div className="admin-table-scroll overflow-x-auto">
-            <table className="admin-table admin-table--compact w-full text-left text-sm">
-              <thead>
-                <tr className="border-b border-ink-900/8">
-                  <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Trip</th>
-                  <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Difficulty</th>
-                  <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Region</th>
-                  <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Price</th>
-                  <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Status</th>
-                  <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Updated</th>
-                  <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Actions</th>
+            <table className="admin-table admin-table--compact admin-table--head-center min-w-[940px] w-full text-left text-sm">
+              <thead className="bg-sand-50/95">
+                <tr className="border-b border-ink-900/14">
+                  <th className="px-4 py-3 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">No.</th>
+                  <th className="px-4 py-3 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Trek</th>
+                  <th className="px-4 py-3 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Difficulty</th>
+                  <th className="px-4 py-3 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Region</th>
+                  <th className="px-4 py-3 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Price</th>
+                  <th className="px-4 py-3 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Status</th>
+                  <th className="px-4 py-3 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Updated</th>
+                  <th className="px-4 py-3 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-ink-500">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {tripList.map((trip) => (
+                {tripList.map((trip, index) => (
                   <tr
                     key={trip.id}
                     className="border-b border-ink-900/6 last:border-b-0 hover:bg-sand-50/60 transition-colors"
                   >
-                    {/* TRIP column */}
+                    <td className="px-4 py-3 text-center font-semibold text-ink-500">
+                      {index + 1}
+                    </td>
+
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        {trip.images?.[0]?.url ? (
-                          <img
-                            src={trip.images[0].url}
-                            alt={trip.title}
-                            className="h-10 w-10 shrink-0 rounded-lg object-cover"
-                          />
-                        ) : (
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sand-100 text-ink-300 text-xs">
-                            <ImageSquare className="h-4 w-4" />
-                          </div>
-                        )}
-                        <div className="min-w-0">
-                          <p className="truncate font-semibold text-ink-900">{trip.title}</p>
-                          <p className="truncate text-xs text-ink-400 max-w-[220px]">{trip.shortDescription}</p>
-                        </div>
+                      <div className="mx-auto min-w-0 max-w-[220px] text-left">
+                        <p className="truncate font-semibold text-ink-900">{trip.title}</p>
+                        <p className="max-w-[220px] truncate text-xs text-ink-400">{trip.shortDescription}</p>
                       </div>
                     </td>
 
                     {/* DIFFICULTY */}
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-center">
                       <DifficultyBadge value={trip.difficulty} />
                     </td>
 
                     {/* REGION */}
-                    <td className="px-4 py-3 whitespace-nowrap text-ink-600">
+                    <td className="px-4 py-3 whitespace-nowrap text-center text-ink-600">
                       {trip.region}
                     </td>
 
                     {/* PRICE */}
-                    <td className="px-4 py-3 whitespace-nowrap">
+                    <td className="px-4 py-3 whitespace-nowrap text-center">
                       <span className="font-semibold text-forest-600">
-                        INR {(trip.discountPrice ?? trip.basePrice).toLocaleString('en-IN')}
+                        ₹{(trip.discountPrice ?? trip.basePrice).toLocaleString('en-IN')}
                       </span>
-                      {trip.discountPrice && (
-                        <span className="ml-1.5 text-xs text-ink-400 line-through">
-                          INR {trip.basePrice.toLocaleString('en-IN')}
-                        </span>
-                      )}
                     </td>
 
                     {/* STATUS */}
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-center">
                       <StatusBadge active={trip.isActive} featured={trip.isFeatured} />
                     </td>
 
                     {/* UPDATED */}
-                    <td className="px-4 py-3 whitespace-nowrap text-ink-500 text-xs">
+                    <td className="px-4 py-3 whitespace-nowrap text-center text-xs text-ink-500">
                       {formatDate(trip.updatedAt)}
                     </td>
 
                     {/* ACTIONS */}
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center justify-center gap-1">
                         <button
                           type="button"
                           onClick={() => openTripModal(trip.id)}
-                          className="flex h-8 w-8 items-center justify-center rounded-lg text-ink-400 hover:bg-forest-500/10 hover:text-forest-600 transition"
-                          title="Edit trip"
+                          className="flex h-9 w-9 items-center justify-center rounded-full text-forest-600 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-110 hover:text-forest-500"
+                          title="Edit trek"
                         >
-                          <PencilSimple className="h-4 w-4" />
+                          <PencilSimple className="h-4.5 w-4.5" weight="duotone" />
                         </button>
                         <button
                           type="button"
-                          onClick={() => { openTripModal(trip.id); setTimeout(() => setScheduleModalOpen(true), 400); }}
-                          className="flex h-8 w-8 items-center justify-center rounded-lg text-ink-400 hover:bg-sea-500/10 hover:text-sea-600 transition"
+                          onClick={() => void openScheduleManager(trip.id)}
+                          className="flex h-9 w-9 items-center justify-center rounded-full text-sea-600 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-110 hover:text-sea-500"
                           title="Manage schedules"
                         >
-                          <CalendarDots className="h-4 w-4" />
+                          <CalendarDots className="h-4.5 w-4.5" weight="duotone" />
                         </button>
                         <button
                           type="button"
-                          onClick={() => { openTripModal(trip.id); setTimeout(() => setImageModalOpen(true), 400); }}
-                          className="flex h-8 w-8 items-center justify-center rounded-lg text-ink-400 hover:bg-gold-500/10 hover:text-gold-600 transition"
+                          onClick={() => void openImageManager(trip.id)}
+                          className="flex h-9 w-9 items-center justify-center rounded-full text-gold-700 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-110 hover:text-gold-600"
                           title="Manage images"
                         >
-                          <ImageSquare className="h-4 w-4" />
+                          <ImageSquare className="h-4.5 w-4.5" weight="duotone" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setTrekToDelete({ id: trip.id, title: trip.title })}
+                          className="flex h-9 w-9 items-center justify-center rounded-full text-coral-600 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-110 hover:text-coral-500"
+                          title="Delete trek"
+                        >
+                          <Trash className="h-4.5 w-4.5" weight="duotone" />
                         </button>
                       </div>
                     </td>
@@ -571,14 +652,25 @@ export default function AdminTrips() {
       </div>
 
       {/* ── Edit Trip Modal ── */}
-      {selectedTripId && !scheduleModalOpen && !imageModalOpen && (
-        <Modal title={detailLoading ? 'Loading trip…' : `Edit — ${selectedTrip?.title ?? ''}`} onClose={closeTripModal} wide>
+      {tripModalOpen && !scheduleModalOpen && !imageModalOpen && (
+        <Modal
+          title={
+            detailLoading
+              ? 'Loading trek…'
+              : selectedTripId
+                ? `Edit trek — ${selectedTrip?.title ?? ''}`
+                : 'Create trek'
+          }
+          onClose={closeTripModal}
+          wide
+        >
           {detailLoading ? (
-            <LoadingSpinner text="Loading trip detail..." />
-          ) : selectedTrip ? (
+            <LoadingSpinner text="Loading trek details..." />
+          ) : (selectedTripId ? selectedTrip : true) ? (
             <div className="space-y-5">
               {/* Status strip */}
-              <div className="flex flex-wrap gap-2 rounded-xl border border-ink-900/6 bg-sand-50 p-3">
+              {selectedTrip ? (
+                <div className="flex flex-wrap gap-2 rounded-xl border border-ink-900/6 bg-sand-50 p-3">
                 <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-ink-700 shadow-sm">
                   {selectedTrip._count.bookings} bookings
                 </span>
@@ -591,7 +683,7 @@ export default function AdminTrips() {
                 <button
                   type="button"
                   onClick={() => setScheduleModalOpen(true)}
-                  className="ml-auto rounded-full bg-sea-500/10 px-3 py-1 text-xs font-semibold text-sea-600 hover:bg-sea-500/20 transition"
+                  className="rounded-full bg-sea-500/10 px-3 py-1 text-xs font-semibold text-sea-600 transition hover:bg-sea-500/20 sm:ml-auto"
                 >
                   Manage schedules →
                 </button>
@@ -602,7 +694,8 @@ export default function AdminTrips() {
                 >
                   Manage images →
                 </button>
-              </div>
+                </div>
+              ) : null}
 
               {/* Core fields */}
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -669,10 +762,10 @@ export default function AdminTrips() {
                 </label>
               </div>
 
-              <div className="flex justify-end gap-3 border-t border-ink-900/8 pt-4">
-                <Button type="button" variant="secondary" onClick={closeTripModal}>Cancel</Button>
-                <Button type="button" variant="primary" isLoading={savingTrip} leftIcon={<FloppyDisk className="h-4 w-4" />} onClick={() => void saveTrip()}>
-                  Save changes
+              <div className="flex flex-col-reverse gap-3 border-t border-ink-900/8 pt-4 sm:flex-row sm:justify-end">
+                <Button type="button" variant="secondary" className="w-full sm:w-auto" onClick={closeTripModal}>Cancel</Button>
+                <Button type="button" variant="primary" className="w-full sm:w-auto" isLoading={savingTrip} leftIcon={<FloppyDisk className="h-4 w-4" />} onClick={() => void saveTrip()}>
+                  {selectedTripId ? 'Save changes' : 'Create trek'}
                 </Button>
               </div>
             </div>
@@ -763,8 +856,8 @@ export default function AdminTrips() {
               })}
             </div>
 
-            <div className="flex justify-end border-t border-ink-900/8 pt-4">
-              <Button type="button" variant="secondary" onClick={() => setScheduleModalOpen(false)}>Close</Button>
+            <div className="flex flex-col-reverse gap-3 border-t border-ink-900/8 pt-4 sm:flex-row sm:justify-end">
+              <Button type="button" variant="secondary" className="w-full sm:w-auto" onClick={() => setScheduleModalOpen(false)}>Close</Button>
             </div>
           </div>
         </Modal>
@@ -790,7 +883,7 @@ export default function AdminTrips() {
                   <input type="number" min="0" value={newImage.sortOrder} onChange={(e) => setNewImage((c) => ({ ...c, sortOrder: e.target.value }))} className={inputCls} />
                 </Field>
               </div>
-              <div className="mt-3 flex flex-wrap items-center gap-4">
+              <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
                 <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-ink-700">
                   <input type="checkbox" checked={newImage.isPrimary} onChange={(e) => setNewImage((c) => ({ ...c, isPrimary: e.target.checked }))} className="h-4 w-4 accent-forest-500 rounded" />
                   Set as primary image
@@ -800,7 +893,7 @@ export default function AdminTrips() {
                   {uploadingImages ? 'Uploading…' : 'Upload files'}
                   <input type="file" multiple accept="image/*" className="hidden" onChange={(e) => { if (e.target.files?.length) void uploadTripImages(e.target.files); e.target.value = ''; }} />
                 </label>
-                <Button type="button" variant="accent" size="sm" className="ml-auto" isLoading={savingImage} leftIcon={<Plus className="h-3.5 w-3.5" />} onClick={() => void addImageByUrl()}>
+                <Button type="button" variant="accent" size="sm" className="w-full sm:ml-auto sm:w-auto" isLoading={savingImage} leftIcon={<Plus className="h-3.5 w-3.5" />} onClick={() => void addImageByUrl()}>
                   Add image
                 </Button>
               </div>
@@ -817,7 +910,7 @@ export default function AdminTrips() {
                 if (!draft) return null;
                 return (
                   <div key={image.id} className="rounded-xl border border-ink-900/8 bg-white p-4">
-                    <div className="flex gap-4">
+                    <div className="flex flex-col gap-4 sm:flex-row">
                       <div className="h-20 w-16 shrink-0 overflow-hidden rounded-xl bg-sand-100">
                         <img src={draft.url} alt={draft.altText || selectedTrip.title} className="h-full w-full object-cover" />
                       </div>
@@ -839,9 +932,9 @@ export default function AdminTrips() {
                             Primary image
                           </label>
                           {draft.isPrimary && <span className="rounded-full bg-gold-500/12 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-gold-600">Primary</span>}
-                          <div className="ml-auto flex gap-2">
-                            <Button type="button" size="sm" variant="secondary" leftIcon={<ImageSquare className="h-3.5 w-3.5" />} onClick={() => void saveExistingImage(image.id)}>Save</Button>
-                            <Button type="button" size="sm" variant="danger" leftIcon={<Trash className="h-3.5 w-3.5" />} onClick={() => void deleteImage(image.id)}>Delete</Button>
+                          <div className="ml-0 flex w-full gap-2 sm:ml-auto sm:w-auto">
+                            <Button type="button" size="sm" variant="secondary" className="flex-1 sm:flex-none" leftIcon={<ImageSquare className="h-3.5 w-3.5" />} onClick={() => void saveExistingImage(image.id)}>Save</Button>
+                            <Button type="button" size="sm" variant="danger" className="flex-1 sm:flex-none" leftIcon={<Trash className="h-3.5 w-3.5" />} onClick={() => void deleteImage(image.id)}>Delete</Button>
                           </div>
                         </div>
                       </div>
@@ -851,12 +944,35 @@ export default function AdminTrips() {
               })}
             </div>
 
-            <div className="flex justify-end border-t border-ink-900/8 pt-4">
-              <Button type="button" variant="secondary" onClick={() => setImageModalOpen(false)}>Close</Button>
+            <div className="flex flex-col-reverse gap-3 border-t border-ink-900/8 pt-4 sm:flex-row sm:justify-end">
+              <Button type="button" variant="secondary" className="w-full sm:w-auto" onClick={() => setImageModalOpen(false)}>Close</Button>
             </div>
           </div>
         </Modal>
       )}
+
+      <ConfirmDialog
+        open={Boolean(trekToDelete)}
+        title={trekToDelete ? `Delete ${trekToDelete.title}?` : 'Delete trek?'}
+        description={
+          trekToDelete ? (
+            <>
+              <span className="font-semibold text-ink-900">{trekToDelete.title}</span> will be removed from the trek
+              directory if deletion is allowed. Schedules and images tied to it will be removed as well. This action
+              cannot be undone.
+            </>
+          ) : null
+        }
+        confirmLabel="Delete trek"
+        cancelLabel="Keep trek"
+        confirmLoading={deletingTrek}
+        icon={<Trash className="h-7 w-7" weight="bold" />}
+        onClose={() => {
+          if (deletingTrek) return;
+          setTrekToDelete(null);
+        }}
+        onConfirm={() => void deleteTrek()}
+      />
     </section>
   );
 }

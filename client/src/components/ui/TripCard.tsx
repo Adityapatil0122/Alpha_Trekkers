@@ -95,11 +95,11 @@ export default function TripCard({
             <div className="flex items-end gap-2">
               <p className="text-[1.05rem] text-slate-500">From</p>
               <p className={`font-semibold leading-none text-lime-600 ${isCompact ? 'text-[1.45rem] sm:text-[1.65rem]' : 'text-[1.6rem] sm:text-[1.9rem]'}`}>
-                INR {price.toLocaleString('en-IN')}
+                ₹{price.toLocaleString('en-IN')}
               </p>
               {trip.discountPrice ? (
                 <p className="pb-0.5 text-base text-slate-400 line-through">
-                  INR {trip.basePrice.toLocaleString('en-IN')}
+                  ₹{trip.basePrice.toLocaleString('en-IN')}
                 </p>
               ) : null}
             </div>

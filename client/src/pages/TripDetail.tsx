@@ -120,6 +120,7 @@ export default function TripDetail() {
             sortOrder: 0,
           },
         ];
+  const heroImageUrl = images[0]?.url || MAHARASHTRA_MONSOON_IMAGES.heroes.tripDetail;
 
   if (loading) return <LoadingSpinner fullPage text="Loading journey..." />;
   if (!trip) return null;
@@ -161,7 +162,7 @@ export default function TripDetail() {
       <section className="travel-dark relative overflow-hidden pt-28">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${images[0]?.url || MAHARASHTRA_MONSOON_IMAGES.heroes.tripDetail})` }}
+          style={{ backgroundImage: `url("${heroImageUrl}")` }}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-dark-900/74 via-dark-900/48 to-dark-900/20" />
         <div className="relative mx-auto max-w-7xl px-4 pb-20 pt-[4.5rem] sm:px-6 lg:px-8">

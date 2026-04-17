@@ -17,6 +17,7 @@ import {
   type OneDayTrip,
   type OneDayTripType,
 } from '@/content/oneDayTrips';
+import { getTourDisplayImage } from '@/content/tourImageOverrides';
 
 function buildBookingHref(slug: string) {
   return `/tour-booking/${slug}`;
@@ -52,6 +53,8 @@ function normalizeHighlights(highlights: string[]): [string, string, string, str
 }
 
 function buildDisplayTrip(tour: Tour): OneDayTrip {
+  const displayImage = getTourDisplayImage(tour);
+
   return {
     slug: tour.slug,
     title: tour.title,
@@ -66,7 +69,7 @@ function buildDisplayTrip(tour: Tour): OneDayTrip {
     highlights: normalizeHighlights(tour.highlights),
     bestSeason: tour.bestSeason,
     tip: tour.tip,
-    imageUrl: tour.imageUrl,
+    imageUrl: displayImage.src,
   };
 }
 

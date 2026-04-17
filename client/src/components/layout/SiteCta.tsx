@@ -34,11 +34,20 @@ export default function SiteCta() {
 
             <div className="relative mx-auto w-full max-w-[26rem] lg:mx-0">
               <div className="absolute inset-x-8 top-1/2 h-40 -translate-y-1/2 rounded-full bg-white/12 blur-3xl" />
-              <img
-                src={siteCtaImage}
-                alt="Explorer standing beside an ancient fort"
-                className="relative z-10 w-full object-contain drop-shadow-[0_22px_44px_rgba(0,0,0,0.28)]"
-              />
+              <div className="relative z-10">
+                <div className="overflow-hidden [clip-path:inset(0_0_14%_0)]">
+                  <img
+                    src={siteCtaImage}
+                    alt="Explorer standing beside an ancient fort"
+                    className="w-full object-contain"
+                  />
+                </div>
+                <div className="pointer-events-none absolute bottom-[17%] left-[51%] -translate-x-1/2 translate-y-1/2">
+                  <span className="playful-text text-[1.4rem] leading-none text-primary-500 sm:text-[1.65rem]">
+                    Enjoy Travel
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

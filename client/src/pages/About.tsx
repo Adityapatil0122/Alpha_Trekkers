@@ -32,36 +32,28 @@ const values = [
   },
 ];
 
+const clearTornaImage = 'https://commons.wikimedia.org/wiki/Special:FilePath/Torna%20fort1.jpg';
+
 const destinations = [
   {
     title: 'Rajgad',
-    trips: '6 Routes',
     image: MAHARASHTRA_MONSOON_IMAGES.sections.aboutRajgad,
-    badgeColor: '#f5b229',
   },
   {
     title: 'Harishchandragad',
-    trips: '4 Routes',
     image: MAHARASHTRA_MONSOON_IMAGES.sections.aboutHarishchandragad,
-    badgeColor: '#27e6cc',
   },
   {
     title: 'Torna',
-    trips: '5 Routes',
-    image: MAHARASHTRA_MONSOON_IMAGES.sections.aboutTorna,
-    badgeColor: '#ff6a2a',
+    image: clearTornaImage,
   },
   {
     title: 'Kalsubai',
-    trips: '3 Routes',
     image: MAHARASHTRA_MONSOON_IMAGES.sections.aboutKalsubai,
-    badgeColor: '#1ec7e8',
   },
   {
     title: 'Rajmachi',
-    trips: 'Night Treks',
     image: MAHARASHTRA_MONSOON_IMAGES.sections.aboutRajmachi,
-    badgeColor: '#e92fff',
   },
 ];
 
@@ -228,7 +220,7 @@ export default function About() {
             <div>
               <p className="playful-text text-3xl text-primary-500 sm:text-[2.7rem]">Explore Maharashtra</p>
               <h2 className="mt-3 text-3xl font-bold text-dark-900 sm:text-5xl lg:text-[4rem] lg:leading-none">
-                Popular <span className="playful-text text-primary-300">Destinations</span>
+                Popular <span className="playful-text text-primary-500">Destinations</span>
               </h2>
             </div>
             <Link
@@ -263,12 +255,6 @@ export default function About() {
                       alt={destination.title}
                       className="h-full w-full rounded-full object-cover shadow-[0_24px_48px_rgba(15,23,42,0.12)] transition duration-700 ease-out group-hover:scale-[1.06]"
                     />
-                    <div
-                      className="about-destination-chip absolute bottom-0 left-1/2 -translate-x-1/2 text-[0.95rem] font-semibold text-dark-900"
-                      style={{ backgroundColor: destination.badgeColor }}
-                    >
-                      {destination.trips}
-                    </div>
                   </div>
                   <p className="mt-6 text-[1.1rem] font-semibold text-dark-900 sm:mt-8 sm:text-[1.3rem]">
                     {destination.title}
