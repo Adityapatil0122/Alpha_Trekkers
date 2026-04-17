@@ -8,6 +8,7 @@ interface ConfirmDialogProps {
   description: React.ReactNode;
   confirmLabel?: string;
   cancelLabel?: string;
+  confirmLoading?: boolean;
   icon?: React.ReactNode;
   onConfirm: () => void;
   onClose: () => void;
@@ -19,6 +20,7 @@ export default function ConfirmDialog({
   description,
   confirmLabel = 'Confirm',
   cancelLabel = 'Cancel',
+  confirmLoading = false,
   icon,
   onConfirm,
   onClose,
@@ -67,7 +69,7 @@ export default function ConfirmDialog({
           <Button variant="secondary" onClick={onClose}>
             {cancelLabel}
           </Button>
-          <Button variant="danger" onClick={onConfirm}>
+          <Button variant="danger" onClick={onConfirm} isLoading={confirmLoading}>
             {confirmLabel}
           </Button>
         </div>

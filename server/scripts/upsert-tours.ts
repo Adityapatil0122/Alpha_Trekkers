@@ -83,7 +83,7 @@ const toursData = [
     highlights: ['Bhimashankar Temple', 'Gupt Bhimashankar Trek', 'Shidi Ghat', 'Wildlife Sanctuary'],
     bestSeason: 'Oct-Feb',
     tip: 'Reach before 7 AM for darshan without long queues.',
-    imageUrl: commonsFile('Bhimashankr.jpg'),
+    imageUrl: commonsFile('Temple front view3.jpg'),
     isActive: true,
   },
   {

@@ -46,7 +46,7 @@ export const MAHARASHTRA_MONSOON_IMAGES = {
       commonsFile('Torna fort Natural view at Rainy season.jpg'),
     ],
     harishchandragad: [
-      commonsFile('Trail from Pachnai to Harishchandragad (32606500883).jpg'),
+      commonsFile('Khireshwar route view (51373052411).jpg'),
       commonsFile('Trail towards Kokankada (32577897544).jpg'),
       commonsFile('Shivling at Harishchandragad.jpg'),
       commonsFile('Surroundings of Harishchandragad.jpg'),

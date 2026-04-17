@@ -41,7 +41,7 @@ export default function AdminLogin() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      const response = await api.post<ApiResponse<AuthResponse & { refreshToken: string }>>(
+      const response = await api.post<ApiResponse<AuthResponse>>(
         '/auth/login',
         data,
       );

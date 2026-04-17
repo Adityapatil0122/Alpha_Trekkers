@@ -88,7 +88,7 @@ export default function Register() {
         phone: data.phone?.trim() || undefined,
         password: data.password,
       };
-      const response = await api.post<ApiResponse<AuthResponse & { refreshToken: string }>>('/auth/register', payload);
+      const response = await api.post<ApiResponse<AuthResponse>>('/auth/register', payload);
       login(response.data.data);
       toast.success('Account created successfully');
       navigate('/', { replace: true });

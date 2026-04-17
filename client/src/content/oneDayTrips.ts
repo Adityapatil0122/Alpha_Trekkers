@@ -128,7 +128,7 @@ export const oneDayTrips: OneDayTrip[] = [
     ],
     bestSeason: 'Oct-Feb (clear paths)',
     tip: 'Reach before 7 AM for darshan without long queues and combine it with the Gupt Bhimashankar trail.',
-    imageUrl: commonsFile('Bhimashankr.jpg'),
+    imageUrl: commonsFile('Temple front view3.jpg'),
   },
   {
     slug: 'tamhini-ghat',

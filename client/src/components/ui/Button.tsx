@@ -47,24 +47,28 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       ...props
     },
     ref,
-  ) => (
-    <button
-      ref={ref}
-      disabled={disabled || isLoading}
-      className={`inline-flex items-center justify-center font-medium transition duration-200 disabled:cursor-not-allowed disabled:opacity-55 ${variantClasses[variant]} ${sizeClasses[size]} ${fullWidth ? 'w-full' : ''} ${className}`.trim()}
-      {...props}
-    >
-      {isLoading ? (
-        <SpinnerGap className="h-5 w-5 animate-spin" />
-      ) : (
-        <>
-          {leftIcon ? <span className="shrink-0">{leftIcon}</span> : null}
-          {children}
-          {rightIcon ? <span className="shrink-0">{rightIcon}</span> : null}
-        </>
-      )}
-    </button>
-  ),
+  ) => {
+    const variantMarkerClass = `button--${variant}`;
+
+    return (
+      <button
+        ref={ref}
+        disabled={disabled || isLoading}
+        className={`inline-flex items-center justify-center font-medium transition duration-200 disabled:cursor-not-allowed disabled:opacity-55 ${variantMarkerClass} ${variantClasses[variant]} ${sizeClasses[size]} ${fullWidth ? 'w-full' : ''} ${className}`.trim()}
+        {...props}
+      >
+        {isLoading ? (
+          <SpinnerGap className="h-5 w-5 animate-spin" />
+        ) : (
+          <>
+            {leftIcon ? <span className="shrink-0">{leftIcon}</span> : null}
+            {children}
+            {rightIcon ? <span className="shrink-0">{rightIcon}</span> : null}
+          </>
+        )}
+      </button>
+    );
+  },
 );
 
 Button.displayName = 'Button';

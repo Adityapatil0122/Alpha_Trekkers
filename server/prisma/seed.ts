@@ -356,7 +356,7 @@ Multiple approach routes exist, with the Pachnai route being the most popular an
         { time: '02:00 PM', title: 'Arrive at Pune', description: 'Reach Shivajinagar. Trek concludes.' },
       ],
       images: [
-        { url: MAHARASHTRA_MONSOON_IMAGES.trips.harishchandragad[0], altText: 'Pachnai trail to Harishchandragad in monsoon', isPrimary: true, sortOrder: 0 },
+        { url: MAHARASHTRA_MONSOON_IMAGES.trips.harishchandragad[0], altText: 'Khireshwar route to Harishchandragad in monsoon', isPrimary: true, sortOrder: 0 },
         { url: MAHARASHTRA_MONSOON_IMAGES.trips.harishchandragad[1], altText: 'Trail towards Kokankada in the rains', isPrimary: false, sortOrder: 1 },
         { url: MAHARASHTRA_MONSOON_IMAGES.trips.harishchandragad[2], altText: 'Harishchandragad cave temple during monsoon season', isPrimary: false, sortOrder: 2 },
         { url: MAHARASHTRA_MONSOON_IMAGES.trips.harishchandragad[3], altText: 'Surroundings of Harishchandragad under cloudy skies', isPrimary: false, sortOrder: 3 },
@@ -705,7 +705,7 @@ This location fits perfectly into the weekday category because it delivers a ful
         { time: '05:30 PM', title: 'Arrive Back', description: 'Trip ends with a same-day return ideal for weekday schedules.' },
       ],
       images: [
-        { url: MAHARASHTRA_MONSOON_IMAGES.trips.devkund[0], altText: 'Devkund waterfall in monsoon', isPrimary: true, sortOrder: 0 },
+        { url: '/destinations/Devkund Waterfall in lush surroundings.png', altText: 'Devkund waterfall plunge pool', isPrimary: true, sortOrder: 0 },
         { url: MAHARASHTRA_MONSOON_IMAGES.trips.devkund[1], altText: 'Devkund waterfall plunge pool', isPrimary: false, sortOrder: 1 },
         { url: MAHARASHTRA_MONSOON_IMAGES.trips.devkund[2], altText: 'View of Devkund valley', isPrimary: false, sortOrder: 2 },
         { url: MAHARASHTRA_MONSOON_IMAGES.trips.devkund[3], altText: 'Devkund waterfall trail', isPrimary: false, sortOrder: 3 },
@@ -1065,7 +1065,7 @@ The Rajmachi fort complex is well-preserved with intact bastions, doorways, and 
       highlights: ['Bhimashankar Temple', 'Gupt Bhimashankar Trek', 'Shidi Ghat', 'Wildlife Sanctuary'],
       bestSeason: 'Oct-Feb',
       tip: 'Reach before 7 AM for darshan without long queues.',
-      imageUrl: commonsFile('Bhimashankr.jpg'),
+      imageUrl: commonsFile('Temple front view3.jpg'),
       isActive: true,
     },
     {

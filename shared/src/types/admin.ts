@@ -3,6 +3,7 @@ import type { Difficulty, ItineraryStep, TripCategory, TripImage, TripSchedule }
 export interface DashboardStats {
   totalUsers: number;
   totalTrips: number;
+  totalTours: number;
   totalBookings: number;
   totalRevenue: number;
   unreadMessages: number;

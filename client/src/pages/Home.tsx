@@ -67,7 +67,6 @@ const counterStats = [
 const destinationCards = [
   {
     name: 'Rajgad',
-    tours: '6 tours',
     image: '/destinations/Rajgad Fort atop misty mountains.png',
     cardClass: 'lg:mt-8',
     imageWrapClass: 'h-[16rem] sm:h-[18rem] lg:h-[15rem] xl:h-[16rem]',
@@ -75,7 +74,6 @@ const destinationCards = [
   },
   {
     name: 'Harishchandragad',
-    tours: '4 tours',
     image: '/destinations/harishchandragad.png',
     cardClass: 'lg:mt-14',
     imageWrapClass: 'h-[18rem] sm:h-[20rem] lg:h-[18rem] xl:h-[19rem]',
@@ -83,7 +81,6 @@ const destinationCards = [
   },
   {
     name: 'Torna Fort',
-    tours: '5 tours',
     image: '/destinations/torna.png',
     cardClass: 'lg:mt-8',
     imageWrapClass: 'h-[16rem] sm:h-[18rem] lg:h-[15rem] xl:h-[16rem]',
@@ -91,7 +88,6 @@ const destinationCards = [
   },
   {
     name: 'Kalsubai',
-    tours: '3 tours',
     image: '/destinations/kalsubai.png',
     cardClass: 'lg:mt-14',
     imageWrapClass: 'h-[18rem] sm:h-[20rem] lg:h-[18rem] xl:h-[19rem]',
@@ -99,7 +95,6 @@ const destinationCards = [
   },
   {
     name: 'Lohagad',
-    tours: '4 tours',
     image: '/destinations/lohagad.png',
     cardClass: 'lg:mt-8',
     imageWrapClass: 'h-[16rem] sm:h-[18rem] lg:h-[15rem] xl:h-[16rem]',
@@ -107,7 +102,6 @@ const destinationCards = [
   },
   {
     name: 'Rajmachi',
-    tours: '3 tours',
     image: '/destinations/Rajmachi Fort from above.png',
     cardClass: 'lg:mt-14',
     imageWrapClass: 'h-[18rem] sm:h-[20rem] lg:h-[18rem] xl:h-[19rem]',
@@ -171,7 +165,7 @@ const blogPosts = [
 
 const FEATURED_PAGE_SIZE = 4;
 const HERO_AUTOPLAY_DELAY = 6500;
-const siteLogo = '/destinations/alogo.jpg';
+const siteLogo = '/destinations/alogo.png';
 
 const heroImageVariants = {
   enter: (direction: number) => ({
@@ -283,13 +277,15 @@ const featuredPageVariants = {
 const featuredCardVariants = {
   enter: {
     opacity: 0,
-    y: 20,
+    y: 36,
+    scale: 0.97,
   },
   center: {
     opacity: 1,
     y: 0,
+    scale: 1,
     transition: {
-      duration: 0.44,
+      duration: 0.55,
       ease: [0.22, 1, 0.36, 1],
     },
   },
@@ -578,8 +574,8 @@ export default function Home() {
             style={{ transformOrigin: 'top center' }}
             className="relative"
           >
-            <div className="booking-hang-sign w-[8.75rem] px-5 py-4 text-center">
-              <p className="playful-text text-[1.75rem] leading-none text-white [text-shadow:0_3px_10px_rgba(0,0,0,0.32)]">
+            <div className="booking-hang-sign w-[7.75rem] px-4 py-3 text-center">
+              <p className="playful-text text-[1.5rem] leading-none text-white [text-shadow:0_3px_10px_rgba(0,0,0,0.32)]">
                 Booking
               </p>
             </div>
@@ -633,12 +629,15 @@ export default function Home() {
                     <motion.div
                       key={trip.id}
                       variants={featuredCardVariants}
+                      transition={{
+                        duration: 0.55,
+                        delay: tripIndex * 0.08,
+                        ease: [0.22, 1, 0.36, 1],
+                      }}
                     >
                       <TripCard
                         trip={trip}
                         variant="featuredCompact"
-                        revealOnScroll
-                        revealIndex={tripIndex}
                       />
                     </motion.div>
                   ))}
@@ -847,9 +846,6 @@ export default function Home() {
                 <div className="mt-5">
                   <p className="text-[1.15rem] font-bold leading-tight text-dark-900 sm:text-[1.35rem]">
                     {dest.name}
-                  </p>
-                  <p className="mt-2 text-xl font-medium text-primary-500 sm:text-2xl">
-                    ({dest.tours.replace(' tours', ' Tour').replace(' tour', ' Tour')})
                   </p>
                 </div>
               </Link>

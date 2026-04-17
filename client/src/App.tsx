@@ -21,7 +21,6 @@ const AdminLayout = lazy(() => import('@/pages/admin/AdminLayout'));
 const Dashboard = lazy(() => import('@/pages/admin/Dashboard'));
 const AdminTrips = lazy(() => import('@/pages/admin/AdminTrips'));
 const AdminBookings = lazy(() => import('@/pages/admin/AdminBookings'));
-const AdminMessages = lazy(() => import('@/pages/admin/AdminMessages'));
 const AdminUsers = lazy(() => import('@/pages/admin/AdminUsers'));
 const AdminTours = lazy(() => import('@/pages/admin/AdminTours'));
 
@@ -60,7 +59,7 @@ function App() {
             <Route path="trips" element={<AdminTrips />} />
             <Route path="tours" element={<AdminTours />} />
             <Route path="bookings" element={<AdminBookings />} />
-            <Route path="messages" element={<AdminMessages />} />
+            <Route path="messages" element={<Navigate to="/admin" replace />} />
             <Route path="users" element={<AdminUsers />} />
           </Route>
         </Route>
